@@ -125,7 +125,15 @@ main{max-width:1240px;margin:0 auto;padding-block:22px 30px;padding-left:max(16p
 .fs-bot{display:flex;flex-direction:column;gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--panel)}
 .fs-sum{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:6px;align-items:stretch}
 .fs-sum .slot{padding:4px}
-.fs-sum .slot b{font-size:1.1rem}
+.fs-sum .slot b{font-size:1.25rem}
+.fs-roster{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}.fs-side.r .fs-roster{justify-content:flex-end}
+.fs-p{font-size:.78rem;padding:1px 7px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted);white-space:nowrap}
+.fs-p.now{background:var(--amber);border-color:var(--amber);color:var(--amber-ink);font-weight:700}
+.fs-co{font-size:.74rem;color:var(--green);font-family:var(--f-mono)}
+.fs-routes{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:2px}
+.fs-routes span{font-family:var(--f-mono);font-size:.78rem;padding:1px 8px;border-radius:6px;border:1px solid var(--green);color:var(--green);background:var(--bg)}
+.fs-routes span.best{background:var(--green);color:#fff;font-weight:700}
+.fs-mid{max-width:46vw}
 .fs-total{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6px;min-width:84px}
 .fs-total b{font-family:var(--f-mono);font-size:1.5rem;line-height:1}
 .fs-btns{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 2fr;gap:6px}
@@ -200,7 +208,9 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--panel2)}
 .slot{background:var(--bg);border:1px dashed var(--line);border-radius:8px;text-align:center;padding:8px 4px}
 .slot b{display:block;font-family:var(--f-mono);font-size:1.3rem}
 .slot small{color:var(--muted);font-size:.7rem}
-.slot.f{border-style:solid;border-color:var(--muted)}
+.slot.f{border:2px solid var(--amber);background:color-mix(in srgb,var(--amber) 26%,var(--panel));box-shadow:0 1px 0 color-mix(in srgb,var(--amber) 40%,transparent)}
+.slot.f b{color:var(--chalk);font-weight:800}.slot.f small{color:var(--chalk);opacity:.8}
+.slot.nx{border:2px dashed var(--amber)}
 .preview{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .preview .tot{font-family:var(--f-mono);font-size:1.5rem;font-weight:700}
 .bust{color:#fff;background:var(--red);padding:2px 10px;border-radius:6px;font-family:var(--f-display);letter-spacing:.08em}
@@ -295,7 +305,7 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
 'use strict';
 /* ====================== storage & helpers ====================== */
 const KEY='oche-dart-league-v1';
-const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
+const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10,sdT:50},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
 const PREF_KEY='oche-dart-prefs-v1';
 let S;
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -447,6 +457,16 @@ const BYVAL={};[...Array.from({length:20},(_,i)=>D(20-i,1)),...Array.from({lengt
 const FIN_PREF=[20,16,18,12,10,8,19,17,14,15,13,11,9,6,4,7,5,3,2,1];
 function finishers(out){let f=FIN_PREF.map(s=>D(s,2)).concat([D(25,2)]);if(out==='master')f=f.concat(FIN_PREF.map(s=>D(s,3)));if(out==='single')f=f.concat(Object.values(BYVAL));return f}
 function okLeft(r,out){return out==='single'?r>0:r>1}
+function checkoutOptions(rem,out,left=3,n=3){if(rem<=0||rem>180)return[];const F=finishers(out),seen=new Set(),res=[];
+  const add=r=>{const k=r.slice(0,-1).map(dLabel).sort().join(' ')+'>'+dLabel(r[r.length-1]);if(!seen.has(k)){seen.add(k);res.push(r)}};
+  F.filter(d=>d.v===rem).forEach(d=>add([d]));
+  if(left>=2)for(const f of F){const v=rem-f.v;if(v<=0)continue;[BYVAL[v],v%3===0&&v/3<=20?D(v/3,3):null].forEach(a=>{if(a&&a.v===v&&okLeft(rem-a.v,out))add([a,f])})}
+  if(left>=3&&res.filter(r=>r.length<3).length<n){const SET=[D(20,3),D(19,3),D(18,3),D(17,3),D(16,3),D(15,3),D(25,2),D(25,1),D(20,1),D(19,1)];
+    for(const f of F){for(const b of SET){const v3=rem-f.v-b.v;if(v3<=0)continue;const a=BYVAL[v3]||(v3%3===0&&v3/3<=20?D(v3/3,3):null);if(a&&okLeft(rem-b.v,out)&&okLeft(rem-b.v-a.v,out))add([b,a,f])}}}
+  const dp={20:0,16:0,8:.4,18:.5,12:.6,10:.6,4:.8,6:1,14:1,19:1.1,17:1.1,15:1.2,13:1.3,11:1.3,9:1.4,7:1.4,5:1.5,3:1.6,2:1.6,1:1.8};
+  const pen=r=>r.reduce((p,d,k)=>{const last=k===r.length-1;if(last)return p+(d.s===25?1.2:d.m===2?(dp[d.s]??1.5):1.5);
+    if(d.s===25)return p+(d.m===2?1.6:1.1);if(d.m===3)return p+([20,19,18,17].includes(d.s)?0:[16,15,14].includes(d.s)?.6:1.2);if(d.m===2)return p+1.4;return p+([20,19,18].includes(d.s)?.3:.7)},0);
+  return res.sort((x,y)=>x.length-y.length||pen(x)-pen(y)).slice(0,n)}
 function checkout(rem,out,left=3){
   if(rem<=0||rem>180)return null;
   const F=finishers(out);
@@ -462,6 +482,8 @@ function evalDarts(darts,before,out){
   return{bust:false,fin:false,total:before-r,used}}
 const need=room=>Math.floor(room.bestOf/2)+1;
 
+/* sudden-death threshold: rounds count only when both sides have this much or less left */
+const SDT=room=>room.sdT??(S&&S.settings&&S.settings.sdT)??50;
 /* replay a room's events -> current state */
 function replay(room){
   const Sc=room.score,st0=room.starter??0;
@@ -472,13 +494,13 @@ function replay(room){
   room.events.forEach((e,i)=>{if(st.finished)return;
     if(e.t==='starter'){if(st.throws[0]+st.throws[1]===0){st.legStarter=e.side;st.toThrow=e.side}}
     else if(e.t==='order'){st.order[e.side]=e.ids.slice();st.orderIdx[e.side]=0}
-    else if(e.t==='turn'){e.leg=st.leg;if((e.before??st.rem[e.side])<=50)st.fin50++;if(!e.bust)st.rem[e.side]-=e.total;st.throws[e.side]++;st.orderIdx[e.side]++;
+    else if(e.t==='turn'){e.leg=st.leg;if((e.before??st.rem[e.side])<=SDT(room)&&st.rem[1-e.side]<=SDT(room))st.fin50++;if(!e.bust)st.rem[e.side]-=e.total;st.throws[e.side]++;st.orderIdx[e.side]++;
       if(st.rem[e.side]===0)legWin(e.side,'checkout',i);else st.toThrow=1-e.side}
     else if(e.t==='adjust'){e.leg=st.leg;st.rem=[e.rem[0]??st.rem[0],e.rem[1]??st.rem[1]]}
     else if(e.t==='bull'){e.leg=st.leg;legWin(e.side,'bull',i)}
   });
   const L=room.roundLimit||0;
-  st.finRounds=Math.floor(st.fin50/2);st.finStage=!st.finished&&(st.rem[0]<=50||st.rem[1]<=50);
+  st.finRounds=Math.floor(st.fin50/2);st.finStage=!st.finished&&st.rem[0]<=SDT(room)&&st.rem[1]<=SDT(room);
   st.needBull=!st.finished&&L>0&&st.finRounds>=L;
   st.round=Math.min(st.throws[0],st.throws[1])+1;
   st.thrower=side=>{const o=st.order[side];return o.length?o[st.orderIdx[side]%o.length]:null};
@@ -666,7 +688,7 @@ VIEWS.teams=()=>{const ts=computeStats().teams;return `<div class="head"><div><h
 
 /* ====================== rooms ====================== */
 const genCode=()=>'DART-'+Math.random().toString(16).slice(2,6).toUpperCase();
-function newRoom(o){const s=S.settings;return Object.assign({id:uid(),code:genCode(),name:'',type:'single',teamSize:2,score:s.score,out:s.out,bestOf:s.bestOf,roundLimit:s.roundLimit,sides:[{teamId:null,playerIds:[]},{teamId:null,playerIds:[]}],events:[],starter:0,created:Date.now(),finishedAt:null,introDone:false},o)}
+function newRoom(o){const s=S.settings;return Object.assign({id:uid(),code:genCode(),name:'',type:'single',teamSize:2,score:s.score,out:s.out,bestOf:s.bestOf,roundLimit:s.roundLimit,sdT:s.sdT??50,sides:[{teamId:null,playerIds:[]},{teamId:null,playerIds:[]}],events:[],starter:0,created:Date.now(),finishedAt:null,introDone:false},o)}
 function playerOpts(sel){return `<option value="">— เว้นว่าง (รอผู้เล่นเข้าร่วม) —</option>`+S.players.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)} · ${esc(T(p.teamId)?.name||'ไม่มีทีม')}</option>`).join('')}
 function teamOpts(sel){return `<option value="">— เว้นว่าง (รอทีมเข้าร่วม) —</option>`+S.teams.map(t=>`<option value="${t.id}" ${sel===t.id?'selected':''}>${esc(t.name)} (${teamMembers(t.id).length} คน)</option>`).join('')}
 function createRoomModal(){const s=S.settings;
@@ -677,7 +699,7 @@ function createRoomModal(){const s=S.settings;
   <label>คะแนนเริ่มต้น<select id="rf-score">${[701,601,501,401,301,201].map(n=>`<option ${n===s.score?'selected':''}>${n}</option>`).join('')}</select></label>
   <label>กติกาปิดเกม<select id="rf-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
   <label>จำนวนขา (Best of)<select id="rf-best">${[1,3,5,7,9].map(n=>`<option value="${n}" ${n===s.bestOf?'selected':''}>Best of ${n} (ชนะ ${Math.floor(n/2)+1})</option>`).join('')}</select></label>
-  <label>Sudden Death ถ้าช่วงปิดเกม (เหลือ ≤50) ครบ<select id="rf-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label>
+  <label>Sudden Death เมื่อทั้งสองฝ่ายเหลือ ≤${S.settings.sdT??50} แล้วปาครบ<select id="rf-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label>
   <div class="full" id="rf-sides"></div></div>`,
   [{label:'ยกเลิก'},{label:'สร้างห้อง',cls:'pri',fn:()=>{
     const type=$('#rf-type').value,size=+$('#rf-size').value;
@@ -835,7 +857,7 @@ function bullOffModal(room){const st=replay(room);if(st.finished)return;sdState=
     $('#sd-reset').onclick=()=>{sdState={turn:0,thr:[null,null]};draw()};
     const ok=$('#sd-ok');if(ok)ok.onclick=()=>{closeModal();bullWin(room,w)};
     $('#sd-h').onclick=()=>{closeModal();bullWin(room,0)};$('#sd-a').onclick=()=>{closeModal();bullWin(room,1)}};
-  openModal('SUDDEN DEATH · ดวลลูกเดียว',`<p class="muted small" style="margin:0">${st.needBull?`ช่วงปิดเกม (เหลือ ≤50) ครบ ${room.roundLimit} รอบแล้วยังปิด Leg ไม่ได้ `:''}ทั้งสองฝ่ายปาคนละ 1 ลูก ใครปักใกล้จุดกึ่งกลาง Bullseye ที่สุดชนะ Leg นี้ ระบบวัดระยะเป็นมิลลิเมตรตามขนาดกระดานจริง</p><div id="sd-body" style="display:flex;flex-direction:column;gap:10px"></div>`,[{label:'ยกเลิก'}],{wide:true,after:draw});if(callerOn)say('Sudden death. Closest to the bull wins.')}
+  openModal('SUDDEN DEATH · ดวลลูกเดียว',`<p class="muted small" style="margin:0">${st.needBull?`ทั้งสองฝ่ายเหลือ ≤${SDT(room)} และปาครบ ${room.roundLimit} รอบแล้วยังปิด Leg ไม่ได้ `:''}ทั้งสองฝ่ายปาคนละ 1 ลูก ใครปักใกล้จุดกึ่งกลาง Bullseye ที่สุดชนะ Leg นี้ ระบบวัดระยะเป็นมิลลิเมตรตามขนาดกระดานจริง</p><div id="sd-body" style="display:flex;flex-direction:column;gap:10px"></div>`,[{label:'ยกเลิก'}],{wide:true,after:draw});if(callerOn)say('Sudden death. Closest to the bull wins.')}
 function bullWin(room,side){const st=replay(room);const n=st.legEnds.length;room.events.push({t:'bull',side,dist:sdState&&sdState.thr[0]&&sdState.thr[1]?[+sdState.thr[0].d.toFixed(1),+sdState.thr[1].d.toFixed(1)]:null,ts:Date.now()});SFX.checkout();pend=[];pendMarks=[];const st2=roomAfterChange(room);
   if(!st2.finished&&room.type==='team'&&st2.legEnds.length>n)setTimeout(()=>nextLegPrompt(room,st2.legEnds[st2.legEnds.length-1],st2),20);render()}
 function refModal(room){if(!canRef()){toast('เฉพาะกรรมการหรือแอดมินเท่านั้น — เปลี่ยนผู้ใช้งานที่มุมขวาบน');return}const st=replay(room);
@@ -876,7 +898,7 @@ VIEWS.match=()=>{const room=curRoom();
     return `<div class="side ${act?'active':''}"><div class="row" style="justify-content:space-between"><span class="tag">${i?'AWAY':'HOME'}${act?' · กำลังปา':''}</span><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div>
     <h2 style="min-width:0;overflow-wrap:anywhere">${esc(sideName(room,i))}</h2>${room.type==='team'&&room.sides[i].teamId?'':teamChip(P(room.sides[i].playerIds[0])?.teamId)}
     <div class="remain">${act&&pend.length&&!ev.bust?after:st.rem[i]}</div>
-    ${co&&!st.finished?`<div class="hint">ปิดได้: <b>${co.map(dLabel).join(' · ')}</b></div>`:''}
+    ${co&&!st.finished?(()=>{const ops=checkoutOptions(st.rem[i]-(act&&!ev.bust?sum:0),room.out,act?3-pend.length:3,3);return `<div class="hint">ปิดได้: <b>${co.map(dLabel).join(' · ')}</b>${ops.length>1?`<div class="small muted">หรือ ${ops.filter(r=>r.map(dLabel).join()!==co.map(dLabel).join()).slice(0,2).map(r=>r.map(dLabel).join(' · ')).join(' / ')}</div>`:''}</div>`})():''}
     <div class="roster">${st.order[i].map((id,k)=>`<div class="rp ${act&&st.thrower(i)===id?'now':''}"><span class="ord">#${k+1}</span>${plHTML(id,{noTeam:room.type==='team'})}</div>`).join('')}</div>
     <div class="kv"><span>Match Avg</span><span>${fmt2(ss.avg)}</span><span>เทิร์นล่าสุด</span><span>${ss.last}</span><span>สูงสุด</span><span>${ss.hi}</span><span>180s</span><span>${ss.c180}</span></div>
     ${sideLog(i)}</div>`};
@@ -892,18 +914,21 @@ VIEWS.match=()=>{const room=curRoom();
   const prevMarks=!pend.length&&roomTurns.length?(()=>{const e=roomTurns[roomTurns.length-1];return e.darts?e.darts.map((d,k)=>{const p=e.pos&&e.pos[k]?e.pos[k]:markPos(d);return{x:p[0],y:p[1],n:k+1,c:'#8fa096'}}):[]})():[];
   if(fsMode){const remShown=i=>(!st.finished&&side===i&&pend.length&&!ev.bust)?after:st.rem[i];
     const co=!st.finished&&!st.needBull?checkout(ev.bust?before:after,room.out,3-pend.length):null;
-    const fsSide=i=>`<div class="fs-side ${i?'r':''} ${!st.finished&&side===i?'on':''}"><span>${i?'AWAY':'HOME'} · ${esc(sideName(room,i))}</span><b>${remShown(i)}</b><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div>`;
-    const mid=st.finished?`<small>จบการแข่งขัน</small><b style="color:var(--amber)">🏆 ${esc(sideName(room,st.winner))}</b>`:st.needBull?`<small>ช่วงปิดเกมครบ ${room.roundLimit} รอบ</small><button class="btn sm pri" onclick="bullOffModal(curRoom())">Sudden Death</button>`:`<small>LEG ${st.leg}/${room.bestOf} · รอบ ${st.round}${st.finStage&&room.roundLimit?' · ปิดเกม '+st.finRounds+'/'+room.roundLimit:''}</small><b>🎯 ${esc(curName)}</b>${co&&pend.length<3?`<small style="color:var(--green)">ปิด: ${co.map(dLabel).join(' ')}</small>`:''}`;
+    const fsSide=i=>{const on=!st.finished&&side===i;const best=!st.finished?checkout(remShown(i),room.out,on?3-pend.length:3):null;
+      return `<div class="fs-side ${i?'r':''} ${on?'on':''}"><span>${i?'AWAY':'HOME'} · ${esc(sideName(room,i))}</span><b>${remShown(i)}</b>
+      <div class="fs-roster">${st.order[i].map((id,k)=>`<span class="fs-p ${on&&st.thrower(i)===id?'now':''}">${k+1}. ${esc(pname(room,id))}</span>`).join('')}</div>
+      <span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span>${best&&!on?`<span class="fs-co">ปิดได้: ${best.map(dLabel).join(' ')}</span>`:''}</div>`};
+    const mid=st.finished?`<small>จบการแข่งขัน</small><b style="color:var(--amber)">🏆 ${esc(sideName(room,st.winner))}</b>`:st.needBull?`<small>ช่วงปิดเกมครบ ${room.roundLimit} รอบ</small><button class="btn sm pri" onclick="bullOffModal(curRoom())">Sudden Death</button>`:`<small>LEG ${st.leg}/${room.bestOf} · รอบ ${st.round}${st.finStage&&room.roundLimit?' · ปิดเกม '+st.finRounds+'/'+room.roundLimit:''}</small><b>🎯 ${esc(curName)}</b>${!ev.bust&&pend.length<3?(()=>{const ops=checkoutOptions(after,room.out,3-pend.length,3);return ops.length?`<div class="fs-routes">${ops.map((r,k)=>`<span class="${k?'':'best'}">${r.map(dLabel).join(' · ')}</span>`).join('')}</div>`:(after>170?`<small>ยังปิดไม่ได้ (เหลือเกิน 170)</small>`:'')})():''}`;
     return `<div class="fs" id="fs"><div class="fs-top">${fsSide(0)}<div class="fs-mid">${mid}</div>${fsSide(1)}</div>
       <div class="fs-board" id="bw"><div class="fs-aim" id="aim">${pend.length?statusLine(ev,before,after,sum,room.out).replace(/<[^>]+>/g,''):'แตะช่องบนเป้าตรงจุดที่ลูกดอกปัก'}</div>${boardSVG(pendMarks.length?pendMarks:prevMarks)}</div>
-      <div class="fs-bot"><div class="fs-sum">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b></div>`).join('')}<div class="fs-total">${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT</span>':`<small class="muted">รอบนี้</small><b>${sum}</b>`}</div></div>
+      <div class="fs-bot"><div class="fs-sum">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':k===pend.length&&!st.finished?'nx':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b></div>`).join('')}<div class="fs-total">${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT</span>':`<small class="muted">รอบนี้</small><b>${sum}</b>`}</div></div>
       <div class="fs-btns"><button class="btn" onclick="undo()">↶ Undo</button><button class="btn" onclick="addDart(D(0,1))">MISS</button><button class="btn" onclick="addDart(D(25,2))">BULL 50</button><button class="btn" onclick="fillMiss()">Miss ที่เหลือ</button><button class="btn ok" onclick="submitTurn()" ${pend.length&&!st.finished?'':'disabled'}>✓ บันทึก ${ev.bust?'(BUST)':'+'+sum}</button></div>
       <div class="row" style="justify-content:space-between"><label class="ck small"><input type="checkbox" ${autoSub?'checked':''} onchange="toggleAuto()"> บันทึกอัตโนมัติเมื่อครบ 3 ลูก</label><button class="btn sm" onclick="setFs(false)">ออกจากเต็มจอ ✕</button></div></div></div>`}
   const center=`<div class="panel center">
     ${st.finished?`<div class="banner" style="justify-content:center"><b>🏆 จบการแข่งขัน · ${esc(sideName(room,st.winner))} ชนะ ${st.legsWon[0]}-${st.legsWon[1]}</b></div>`:
      st.needBull?`<div class="banner"><b>ช่วงปิดเกมครบ ${room.roundLimit} รอบ · ต้องดวล Sudden Death</b><button class="btn pri" onclick="bullOffModal(curRoom())">ตัดสิน Bull-off</button></div>`:
-     `<div class="row" style="justify-content:space-between"><div><span class="muted small">LEG ${st.leg}/${room.bestOf} · รอบ ${st.round} · ตาของ</span>${st.finStage&&room.roundLimit?` <span class="pill" style="color:${st.finRounds>=room.roundLimit-2?'var(--red)':'var(--amber)'}" title="นับรอบตั้งแต่มีฝ่ายเหลือ 50 แต้มหรือน้อยกว่า">รอบปิดเกม ${st.finRounds}/${room.roundLimit}</span>`:''}<h2>${esc(curName)}</h2></div><div class="row">${st.legFresh?`<button class="btn sm pri" onclick="tossModal(curRoom())">🎰 สุ่มผู้เริ่มก่อน</button>`:''}</div></div>
-    <div class="slots">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b><small>${pend[k]?pend[k].v+' แต้ม':''}</small></div>`).join('')}</div>
+     `<div class="row" style="justify-content:space-between"><div><span class="muted small">LEG ${st.leg}/${room.bestOf} · รอบ ${st.round} · ตาของ</span>${st.finStage&&room.roundLimit?` <span class="pill" style="color:${st.finRounds>=room.roundLimit-2?'var(--red)':'var(--amber)'}" title="เริ่มนับเมื่อทั้งสองฝ่ายเหลือ ${SDT(room)} แต้มหรือน้อยกว่า">รอบปิดเกม ${st.finRounds}/${room.roundLimit}</span>`:''}<h2>${esc(curName)}</h2></div><div class="row">${st.legFresh?`<button class="btn sm pri" onclick="tossModal(curRoom())">🎰 สุ่มผู้เริ่มก่อน</button>`:''}</div></div>
+    <div class="slots">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':k===pend.length&&!st.finished?'nx':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b><small>${pend[k]?pend[k].v+' แต้ม':''}</small></div>`).join('')}</div>
     <div class="preview"><span>รอบนี้ <span class="tot">${ev.bust?0:sum}</span></span>${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT!</span>':''}<span class="muted">เหลือ <b class="num" style="color:var(--chalk)">${after}</b></span></div>${statusLine(ev,before,after,sum,room.out)}
     <div class="subtabs">${[['board','🎯 กดบนเป้า'],['pad','ปุ่มตัวเลข'],['quick','กรอกยอดรวม'],['cam','📷 กล้อง / VAR'],['dual','จอคู่ (เป้า+กล้อง)']].map(([k,l])=>`<button class="btn sm ${inputMode===k?'on':''}" onclick="inputMode='${k}';render()">${l}</button>`).join('')}</div>
     ${inputMode==='pad'?`<div class="mult">${[[1,'Single ×1'],[2,'Double ×2'],[3,'Treble ×3']].map(([m,l])=>`<button class="btn ${mult===m?'on':''}" onclick="mult=${m};render()">${l}</button>`).join('')}</div>
@@ -917,7 +942,7 @@ VIEWS.match=()=>{const room=curRoom();
     ${inputMode==='dual'?`<div class="dual"><div><div class="board-wrap" id="bw">${boardSVG(pendMarks.length?pendMarks:prevMarks)}</div></div><div>${camHTML()}</div></div>`:''}
     ${inputMode!=='quick'?`<div class="row act-bar"><button class="btn" onclick="pend=[];pendMarks=[];render()">ล้าง</button><button class="btn" onclick="fillMiss()">Miss ที่เหลือ</button><button class="btn" onclick="editLastTurn()">แก้เทิร์นล่าสุด</button><span class="spacer"></span><button class="btn ok" onclick="submitTurn()" ${pend.length?'':'disabled'}>✓ บันทึก ${ev.bust?'(BUST)':'+'+sum}</button></div>`:''}`}
   </div>`;
-  return `<div class="score-top"><div style="min-width:0"><div class="row"><span class="code mono muted">${room.code}</span>${statusPill(roomStatus(room))}<span class="pill" style="color:var(--muted)">BEST OF ${room.bestOf}</span>${!st.finished?`<span class="pill" style="color:var(--amber)">LEG ${st.leg} / ${room.bestOf}</span>`:''}</div><h1>${esc(room.name)}</h1><div class="muted small">${room.score} · ${OUT_LABEL[room.out]} · ${room.type==='team'?'ทีม '+room.teamSize+'v'+room.teamSize:'เดี่ยว 1v1'}${room.roundLimit?' · Sudden Death เมื่อช่วงปิดเกมครบ '+room.roundLimit+' รอบ':''}</div></div>
+  return `<div class="score-top"><div style="min-width:0"><div class="row"><span class="code mono muted">${room.code}</span>${statusPill(roomStatus(room))}<span class="pill" style="color:var(--muted)">BEST OF ${room.bestOf}</span>${!st.finished?`<span class="pill" style="color:var(--amber)">LEG ${st.leg} / ${room.bestOf}</span>`:''}</div><h1>${esc(room.name)}</h1><div class="muted small">${room.score} · ${OUT_LABEL[room.out]} · ${room.type==='team'?'ทีม '+room.teamSize+'v'+room.teamSize:'เดี่ยว 1v1'}${room.roundLimit?' · Sudden Death: ทั้งสองฝ่ายเหลือ ≤'+SDT(room)+' แล้วปาครบ '+room.roundLimit+' รอบ':''}</div></div>
     <div class="legs-box"><span>HOME</span><span class="big">${st.legsWon[0]}</span><span class="muted">:</span><span class="big">${st.legsWon[1]}</span><span>AWAY</span></div>
     <div class="row"><button class="btn sm pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn sm" onclick="introModal(curRoom())">⚔️ Face-off</button>${room.type==='team'?`<button class="btn sm" onclick="orderModal(curRoom())">จัดลำดับการปา</button>`:''}<button class="btn sm" onclick="bullOffModal(curRoom())" ${st.finished?'disabled':''}>Sudden Death</button><button class="btn sm" onclick="refModal(curRoom())" title="${canRef()?'':'ต้องเป็นกรรมการหรือแอดมิน'}">🧑‍⚖️ กรรมการ</button><button class="btn sm" onclick="undo()">↶ Undo</button><button class="btn sm ${soundOn?'on':''}" onclick="toggleSound()" title="เสียงเอฟเฟกต์">${soundOn?'🔊':'🔇'}</button><button class="btn sm ${callerOn?'on':''}" onclick="toggleCaller()" title="ผู้ประกาศคะแนนแบบ PDC">🗣️ Caller</button><button class="btn sm" onclick="S.ui.roomId=null;save();render()">เปลี่ยนห้อง</button></div></div>
   <div class="arena">${sidePanel(0)}${center}${sidePanel(1)}</div>
@@ -1074,7 +1099,7 @@ VIEWS.dashboard=()=>{const rr=realRooms();const stats=computeStats();const fin=r
   <div class="panel tbl-wrap"><h2>แมตช์ล่าสุด</h2><table><thead><tr><th>ห้อง</th><th>ผู้ชนะ</th><th class="n">สกอร์</th><th class="n">จบเมื่อ</th></tr></thead><tbody>${recent.map(r=>{const st=replay(r);return `<tr class="click" onclick="openRoom('${r.id}')"><td>${esc(r.name)}<div class="small muted">${r.type==='team'?'ทีม':'เดี่ยว'} · ${r.score}</div></td><td><b style="color:var(--amber)">${esc(sideName(r,st.winner))}</b><div class="small muted">ชนะ ${esc(sideName(r,1-st.winner))}</div></td><td class="n">${st.legsWon[0]}-${st.legsWon[1]}</td><td class="n small">${dt(r.finishedAt)}</td></tr>`}).join('')||'<tr><td colspan="4" class="muted">ยังไม่มีแมตช์ที่จบ</td></tr>'}</tbody></table></div></div>`};
 
 /* ====================== settings ====================== */
-function saveSettings(){S.settings={appName:$('#st-name').value.trim()||'OCHE Dart League',score:+$('#st-score').value,out:$('#st-out').value,bestOf:+$('#st-best').value,roundLimit:+$('#st-limit').value};save();render();toast('บันทึกการตั้งค่าแล้ว')}
+function saveSettings(){S.settings={appName:$('#st-name').value.trim()||'OCHE Dart League',score:+$('#st-score').value,out:$('#st-out').value,bestOf:+$('#st-best').value,roundLimit:+$('#st-limit').value,sdT:+$('#st-sdt').value};save();render();toast('บันทึกการตั้งค่าแล้ว')}
 function exportData(){const txt=JSON.stringify(S,null,1);openModal('สำรองข้อมูล (Export)',`<p class="muted small" style="margin:0">ดาวน์โหลดเป็นไฟล์ .json หรือคัดลอกข้อความไปเก็บไว้ ใช้นำเข้ากลับหรือย้ายไปเครื่องอื่นได้</p><textarea id="ex-t" readonly style="min-height:200px;font-family:var(--f-mono);font-size:.75rem">${esc(txt)}</textarea>`,
   [{label:'คัดลอก',fn:()=>{navigator.clipboard.writeText(txt).then(()=>toast('คัดลอกแล้ว')).catch(()=>{$('#ex-t').select();toast('เลือกข้อความแล้ว กด Ctrl+C')});return false}},{label:'ดาวน์โหลด .json',cls:'pri',fn:()=>{saveFile('oche-backup-'+new Date().toISOString().slice(0,10)+'.json',txt,'application/json');return false}}],{wide:true})}
 function importData(){openModal('นำเข้าข้อมูล (Import)',`<p class="muted small" style="margin:0">เลือกไฟล์สำรอง .json หรือวางข้อความ ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด</p><input type="file" id="im-f" accept=".json,application/json"><textarea id="im-t" placeholder="หรือวาง JSON ที่นี่" style="min-height:160px;font-family:var(--f-mono);font-size:.75rem"></textarea>`,
@@ -1096,7 +1121,8 @@ VIEWS.config=()=>{const s=S.settings;return `<div class="head"><div><h1>ตั�
    <label>คะแนนเริ่มต้น<select id="st-score">${[701,601,501,401,301,201].map(n=>`<option ${n===s.score?'selected':''}>${n}</option>`).join('')}</select></label>
    <label>กติกาปิดเกม<select id="st-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
    <label>Best of<select id="st-best">${[1,3,5,7,9].map(n=>`<option ${n===s.bestOf?'selected':''}>${n}</option>`).join('')}</select></label>
-   <label>Sudden Death เมื่อครบ<select id="st-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label></div>
+   <label>เริ่มนับรอบ Sudden Death เมื่อทั้งสองฝ่ายเหลือ ≤<select id="st-sdt">${[40,50,60,80,100,170].map(n=>`<option value="${n}" ${n===(s.sdT??50)?'selected':''}>${n} แต้ม</option>`).join('')}</select></label>
+   <label>Sudden Death เมื่อปาครบ<select id="st-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label></div>
    <div class="row"><button class="btn pri" onclick="saveSettings()">บันทึกการตั้งค่า</button></div></div>
   <div class="panel"><h2>ข้อมูลและการสำรอง</h2><p class="muted small" style="margin:0">ระบบนี้ไม่มีเซิร์ฟเวอร์และไม่มีล็อกอิน ข้อมูลทั้งหมดอยู่ในเบราว์เซอร์เครื่องนี้ ควรสำรองเป็นไฟล์อยู่เสมอ</p>
    <div class="kv"><span>ผู้เล่น</span><span>${S.players.length}</span><span>ทีม</span><span>${S.teams.length}</span><span>ห้องแข่งขัน</span><span>${realRooms().length}</span><span>ทัวร์นาเมนต์</span><span>${S.tours.length}</span></div>
