@@ -6,7 +6,9 @@
 <meta name="description" content="ระบบจัดการแข่งขันปาลูกดอก ห้องแข่ง ให้คะแนนสด อันดับ ทีม และผังทัวร์นาเมนต์">
 <meta name="theme-color" content="#0f1512">
 <script src="config.js"></script>
-<title>OCHE Dart League</title>
+<title>JLC Dart League</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='%23efe6cf' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23d64a3d' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%232f9d62'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23d64a3d'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -403,7 +405,7 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
 
 <header class="top">
   <div class="top-in">
-    <div class="brand"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#111" stroke="#efe6cf" stroke-width="2"/><circle cx="20" cy="20" r="12" fill="none" stroke="#d64a3d" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="#2f9d62"/><circle cx="20" cy="20" r="2.5" fill="#d64a3d"/></svg><div><span id="app-name">OCHE</span><small>ระบบจัดการแข่งขันปาลูกดอก</small></div></div>
+    <div class="brand"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#111" stroke="#efe6cf" stroke-width="2"/><circle cx="20" cy="20" r="12" fill="none" stroke="#d64a3d" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="#2f9d62"/><circle cx="20" cy="20" r="2.5" fill="#d64a3d"/></svg><div><span id="app-name">JLC Dart League</span><small>ระบบจัดการแข่งขันปาลูกดอก</small></div></div>
     <div class="spacer"></div>
     <button class="sync" id="sync-pill" type="button" title="สถานะการเก็บข้อมูล"><i></i><span>ออฟไลน์</span></button>
     <button class="skin-btn" id="skin-btn" type="button" title="เปลี่ยนธีม" aria-label="เปลี่ยนธีม">🎨</button>
@@ -416,7 +418,7 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
   <div class="foot">
     <button class="copy-c" id="about-btn" type="button" title="เกี่ยวกับระบบและเทคโนโลยีที่ใช้" aria-label="เกี่ยวกับระบบ">C</button>
     <div style="flex:1;min-width:220px">
-      <div>© 2026 <span id="foot-name">OCHE Dart League</span> · พัฒนาด้วย HTML5 + CSS3 + JavaScript (ES2020) ล้วน ไม่ใช้เฟรมเวิร์ก ทำงานในเบราว์เซอร์ทั้งหมด</div>
+      <div>© 2026 <span id="foot-name">JLC Dart League</span> · พัฒนาด้วย HTML5 + CSS3 + JavaScript (ES2020) ล้วน ไม่ใช้เฟรมเวิร์ก ทำงานในเบราว์เซอร์ทั้งหมด</div>
       <div class="small">ข้อมูลซิงก์ผ่าน Cloud Firestore หรือเก็บในเครื่องด้วย localStorage · กระดานปาเป้าและกราฟวาดด้วย SVG · AI จำลองใช้โมเดลความแม่นยำแบบสุ่ม · โฮสต์บน GitHub Pages</div>
     </div>
     <div class="stack"><span>HTML5</span><span>CSS3</span><span>Vanilla JS</span><span>SVG</span><span>Firebase</span></div>
@@ -428,7 +430,7 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
 'use strict';
 /* ====================== storage & helpers ====================== */
 const KEY='oche-dart-league-v1';
-const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10,sdT:50},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},reg:{open:true,needCode:false,adminTeams:false},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
+const DEF={settings:{appName:'JLC Dart League',score:501,out:'double',bestOf:3,roundLimit:10,sdT:50},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},reg:{open:true,needCode:false,adminTeams:false},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
 const PREF_KEY='oche-dart-prefs-v1';
 let S;
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -465,7 +467,7 @@ function cloudErr(e){const c=e&&e.code;
   else if(c==='resource-exhausted')toast('ใช้งานเกินโควตาฟรีของวันนี้ ลองใหม่พรุ่งนี้');
   else toast('บันทึกขึ้นเซิร์ฟเวอร์ไม่สำเร็จ ('+(c||'error')+') ลองอีกครั้ง')}
 function loadPrefs(){let p={};try{p=JSON.parse(localStorage.getItem(PREF_KEY)||'{}')||{}}catch(e){}return p}
-function fixShape(){const d=clone(DEF);S=Object.assign(d,S);S.settings=Object.assign(clone(DEF.settings),S.settings);S.ui=Object.assign(clone(DEF.ui),S.ui);S.roles=S.roles||{}}
+function fixShape(){const d=clone(DEF);S=Object.assign(d,S);S.settings=Object.assign(clone(DEF.settings),S.settings);if(S.settings.appName==='OCHE Dart League')S.settings.appName=DEF.settings.appName;S.ui=Object.assign(clone(DEF.ui),S.ui);S.roles=S.roles||{}}
 function load(){const pr=loadPrefs();
   if(cloud.state==='local'){let raw=null;try{raw=localStorage.getItem(KEY)}catch(e){}
     try{S=raw?JSON.parse(raw):null}catch(e){S=null}
@@ -474,7 +476,7 @@ function load(){const pr=loadPrefs();
   else{S=clone(DEF);fixShape()}
   if(pr.ui)S.ui=Object.assign(S.ui,pr.ui);S.skin=pr.skin||S.skin||'auto';applySkin()}
 function applyMeta(k,d){d=d||{};
-  if(k==='settings')S.settings=Object.assign(clone(DEF.settings),d.settings||{});
+  if(k==='settings'){S.settings=Object.assign(clone(DEF.settings),d.settings||{});if(S.settings.appName==='OCHE Dart League')S.settings.appName=DEF.settings.appName}
   else if(k==='tours')S.tours=d.tours||[];
   else if(k==='audit')S.audit=d.audit||[]}
 let needRender=false;
@@ -720,7 +722,7 @@ function render(){
   if(r!=='simulator')simStop();
   if(r!=='match'){camStop();if(fsMode){fsMode=false;document.body.style.overflow=''}}
   $('#tabs').innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${(r===k||(r==='profile'&&k==='ranking'))?'on':''}">${l}</a>`).join('');
-  $('#app-name').textContent=S.settings.appName||'OCHE';$('#foot-name').textContent=S.settings.appName||'OCHE';
+  $('#app-name').textContent=S.settings.appName||'JLC Dart League';document.title=S.settings.appName||'JLC Dart League';$('#foot-name').textContent=S.settings.appName||'OCHE';
   syncMe();const m=me();
   if(cloud.state!=='local'&&!cloud.user)$('#me-chip').innerHTML=`<span class="av" style="background:#fff;border-color:#dadce0">${GLOGO}</span><span class="nm">เข้าสู่ระบบ</span>`;
   else if(cloud.state!=='local'&&!m)$('#me-chip').innerHTML=`<span class="av">👤</span><span style="display:flex;flex-direction:column;align-items:flex-start;min-width:0"><span class="lbl">${isAdminUser()?'ADMIN':'ยังไม่มีโปรไฟล์'}</span><span class="nm">${esc(cloud.user.name||cloud.user.email||'ผู้ใช้')}</span></span>`;
@@ -1277,7 +1279,7 @@ VIEWS.dashboard=()=>{const rr=realRooms();const stats=computeStats();const fin=r
   <div class="panel tbl-wrap"><h2>แมตช์ล่าสุด</h2><table><thead><tr><th>ห้อง</th><th>ผู้ชนะ</th><th class="n">สกอร์</th><th class="n">จบเมื่อ</th></tr></thead><tbody>${recent.map(r=>{const st=replay(r);return `<tr class="click" onclick="openRoom('${r.id}')"><td>${esc(r.name)}<div class="small muted">${r.type==='team'?'ทีม':'เดี่ยว'} · ${r.score}</div></td><td><b style="color:var(--amber)">${esc(sideName(r,st.winner))}</b><div class="small muted">ชนะ ${r.sides.map((x,i)=>i).filter(i=>i!==st.winner).map(i=>esc(sideName(r,i))).join(', ')}</div></td><td class="n">${legsStr(st,'-')}</td><td class="n small">${dt(r.finishedAt)}</td></tr>`}).join('')||'<tr><td colspan="4" class="muted">ยังไม่มีแมตช์ที่จบ</td></tr>'}</tbody></table></div></div>`};
 
 /* ====================== settings ====================== */
-function saveSettings(){S.settings={appName:$('#st-name').value.trim()||'OCHE Dart League',score:+$('#st-score').value,out:$('#st-out').value,bestOf:+$('#st-best').value,roundLimit:+$('#st-limit').value,sdT:+$('#st-sdt').value};save();render();toast('บันทึกการตั้งค่าแล้ว')}
+function saveSettings(){S.settings={appName:$('#st-name').value.trim()||'JLC Dart League',score:+$('#st-score').value,out:$('#st-out').value,bestOf:+$('#st-best').value,roundLimit:+$('#st-limit').value,sdT:+$('#st-sdt').value};save();render();toast('บันทึกการตั้งค่าแล้ว')}
 function exportData(){const txt=JSON.stringify(S,null,1);openModal('สำรองข้อมูล (Export)',`<p class="muted small" style="margin:0">ดาวน์โหลดเป็นไฟล์ .json หรือคัดลอกข้อความไปเก็บไว้ ใช้นำเข้ากลับหรือย้ายไปเครื่องอื่นได้</p><textarea id="ex-t" readonly style="min-height:200px;font-family:var(--f-mono);font-size:.75rem">${esc(txt)}</textarea>`,
   [{label:'คัดลอก',fn:()=>{navigator.clipboard.writeText(txt).then(()=>toast('คัดลอกแล้ว')).catch(()=>{$('#ex-t').select();toast('เลือกข้อความแล้ว กด Ctrl+C')});return false}},{label:'ดาวน์โหลด .json',cls:'pri',fn:()=>{saveFile('oche-backup-'+new Date().toISOString().slice(0,10)+'.json',txt,'application/json');return false}}],{wide:true})}
 function importData(){openModal('นำเข้าข้อมูล (Import)',`<p class="muted small" style="margin:0">เลือกไฟล์สำรอง .json หรือวางข้อความ ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด</p><input type="file" id="im-f" accept=".json,application/json"><textarea id="im-t" placeholder="หรือวาง JSON ที่นี่" style="min-height:160px;font-family:var(--f-mono);font-size:.75rem"></textarea>`,
