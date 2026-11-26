@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="config.js"></script>
+<title>OCHE Dart League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: sticky scoreboard header + scrollable tab strip, content in a 1200px column; darts-pub slate with tungsten amber */
+:root{
+  --bg:#0f1512; --panel:#161e1a; --panel2:#1d2822; --line:#2a3830; --chalk:#ecefe4; --muted:#8fa096;
+  --amber:#f2b134; --amber-ink:#1b1405; --red:#d64a3d; --green:#2f9d62; --blue:#4c9be0; --cream:#efe6cf; --ink:#111;
+  --f-display:'Oswald','Arial Narrow',sans-serif; --f-body:'IBM Plex Sans Thai','Leelawadee UI','Tahoma',system-ui,sans-serif; --f-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  --r:10px; color-scheme:dark; --dng-ink:#ffb4ab; --board-ring:#0b0b0b;
+}
+/* skins: auto follows the viewer's light/dark, others are fixed */
+:root[data-skin="light"]{--bg:#f2f0e8;--panel:#ffffff;--panel2:#ebe9e1;--line:#d5d2c6;--chalk:#1b201d;--muted:#5d6861;--amber:#b4720b;--amber-ink:#ffffff;--red:#c23b2f;--green:#23804e;--blue:#2c6fb0;--dng-ink:#b3261e;--board-ring:#1d1d1d;color-scheme:light}
+@media (prefers-color-scheme:light){:root[data-skin="auto"]:not([data-theme="dark"]){--bg:#f2f0e8;--panel:#ffffff;--panel2:#ebe9e1;--line:#d5d2c6;--chalk:#1b201d;--muted:#5d6861;--amber:#b4720b;--amber-ink:#ffffff;--red:#c23b2f;--green:#23804e;--blue:#2c6fb0;--dng-ink:#b3261e;--board-ring:#1d1d1d;color-scheme:light}}
+:root[data-skin="auto"][data-theme="light"]{--bg:#f2f0e8;--panel:#ffffff;--panel2:#ebe9e1;--line:#d5d2c6;--chalk:#1b201d;--muted:#5d6861;--amber:#b4720b;--amber-ink:#ffffff;--red:#c23b2f;--green:#23804e;--blue:#2c6fb0;--dng-ink:#b3261e;--board-ring:#1d1d1d;color-scheme:light}
+:root[data-skin="neon"]{--bg:#0c0a19;--panel:#15122f;--panel2:#1e1a40;--line:#2f2a5c;--chalk:#eceaff;--muted:#9a95c9;--amber:#22e1d6;--amber-ink:#03201e;--red:#ff4f8b;--green:#38e07b;--blue:#8c7bff;--dng-ink:#ff9cbf;color-scheme:dark}
+:root[data-skin="pub"]{--bg:#19110b;--panel:#23180f;--panel2:#2d1f14;--line:#46321f;--chalk:#f3e7d3;--muted:#b19c80;--amber:#d9a441;--amber-ink:#1f1405;--red:#c4422f;--green:#3d8f4f;--blue:#5f95c4;--dng-ink:#f2a594;color-scheme:dark}
+:root[data-skin="ocean"]{--bg:#081521;--panel:#0e1f30;--panel2:#13283d;--line:#21405c;--chalk:#e6f1fa;--muted:#8aa7bf;--amber:#ff9f43;--amber-ink:#2a1300;--red:#ef5350;--green:#26a69a;--blue:#4fc3f7;--dng-ink:#ffab9f;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--chalk)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--amber)}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);letter-spacing:.02em;text-wrap:balance;margin:0;font-weight:600}
+h1{font-size:1.9rem}h2{font-size:1.3rem}h3{font-size:1.05rem}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--panel);border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:1.35rem;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+.brand small{font-family:var(--f-body);font-size:.72rem;color:var(--muted);letter-spacing:0;font-weight:500;display:block;line-height:1.1}
+.spacer{flex:1}
+.me-chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;min-width:0}
+.me-chip:hover{border-color:var(--amber)}
+.me-chip .lbl{font-size:.72rem;color:var(--muted);line-height:1}
+.me-chip .nm{font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.tabs{max-width:1240px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{color:var(--muted);text-decoration:none;padding:9px 12px;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;font-size:.92rem}
+.tabs a:hover{color:var(--chalk)}
+.tabs a.on{color:var(--amber);border-bottom-color:var(--amber)}
+main{max-width:1240px;margin:0 auto;padding-block:22px 30px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px;min-height:60vh}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;justify-content:space-between}
+.head p{margin:4px 0 0;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr))}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.tile .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tile .v{font-family:var(--f-mono);font-size:1.7rem;font-weight:700;line-height:1.2}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.muted{color:var(--muted)}.small{font-size:.82rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:500;white-space:nowrap;text-decoration:none;color:var(--chalk)}
+.btn:hover{border-color:var(--muted)}
+.btn:focus-visible,.tabs a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.me-chip:focus-visible,.seg:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.btn.pri{background:var(--amber);color:var(--amber-ink);border-color:var(--amber);font-weight:600}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.dng{border-color:color-mix(in srgb,var(--red) 60%,transparent);color:var(--dng-ink)}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap;background:none;cursor:pointer}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync.online i{background:var(--green)}.sync.connecting i{background:var(--amber);animation:blink 1s infinite}.sync.ro i{background:var(--red)}
+.skin-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);cursor:pointer;display:grid;place-items:center;font-size:16px;flex:none}
+.skins{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.skin{border:2px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.skin.on{border-color:var(--amber)}
+.skin .sw{display:flex;gap:4px}.skin .sw i{flex:1;height:22px;border-radius:4px;display:block}
+.aim{text-align:center;font-family:var(--f-mono);font-size:1rem;min-height:1.6em;color:var(--muted)}
+.aim b{color:var(--amber);font-size:1.25rem}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:.74rem;border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:3px;background:var(--panel2);white-space:nowrap}
+.chip.t{border-color:var(--red)}.chip.d{border-color:var(--green)}.chip.m{opacity:.6}
+.co-badge{font-size:.68rem;font-weight:700;letter-spacing:.06em;background:var(--green);color:#fff;border-radius:4px;padding:0 6px}
+.slog{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto}
+.slog .r{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.8rem;padding:4px 6px;border-radius:6px;background:var(--bg)}
+.slog .r .p{font-family:var(--f-mono);font-weight:700}
+.big-board{max-width:560px}
+.act-bar{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--panel);padding-block:8px;margin-block:-8px;z-index:2;border-top:1px solid var(--line)}
+/* full-screen scoring */
+.fs{position:fixed;inset:0;z-index:40;background:var(--bg);display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px)}
+.fs-top{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+.fs-side{display:flex;flex-direction:column;gap:2px;min-width:0;padding:6px 10px;border-radius:10px;border:2px solid transparent}
+.fs-side.r{align-items:flex-end;text-align:right}
+.fs-side.on{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 10%,transparent)}
+.fs-side span{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.fs-side b{font-family:var(--f-mono);font-size:clamp(1.8rem,7vw,3rem);line-height:1}
+.fs-side.on b{color:var(--amber)}
+.fs-mid{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:0;max-width:40vw}
+.fs-mid small{color:var(--muted);font-size:.72rem;letter-spacing:.06em}
+.fs-mid b{font-family:var(--f-display);font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.fs-board{display:flex;align-items:center;justify-content:center;min-height:0;padding:6px;position:relative}
+.fs-board svg{height:100%;width:auto;max-width:100%;max-height:100%;display:block;touch-action:manipulation}
+.fs-aim{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:.9rem;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 12px;pointer-events:none}
+.fs-bot{display:flex;flex-direction:column;gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--panel)}
+.fs-sum{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:6px;align-items:stretch}
+.fs-sum .slot{padding:4px}
+.fs-sum .slot b{font-size:1.1rem}
+.fs-total{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6px;min-width:84px}
+.fs-total b{font-family:var(--f-mono);font-size:1.5rem;line-height:1}
+.fs-btns{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 2fr;gap:6px}
+.fs-btns .btn{padding:13px 4px;font-size:.88rem}
+.fs-btns .ok{font-size:1rem}
+.fs-x{position:absolute;right:max(8px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 6px)}
+@media (max-width:600px){.arena{grid-template-columns:1fr 1fr;gap:8px}.side{padding:10px;gap:6px}.side .roster,.side .kv{display:none}.side h2{font-size:.95rem}.side .hint{font-size:.75rem}
+  .pad{grid-template-columns:repeat(5,1fr);gap:4px}.score-top .row .btn.sm{padding:4px 7px}.fs-btns{grid-template-columns:repeat(4,1fr)}.fs-btns .ok{grid-column:1/-1}}
+.btn.ok{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.btn.sm{padding:4px 9px;font-size:.82rem}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.on{border-color:var(--amber);color:var(--amber)}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{min-height:70px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+label.ck{flex-direction:row;align-items:center;gap:8px;color:var(--chalk);font-size:.92rem}
+label.ck input{width:auto}
+.form{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.form .full{grid-column:1/-1}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:left;font-weight:600;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:default}
+th.sort{cursor:pointer}th.sort:hover{color:var(--chalk)}
+td{padding:8px;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);vertical-align:middle}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--panel2)}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:1px 9px;font-size:.72rem;font-weight:600;letter-spacing:.04em;border:1px solid currentColor;white-space:nowrap}
+.st-waiting{color:var(--amber)}.st-ready{color:var(--blue)}.st-playing{color:#5fd68f}.st-finished{color:var(--muted)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.av{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:15px;flex:none;border:2px solid var(--line)}
+.av.lg{width:64px;height:64px;font-size:32px}
+.pl{display:inline-flex;align-items:center;gap:8px;min-width:0;vertical-align:middle}
+.pl .t{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.pl .t b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted);white-space:nowrap}
+.team-chip i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.role{font-size:.64rem;letter-spacing:.08em;font-weight:700;padding:0 6px;border-radius:4px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.role.admin{color:var(--amber)}.role.referee{color:var(--blue)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card .code{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.vs .mid{font-family:var(--f-display);color:var(--muted)}
+.vs .r{text-align:right;justify-self:end}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+.banner{background:color-mix(in srgb,var(--amber) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:var(--r);padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+/* scoring */
+.score-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.legs-box{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 16px;font-family:var(--f-display)}
+.legs-box .big{font-family:var(--f-mono);font-size:1.8rem;font-weight:700}
+.arena{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:980px){.arena{grid-template-columns:1fr 1fr}.arena .center{grid-column:1/-1;order:-1}}
+@media (max-width:600px){.sync span{display:none}.me-chip .lbl{display:none}.brand small{display:none}.remain{font-size:2.6rem}
+  .top-in{gap:8px}.brand{font-size:1.1rem;min-width:0;flex:0 1 auto}.brand>div{min-width:0;overflow:hidden;text-overflow:ellipsis}.me-chip{flex:0 1 auto;max-width:150px;padding-right:8px;overflow:hidden}.me-chip .nm{max-width:90px}.skin-btn{width:30px;height:30px}.score-top h1{font-size:1.25rem}.legs-box{padding:4px 12px}.legs-box .big{font-size:1.4rem}}
+@media (max-width:560px){.arena{grid-template-columns:1fr}}
+.side{background:var(--panel);border:2px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.side.active{border-color:var(--amber);box-shadow:0 0 0 3px color-mix(in srgb,var(--amber) 18%,transparent)}
+.side .tag{font-size:.7rem;letter-spacing:.12em;font-weight:700;color:var(--muted)}
+.side.active .tag{color:var(--amber)}
+.remain{font-family:var(--f-mono);font-size:clamp(3rem,7vw,4.6rem);font-weight:700;line-height:1;text-align:center;padding:10px 0;background:var(--bg);border-radius:8px}
+.side.active .remain{color:var(--amber)}
+.dots{display:flex;gap:5px}.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--muted);display:inline-block}.dots i.f{background:var(--amber);border-color:var(--amber)}
+.roster{display:flex;flex-direction:column;gap:6px}
+.roster .rp{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;border:1px solid transparent}
+.roster .rp.now{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 8%,transparent)}
+.roster .ord{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);width:22px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:.85rem}
+.kv span:nth-child(odd){color:var(--muted)}.kv span:nth-child(even){font-family:var(--f-mono);text-align:right}
+.hint{background:color-mix(in srgb,var(--green) 16%,var(--bg));border:1px solid color-mix(in srgb,var(--green) 50%,transparent);border-radius:8px;padding:6px 10px;font-size:.85rem}
+.hint b{font-family:var(--f-mono)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{background:var(--bg);border:1px dashed var(--line);border-radius:8px;text-align:center;padding:8px 4px}
+.slot b{display:block;font-family:var(--f-mono);font-size:1.3rem}
+.slot small{color:var(--muted);font-size:.7rem}
+.slot.f{border-style:solid;border-color:var(--muted)}
+.preview{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.preview .tot{font-family:var(--f-mono);font-size:1.5rem;font-weight:700}
+.bust{color:#fff;background:var(--red);padding:2px 10px;border-radius:6px;font-family:var(--f-display);letter-spacing:.08em}
+.fin{color:var(--amber-ink);background:var(--amber);padding:2px 10px;border-radius:6px;font-family:var(--f-display);letter-spacing:.08em}
+.mult{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.pad .btn{padding:10px 0;font-family:var(--f-mono);font-weight:700}
+.pad2{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.subtabs{display:flex;gap:4px;flex-wrap:wrap}
+.board-wrap{max-width:430px;margin:0 auto;width:100%}
+.board-wrap svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.seg{cursor:pointer;stroke:#8a8a80;stroke-width:.6}
+.seg:hover{filter:brightness(1.35)}
+.log{display:flex;flex-direction:column;gap:4px;max-height:340px;overflow:auto}
+.log .ln{display:grid;grid-template-columns:52px 1fr auto auto;gap:8px;align-items:center;padding:5px 8px;border-radius:6px;background:var(--bg);font-size:.85rem}
+.log .ln .d{font-family:var(--f-mono);color:var(--muted);font-size:.78rem}
+.log .ln .tt{font-family:var(--f-mono);font-weight:700}
+.log .sep{font-size:.75rem;color:var(--amber);padding:4px 8px;font-family:var(--f-display);letter-spacing:.06em}
+video,canvas.snap{width:100%;border-radius:8px;background:#000}
+/* bracket */
+.bracket{display:flex;gap:26px;overflow-x:auto;padding-bottom:8px}
+.round{display:flex;flex-direction:column;justify-content:space-around;gap:14px;min-width:220px}
+.round h3{font-size:.85rem;color:var(--muted);text-align:center;letter-spacing:.1em}
+.bm{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.bm .e{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--line);min-height:40px}
+.bm .e:last-of-type{border-bottom:0}
+.bm .e.w{background:color-mix(in srgb,var(--amber) 14%,transparent)}
+.bm .e.w b{color:var(--amber)}
+.bm .e.l{opacity:.5}
+.bm .act{display:flex;gap:4px;padding:6px;border-top:1px solid var(--line);background:var(--bg);flex-wrap:wrap}
+.champ{min-width:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;text-align:center;border:2px solid var(--amber);border-radius:var(--r);padding:18px;background:color-mix(in srgb,var(--amber) 8%,var(--panel))}
+/* charts */
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:min(620px,100%);max-height:90vh;overflow:auto;display:flex;flex-direction:column}
+.modal.wide{width:min(860px,100%)}
+.modal-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modal-b{padding:18px;display:flex;flex-direction:column;gap:14px}
+.modal-f{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.x{background:none;border:0;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1}
+.faceoff{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;text-align:center}
+.faceoff .vsb{font-family:var(--f-display);font-size:2.2rem;color:var(--amber)}
+.coin{font-family:var(--f-display);font-size:2rem;text-align:center;padding:16px;border-radius:var(--r);background:var(--bg)}
+.coin.spin{animation:spin .25s linear infinite}
+@keyframes spin{50%{opacity:.4}}
+.pick-list{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));max-height:300px;overflow:auto}
+.pick-list .opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+.pick-list .opt.on{border-color:var(--amber)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--chalk);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;z-index:60;box-shadow:0 6px 24px rgba(0,0,0,.4);max-width:90vw}
+/* footer */
+footer{border-top:1px solid var(--line);background:var(--panel)}
+.foot{max-width:1240px;margin:0 auto;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.84rem}
+.copy-c{width:30px;height:30px;border-radius:50%;border:2px solid var(--amber);color:var(--amber);display:inline-grid;place-items:center;font-weight:700;font-family:var(--f-display);font-size:1rem;cursor:pointer;background:none;flex:none}
+.copy-c:hover{background:var(--amber);color:var(--amber-ink)}
+.foot .stack{display:flex;gap:6px;flex-wrap:wrap}
+.foot .stack span{border:1px solid var(--line);border-radius:999px;padding:0 8px;font-size:.75rem}
+.spark{width:100%;height:60px}
+.prof{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.move{display:flex;flex-direction:column;gap:6px}
+.move .it{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#111" stroke="#efe6cf" stroke-width="2"/><circle cx="20" cy="20" r="12" fill="none" stroke="#d64a3d" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="#2f9d62"/><circle cx="20" cy="20" r="2.5" fill="#d64a3d"/></svg><div><span id="app-name">OCHE</span><small>ระบบจัดการแข่งขันปาลูกดอก</small></div></div>
+    <div class="spacer"></div>
+    <button class="sync" id="sync-pill" type="button" title="สถานะการเก็บข้อมูล"><i></i><span>ออฟไลน์</span></button>
+    <button class="skin-btn" id="skin-btn" type="button" title="เปลี่ยนธีม" aria-label="เปลี่ยนธีม">🎨</button>
+    <button class="me-chip" id="me-chip" type="button" title="เลือกว่าคุณคือผู้เล่นคนไหน"></button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main id="view"></main>
+<footer>
+  <div class="foot">
+    <button class="copy-c" id="about-btn" type="button" title="เกี่ยวกับระบบและเทคโนโลยีที่ใช้" aria-label="เกี่ยวกับระบบ">C</button>
+    <div style="flex:1;min-width:220px">
+      <div>© 2026 <span id="foot-name">OCHE Dart League</span> · พัฒนาด้วย HTML5 + CSS3 + JavaScript (ES2020) ล้วน ไม่ใช้เฟรมเวิร์ก ทำงานในเบราว์เซอร์ทั้งหมด</div>
+      <div class="small">ข้อมูลซิงก์ผ่าน Cloud Firestore หรือเก็บในเครื่องด้วย localStorage · กระดานปาเป้าและกราฟวาดด้วย SVG · AI จำลองใช้โมเดลความแม่นยำแบบสุ่ม · โฮสต์บน GitHub Pages</div>
+    </div>
+    <div class="stack"><span>HTML5</span><span>CSS3</span><span>Vanilla JS</span><span>SVG</span><span>Firebase</span></div>
+  </div>
+</footer>
+<div id="modal-root"></div>
+
+<script>
+'use strict';
+/* ====================== storage & helpers ====================== */
+const KEY='oche-dart-league-v1';
+const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10},players:[],teams:[],rooms:[],tours:[],audit:[],me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
+const PREF_KEY='oche-dart-prefs-v1';
+let S;
+const clone=o=>JSON.parse(JSON.stringify(o));
+/* cloud = Firestore shared store. local = this browser only. */
+const FB_KEY='oche-firebase-config';
+function fbConfig(){if(window.OCHE_FIREBASE&&window.OCHE_FIREBASE.projectId)return window.OCHE_FIREBASE;try{const c=JSON.parse(localStorage.getItem(FB_KEY)||'null');return c&&c.projectId?c:null}catch(e){return null}}
+/* a link like #connect=<base64 config> lets other devices join the same database */
+(function(){const h=location.hash;if(h.startsWith('#connect=')){try{const c=JSON.parse(decodeURIComponent(escape(atob(h.slice(9)))));if(c&&c.projectId)localStorage.setItem(FB_KEY,JSON.stringify(c))}catch(e){}history.replaceState(null,'',location.pathname+'#dashboard')}})();
+const hasHostDb=false;
+const cloud={db:null,kind:null,state:(hasHostDb||fbConfig())?'connecting':'local',readOnly:false,slow:false,written:{},chain:{},seen:{}};
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('โหลด '+src+' ไม่ได้'));document.head.appendChild(s)})}
+async function initFirebase(cfg){const v='10.12.2';
+  if(!window.firebase){await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`);await loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`)}
+  const app=firebase.apps.length?firebase.app():firebase.initializeApp(cfg);return app.firestore()}
+const META_DOCS={settings:()=>({settings:S.settings}),people:()=>({players:S.players,teams:S.teams}),tours:()=>({tours:S.tours}),audit:()=>({audit:S.audit.slice(0,300)})};
+const ser=o=>JSON.stringify(o,(k,v)=>k==='leg'?undefined:v);
+function savePrefs(){try{localStorage.setItem(PREF_KEY,JSON.stringify({me:S.me,ui:S.ui,skin:S.skin||'auto'}))}catch(e){}}
+function save(){savePrefs();
+  if(cloud.state==='local'){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}return}
+  if(cloud.state!=='online'||cloud.readOnly)return;
+  for(const k in META_DOCS){const p='league/'+k,s=ser(META_DOCS[k]());if(cloud.written[p]!==s){cloud.written[p]=s;writeDoc(p,{json:s,at:Date.now()})}}
+  const ids=new Set();S.rooms.forEach(r=>{if(r.sim)return;ids.add(r.id);const p='rooms/'+r.id,s=ser(r);if(cloud.written[p]!==s){cloud.written[p]=s;writeDoc(p,{json:s,created:r.created||0,at:Date.now()})}});
+  Object.keys(cloud.written).forEach(p=>{if(p.startsWith('rooms/')&&!ids.has(p.slice(6))){delete cloud.written[p];delDoc(p)}})}
+function cloudQ(p,fn){cloud.chain[p]=(cloud.chain[p]||Promise.resolve()).then(fn).catch(cloudErr)}
+const writeDoc=(p,d)=>cloudQ(p,()=>cloud.db.doc(p).set(d));
+const delDoc=p=>cloudQ(p,()=>cloud.db.doc(p).delete());
+function cloudErr(e){const c=e&&e.code;
+  if(c==='invalid_argument'||c==='permission-denied'){if(!cloud.readOnly){cloud.readOnly=true;toast('ฐานข้อมูลไม่อนุญาตให้บันทึก ตรวจสอบสิทธิ์ / Security Rules');render()}}
+  else if(c==='quota_exceeded')toast('พื้นที่เก็บข้อมูลบนเซิร์ฟเวอร์เต็ม ลบห้องเก่าบางส่วนแล้วลองใหม่');
+  else if(c==='revoked'){cloud.readOnly=true;render()}
+  else toast('บันทึกขึ้นเซิร์ฟเวอร์ไม่สำเร็จ ('+(c||'error')+') ลองอีกครั้ง')}
+function loadPrefs(){let p={};try{p=JSON.parse(localStorage.getItem(PREF_KEY)||'{}')||{}}catch(e){}return p}
+function fixShape(){const d=clone(DEF);S=Object.assign(d,S);S.settings=Object.assign(clone(DEF.settings),S.settings);S.ui=Object.assign(clone(DEF.ui),S.ui)}
+function load(){const pr=loadPrefs();
+  if(cloud.state==='local'){let raw=null;try{raw=localStorage.getItem(KEY)}catch(e){}
+    try{S=raw?JSON.parse(raw):null}catch(e){S=null}
+    if(!S){S=clone(DEF);seedDemo();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}}
+  else S=clone(DEF);
+  fixShape();if(pr.me)S.me=pr.me;if(pr.ui)S.ui=Object.assign(S.ui,pr.ui);S.skin=pr.skin||S.skin||'auto';applySkin()}
+function applyMeta(k,d){d=d||{};
+  if(k==='settings')S.settings=Object.assign(clone(DEF.settings),d.settings||{});
+  else if(k==='people'){S.players=d.players||[];S.teams=d.teams||[]}
+  else if(k==='tours')S.tours=d.tours||[];
+  else if(k==='audit')S.audit=d.audit||[]}
+let needRender=false;
+function remoteRender(){const a=document.activeElement;if($('#mbg')||(a&&a.matches&&a.matches('input,textarea,select'))){needRender=true;return}render()}
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(needRender&&!$('#mbg')&&!(a&&a.matches&&a.matches('input,textarea,select'))){needRender=false;render()}},60));
+async function initCloud(){
+  if(cloud.state!=='connecting')return;
+  let db=null;
+
+  if(!db&&fbConfig()){try{db=await initFirebase(fbConfig());cloud.kind='firebase'}catch(e){toast('เชื่อมต่อ Firebase ไม่สำเร็จ: '+(e.message||e));db=null}}
+  if(!db){cloud.state='local';load();render();if(!S.me)setTimeout(pickMe,300);return}
+  cloud.db=db;
+  const parse=snap=>{if(!snap.exists)return null;const d=snap.data();if(d&&typeof d.json==='string'){try{return JSON.parse(d.json)}catch(e){return null}}return clone(d)};
+  const timer=setTimeout(()=>{if(cloud.state==='connecting'){cloud.slow=true;render()}},10000);
+  const done=()=>{if(cloud.state==='connecting'&&Object.keys(cloud.seen).length>=5){cloud.state='online';cloud.slow=false;clearTimeout(timer);render();
+    if(S.players.length&&!P(S.me))setTimeout(pickMe,300);
+    if(!S.players.length&&!cloud.readOnly){let loc=null;try{loc=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+      if(loc&&loc.players&&loc.players.length&&!loc.demo)setTimeout(()=>openModal('ย้ายข้อมูลขึ้นออนไลน์?',`<p style="margin:0">ฐานข้อมูลออนไลน์ยังว่างอยู่ แต่เครื่องนี้มีข้อมูลเดิม (${loc.players.length} ผู้เล่น, ${(loc.rooms||[]).length} ห้อง) ต้องการอัปโหลดขึ้นไปใช้ร่วมกันทุกเครื่องไหม?</p>`,[{label:'ไม่ต้อง'},{label:'อัปโหลดข้อมูลเครื่องนี้',cls:'pri',fn:()=>{const sk=S.skin;S=Object.assign(clone(DEF),loc);S.skin=sk;fixShape();save();render();toast('อัปโหลดข้อมูลแล้ว')}}]),400)}}};
+  Object.keys(META_DOCS).forEach(k=>{const p='league/'+k;
+    db.doc(p).onSnapshot(snap=>{if(cloud.state==='local')return;applyMeta(k,parse(snap));cloud.written[p]=snap.exists?ser(META_DOCS[k]()):undefined;
+      if(!snap.metadata.fromCache)cloud.seen[p]=1;done();if(cloud.state==='online')remoteRender()},e=>{cloud.seen[p]=1;cloudErr(e);done()})});
+  db.collection('rooms').onSnapshot(snap=>{if(cloud.state==='local')return;const old=new Map(S.rooms.map(r=>[r.id,r]));
+    S.rooms=snap.docs.map(parse).filter(Boolean).map(nd=>{const o=old.get(nd.id);if(o){Object.keys(o).forEach(k=>delete o[k]);Object.assign(o,nd);return o}return nd}).sort((a,b)=>(b.created||0)-(a.created||0));
+    Object.keys(cloud.written).forEach(p=>{if(p.startsWith('rooms/'))delete cloud.written[p]});S.rooms.forEach(r=>cloud.written['rooms/'+r.id]=ser(r));
+    if(!snap.metadata.fromCache)cloud.seen.rooms=1;done();if(cloud.state==='online')remoteRender()},e=>{cloud.seen.rooms=1;cloudErr(e);done()});
+}
+/* skins */
+const SKINS=[['auto','อัตโนมัติ','ตามโหมดสว่าง/มืดของเครื่อง',['#0f1512','#f2b134','#f2f0e8','#b4720b']],['slate','Slate Pub','เขียวเข้ม ไฟทังสเตน',['#0f1512','#161e1a','#f2b134','#2f9d62']],['light','Chalk Light','พื้นสว่าง อ่านง่ายกลางวัน',['#f2f0e8','#ffffff','#b4720b','#23804e']],['neon','Neon Arcade','ม่วงเข้ม นีออนฟ้า',['#0c0a19','#15122f','#22e1d6','#ff4f8b']],['pub','Oak & Brass','ไม้โอ๊กกับทองเหลือง',['#19110b','#23180f','#d9a441','#c4422f']],['ocean','Deep Ocean','น้ำเงินลึก ส้มสด',['#081521','#0e1f30','#ff9f43','#4fc3f7']]];
+function applySkin(){document.documentElement.setAttribute('data-skin',(S&&S.skin)||'auto')}
+function skinModal(){openModal('เปลี่ยนธีม',`<p class="muted small" style="margin:0">ธีมจำแยกตามเครื่อง ไม่กระทบผู้ใช้คนอื่น</p><div class="skins">${SKINS.map(([k,n,d,c])=>`<div class="skin ${(S.skin||'auto')===k?'on':''}" data-skin-pick="${k}" tabindex="0"><div class="sw">${c.map(x=>`<i style="background:${x}"></i>`).join('')}</div><b>${n}</b><span class="muted small">${d}</span></div>`).join('')}</div>`,[{label:'ปิด',cls:'pri'}],
+  {after:root=>root.querySelectorAll('[data-skin-pick]').forEach(el=>{const f=()=>{S.skin=el.dataset.skinPick;applySkin();savePrefs();root.querySelectorAll('.skin').forEach(x=>x.classList.toggle('on',x===el))};el.onclick=f;el.onkeydown=e=>{if(e.key==='Enter')f()}})})}
+async function saveFile(filename,data,mime){try{const dl=null;
+  if(dl){await dl.save({filename,data:data instanceof Blob?data:new Blob([data],{type:mime})});toast('บันทึกไฟล์แล้ว');return}}catch(e){if(e&&e.code==='not_granted'||e&&e.code==='dismissed')return}
+  const a=document.createElement('a');a.href=typeof data==='string'&&data.startsWith('data:')?data:URL.createObjectURL(data instanceof Blob?data:new Blob([data],{type:mime}));a.download=filename;a.click()}
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const fmt2=n=>(isFinite(n)?n:0).toFixed(2);
+const pct=(a,b)=>b?Math.round(a/b*100)+'%':'0%';
+const dt=ts=>ts?new Date(ts).toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+const dayKey=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+const OUT_LABEL={double:'Double Out',single:'Single Out',master:'Master Out'};
+const ROLE_LABEL={admin:'ADMIN',referee:'REFEREE',player:'PLAYER'};
+const P=id=>S.players.find(p=>p.id===id);
+const T=id=>S.teams.find(t=>t.id===id);
+const teamMembers=tid=>S.players.filter(p=>p.teamId===tid);
+const me=()=>P(S.me);
+const canRef=()=>{const m=me();return !!m&&(m.role==='admin'||m.role==='referee')};
+const isAdmin=()=>{const m=me();return !!m&&m.role==='admin'};
+
+/* ====================== people rendering ====================== */
+function av(p,cls=''){if(!p)return `<span class="av ${cls}" style="background:var(--panel2)">?</span>`;return `<span class="av ${cls}" style="background:${esc(p.color)}33;border-color:${esc(p.color)}">${esc(p.emoji||'🎯')}</span>`}
+function teamChip(tid){const t=T(tid);return t?`<span class="team-chip"><i style="background:${esc(t.color)}"></i>${esc(t.name)}</span>`:`<span class="team-chip"><i style="background:var(--line)"></i>ไม่มีทีม</span>`}
+function plHTML(id,opt={}){const p=P(id)||opt.fake;if(!p)return '<span class="muted">—</span>';
+  return `<span class="pl">${av(p)}<span class="t"><b>${esc(p.name)}${p.nick?` <span class="muted small">“${esc(p.nick)}”</span>`:''}</b>${opt.noTeam?'':teamChip(p.teamId)}</span></span>`}
+function sideName(room,i){if(room.labels)return room.labels[i];const s=room.sides[i];if(!s)return '—';if(s.teamId){const t=T(s.teamId);return t?t.name:'ทีมที่ถูกลบ'}const p=P(s.playerIds[0]);return p?p.name:'รอผู้เล่น'}
+function sideFilled(room,i){const s=room.sides[i];return s&&s.playerIds.length>0}
+function pname(room,id){if(room.fake&&room.fake[id])return room.fake[id].name;const p=P(id);return p?p.name:'?'}
+
+/* ====================== darts core ====================== */
+const ORDER=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const D=(s,m)=>({s,m,v:s*m});
+const dLabel=d=>!d?'':d.s===0?'MISS':d.s===25?(d.m===2?'BULL':'25'):(d.m===3?'T':d.m===2?'D':'')+d.s;
+const SETUP=[];for(let s=20;s>=1;s--)SETUP.push(D(s,3));for(let s=20;s>=1;s--)SETUP.push(D(s,1));SETUP.push(D(25,1),D(25,2));for(let s=20;s>=1;s--)SETUP.push(D(s,2));
+const BYVAL={};[...Array.from({length:20},(_,i)=>D(20-i,1)),...Array.from({length:20},(_,i)=>D(20-i,3)),D(25,1),...Array.from({length:20},(_,i)=>D(20-i,2)),D(25,2)].forEach(d=>{if(!BYVAL[d.v])BYVAL[d.v]=d});
+const FIN_PREF=[20,16,18,12,10,8,19,17,14,15,13,11,9,6,4,7,5,3,2,1];
+function finishers(out){let f=FIN_PREF.map(s=>D(s,2)).concat([D(25,2)]);if(out==='master')f=f.concat(FIN_PREF.map(s=>D(s,3)));if(out==='single')f=f.concat(Object.values(BYVAL));return f}
+function okLeft(r,out){return out==='single'?r>0:r>1}
+function checkout(rem,out,left=3){
+  if(rem<=0||rem>180)return null;
+  const F=finishers(out);
+  const f1=F.find(d=>d.v===rem);if(f1)return [f1];
+  if(left>=2)for(const f of F){const a=BYVAL[rem-f.v];if(a&&okLeft(rem-a.v,out))return [a,f]}
+  if(left>=3)for(const f of F)for(const b of SETUP){const r2=rem-f.v-b.v;const a=BYVAL[r2];if(a&&okLeft(rem-a.v,out)&&okLeft(rem-a.v-b.v,out))return [a.v>=b.v?a:b,a.v>=b.v?b:a,f]}
+  return null}
+function evalDarts(darts,before,out){
+  let r=before;const used=[];
+  for(const d of darts){used.push(d);r-=d.v;
+    if(r<0||(r===1&&out!=='single'))return{bust:true,fin:false,total:0,used};
+    if(r===0){const ok=out==='single'||(out==='double'&&d.m===2)||(out==='master'&&d.m>=2);return ok?{bust:false,fin:true,total:before,used}:{bust:true,fin:false,total:0,used}}}
+  return{bust:false,fin:false,total:before-r,used}}
+const need=room=>Math.floor(room.bestOf/2)+1;
+
+/* replay a room's events -> current state */
+function replay(room){
+  const Sc=room.score,st0=room.starter??0;
+  const st={leg:1,legsWon:[0,0],rem:[Sc,Sc],legStarter:st0,toThrow:st0,throws:[0,0],orderIdx:[0,0],order:room.sides.map(s=>s.playerIds.slice()),finished:false,winner:null,legEnds:[],needBull:false,lastEvent:null};
+  const legWin=(side,how,i)=>{st.legsWon[side]++;st.legEnds.push({leg:st.leg,winner:side,how,idx:i});
+    if(st.legsWon[side]>=need(room)){st.finished=true;st.winner=side;return}
+    st.leg++;st.rem=[Sc,Sc];st.legStarter=1-st.legStarter;st.toThrow=st.legStarter;st.throws=[0,0];st.orderIdx=[0,0];};
+  room.events.forEach((e,i)=>{if(st.finished)return;
+    if(e.t==='starter'){if(st.throws[0]+st.throws[1]===0){st.legStarter=e.side;st.toThrow=e.side}}
+    else if(e.t==='order'){st.order[e.side]=e.ids.slice();st.orderIdx[e.side]=0}
+    else if(e.t==='turn'){e.leg=st.leg;if(!e.bust)st.rem[e.side]-=e.total;st.throws[e.side]++;st.orderIdx[e.side]++;
+      if(st.rem[e.side]===0)legWin(e.side,'checkout',i);else st.toThrow=1-e.side}
+    else if(e.t==='adjust'){e.leg=st.leg;st.rem=[e.rem[0]??st.rem[0],e.rem[1]??st.rem[1]]}
+    else if(e.t==='bull'){e.leg=st.leg;legWin(e.side,'bull',i)}
+  });
+  const L=room.roundLimit||0;
+  st.needBull=!st.finished&&L>0&&st.throws[0]>=L&&st.throws[1]>=L;
+  st.round=Math.min(st.throws[0],st.throws[1])+1;
+  st.thrower=side=>{const o=st.order[side];return o.length?o[st.orderIdx[side]%o.length]:null};
+  st.anyTurn=room.events.some(e=>e.t==='turn'||e.t==='bull');
+  st.legFresh=st.throws[0]+st.throws[1]===0;
+  return st}
+function roomStatus(room){if(!sideFilled(room,0)||!sideFilled(room,1))return 'waiting';const st=replay(room);if(st.finished)return 'finished';return st.anyTurn?'playing':'ready'}
+function makeTurn(room,st,darts,quick){
+  const side=st.toThrow,before=st.rem[side];
+  let ev;
+  if(quick){const total=quick.total,r=before-total;const bust=total>180||r<0||(r===1&&room.out!=='single');const fin=!bust&&r===0;
+    ev={t:'turn',side,pid:st.thrower(side),darts:null,n:fin?quick.n:3,total:bust?0:total,raw:total,bust,before,ts:Date.now()}}
+  else{const r=evalDarts(darts,before,room.out);const used=r.fin||r.bust?r.used:darts.concat(Array(3-darts.length).fill(D(0,1))).slice(0,3);
+    ev={t:'turn',side,pid:st.thrower(side),darts:used,n:r.bust?3:used.length,total:r.total,raw:used.reduce((a,d)=>a+d.v,0),bust:r.bust,before,ts:Date.now()}}
+  return ev}
+
+/* ====================== AI thrower ====================== */
+const LEVELS={pro:{a:1,name:'Professional (96%)'},adv:{a:.78,name:'Advanced (85%)'},mid:{a:.5,name:'Intermediate (65%)'},beg:{a:.22,name:'Beginner (40%)'}};
+const neighbor=(s,dir)=>{const i=ORDER.indexOf(s);return ORDER[(i+dir+20)%20]};
+function aiAim(rem,out,left){
+  const co=checkout(rem,out,left);if(co)return co[0];
+  if(rem>=100||rem>60+40)return D(20,3);
+  // leave a preferred double with a single
+  for(const f of finishers(out)){const s=rem-f.v;if(s>=1&&s<=20)return D(s,1);if(s>20&&s<=60&&s%3===0)return D(s/3,3)}
+  return rem>60?D(20,3):D(Math.min(20,rem-2>0?rem-2:1),1)}
+function aiHit(t,a){
+  const r=Math.random();
+  if(t.s===25){const p=t.m===2?.07+.25*a:.28+.4*a;if(r<p)return t;if(r<p+.3)return D(25,t.m===2?1:2);return D(ORDER[Math.floor(Math.random()*20)],1)}
+  const p=t.m===3?.1+.36*a:t.m===2?.12+.33*a:.55+.4*a;if(r<p)return t;
+  const r2=Math.random(),adj=neighbor(t.s,Math.random()<.5?1:-1);
+  if(t.m===3)return r2<.62?D(t.s,1):r2<.92?D(adj,1):D(adj,3);
+  if(t.m===2)return r2<.45?D(t.s,1):r2<.8?D(0,1):D(adj,2);
+  return r2<.8?D(adj,1):D(t.s,Math.random()<.5?3:2)}
+function aiTurn(room,st,a){const side=st.toThrow,before=st.rem[side];const darts=[];
+  for(let k=0;k<3;k++){const done=evalDarts(darts,before,room.out);if(done.bust||done.fin)break;darts.push(aiHit(aiAim(before-darts.reduce((x,d)=>x+d.v,0),room.out,3-k),a))}
+  return darts}
+function playOut(room,lv,maxTurns=999){let n=0;while(n<maxTurns){const st=replay(room);if(st.finished)break;
+  if(st.needBull){room.events.push({t:'bull',side:Math.random()<.5?0:1,ts:Date.now()});continue}
+  const darts=aiTurn(room,st,lv[st.toThrow]);room.events.push(makeTurn(room,st,darts));n++}}
+
+/* ====================== stats ====================== */
+function realRooms(){return S.rooms.filter(r=>!r.sim)}
+function computeStats(){
+  const m={};const get=id=>m[id]||(m[id]={id,matches:0,wins:0,darts:0,points:0,s180:0,s140:0,s100:0,high:0,best:0,legs:0,mAvg:[],last:0});
+  S.players.forEach(p=>get(p.id));
+  const tm={};S.teams.forEach(t=>tm[t.id]={id:t.id,matches:0,wins:0,darts:0,points:0,s180:0});
+  realRooms().forEach(room=>{const st=replay(room);const per={};
+    room.events.forEach(e=>{if(e.t!=='turn'||!e.pid)return;const s=get(e.pid);const n=e.darts?e.darts.length:e.n||3;s.darts+=n;s.points+=e.total;
+      per[e.pid]=per[e.pid]||{d:0,p:0};per[e.pid].d+=n;per[e.pid].p+=e.total;
+      if(!e.bust){if(e.total===180)s.s180++;if(e.total>=140)s.s140++;if(e.total>=100)s.s100++;if(e.total>s.high)s.high=e.total;if(e.total===e.before&&e.total>s.best)s.best=e.total}
+      const tid=room.sides[e.side]?.teamId;if(tid&&tm[tid]){tm[tid].darts+=n;tm[tid].points+=e.total;if(e.total===180)tm[tid].s180++}});
+    st.legEnds.forEach(l=>{const pids=room.sides[l.winner].playerIds;pids.forEach(id=>get(id).legs++)});
+    if(st.finished){room.sides.forEach((sd,i)=>{sd.playerIds.forEach(id=>{const s=get(id);s.matches++;if(st.winner===i)s.wins++;if(per[id]&&per[id].d)s.mAvg.push({ts:room.finishedAt||room.created,avg:per[id].p/per[id].d*3,room:room.id});s.last=Math.max(s.last,room.finishedAt||0)});
+      if(sd.teamId&&tm[sd.teamId]){tm[sd.teamId].matches++;if(st.winner===i)tm[sd.teamId].wins++}})}});
+  Object.values(m).forEach(s=>{s.avg=s.darts?s.points/s.darts*3:0;s.wr=s.matches?s.wins/s.matches:0;s.mAvg.sort((a,b)=>a.ts-b.ts)});
+  Object.values(tm).forEach(s=>{s.avg=s.darts?s.points/s.darts*3:0;s.wr=s.matches?s.wins/s.matches:0});
+  return{players:m,teams:tm}}
+function list180(){const out=[];realRooms().forEach(room=>room.events.forEach(e=>{if(e.t==='turn'&&!e.bust&&e.total===180)out.push({pid:e.pid,room,ts:e.ts})}));return out.sort((a,b)=>b.ts-a.ts)}
+
+/* ====================== modal ====================== */
+let modalOnClose=null;
+function openModal(title,body,buttons=[],opt={}){
+  const root=$('#modal-root');
+  root.innerHTML=`<div class="modal-bg" id="mbg"><div class="modal ${opt.wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modal-h"><h2>${title}</h2>${opt.noClose?'':'<button class="x" id="mx" aria-label="ปิด">×</button>'}</div><div class="modal-b">${body}</div>${buttons.length?`<div class="modal-f">${buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-mb="${i}" type="button">${b.label}</button>`).join('')}</div>`:''}</div></div>`;
+  modalOnClose=opt.onClose||null;
+  if(!opt.noClose){$('#mx').onclick=closeModal;$('#mbg').addEventListener('mousedown',e=>{if(e.target.id==='mbg')closeModal()})}
+  buttons.forEach((b,i)=>root.querySelector(`[data-mb="${i}"]`).onclick=()=>{const r=b.fn?b.fn():undefined;if(r!==false)closeModal()});
+  const f=root.querySelector('input,select,textarea');if(f)setTimeout(()=>f.focus(),30);
+  if(opt.after)opt.after(root)}
+function closeModal(){$('#modal-root').innerHTML='';const f=modalOnClose;modalOnClose=null;if(f)f();if(needRender&&!$('#mbg')){needRender=false;render()}}
+function confirmBox(title,msg,okLabel,fn,danger=true){openModal(title,`<p style="margin:0">${msg}</p>`,[{label:'ยกเลิก'},{label:okLabel,cls:danger?'dng':'pri',fn}])}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mx'))closeModal()});
+
+/* ====================== router ====================== */
+const ROUTES=[['dashboard','ภาพรวม'],['rooms','ห้องแข่งขัน'],['match','ให้คะแนนสด'],['simulator','AI จำลอง'],['ranking','อันดับ'],['players','ผู้เล่น'],['teams','ทีม'],['tournament','ผังการแข่งขัน'],['hall-of-fame','Hall of Fame 180'],['config','ตั้งค่า']];
+function route(){return (location.hash||'').slice(1)||'dashboard'}
+function go(r){if(location.hash.slice(1)===r)render();else location.hash=r}
+window.addEventListener('hashchange',render);
+function render(){
+  const r=route();
+  if(r!=='simulator')simStop();
+  if(r!=='match'){camStop();if(fsMode){fsMode=false;document.body.style.overflow=''}}
+  $('#tabs').innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${(r===k||(r==='profile'&&k==='ranking'))?'on':''}">${l}</a>`).join('');
+  $('#app-name').textContent=S.settings.appName||'OCHE';$('#foot-name').textContent=S.settings.appName||'OCHE';
+  const m=me();
+  $('#me-chip').innerHTML=m?`${av(m)}<span style="display:flex;flex-direction:column;align-items:flex-start;min-width:0"><span class="lbl">ใช้งานในนาม · <span class="role ${m.role}">${ROLE_LABEL[m.role]}</span></span><span class="nm">${esc(m.name)}${m.teamId?' · '+esc(T(m.teamId)?.name||''):''}</span></span>`:`<span class="av">?</span><span class="nm">เลือกว่าคุณคือใคร</span>`;
+  const sp=$('#sync-pill');sp.className='sync '+(cloud.readOnly?'ro':cloud.state);
+  sp.querySelector('span').textContent=cloud.readOnly?'ดูอย่างเดียว':cloud.state==='online'?'ออนไลน์ · ซิงก์ทุกเครื่อง':cloud.state==='connecting'?'กำลังเชื่อมต่อ…':'ออฟไลน์ · เก็บในเครื่องนี้';
+  if(cloud.state==='connecting'){$('#view').innerHTML=`<div class="empty" style="padding:60px 16px"><h2>กำลังเชื่อมต่อเซิร์ฟเวอร์…</h2><p>${cloud.slow?'ยังเชื่อมต่อไม่ได้ ตรวจสอบอินเทอร์เน็ต ระบบจะลองต่อเองอัตโนมัติ <button class="btn sm" onclick="cloud.state=\'local\';load();render()">ใช้แบบออฟไลน์ไปก่อน</button>':'กำลังโหลดผู้เล่น ทีม และห้องแข่งขัน'}</p></div>`;return}
+  const v=VIEWS[r]||VIEWS.dashboard;$('#view').innerHTML=(cloud.readOnly?`<div class="banner"><span>โหมด<b>ดูอย่างเดียว</b> ดูสกอร์สดได้ แต่ฐานข้อมูลไม่อนุญาตให้บันทึก ตรวจสอบสิทธิ์หรือ Security Rules</span></div>`:'')+v();if(AFTER[r])AFTER[r]();
+}
+$('#skin-btn').onclick=()=>skinModal();
+$('#sync-pill').onclick=()=>openModal('การเก็บข้อมูล',cloud.state==='online'?`<p style="margin:0">ข้อมูลทั้งหมดเก็บบน<b>ฐานข้อมูลออนไลน์</b> ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลชุดเดียวกันแบบเรียลไทม์ ใช้ได้ตลอด 24 ชั่วโมง</p>`:`<p style="margin:0">ตอนนี้ข้อมูลเก็บใน<b>เบราว์เซอร์เครื่องนี้เท่านั้น</b> เครื่องอื่นจะไม่เห็น ไปที่ ตั้งค่า → ฐานข้อมูลออนไลน์ เพื่อเชื่อมต่อ Firebase แล้วทุกเครื่องจะใช้ข้อมูลร่วมกัน</p>`,[{label:'ปิด',cls:'pri'}]);
+const AFTER={};
+
+/* ====================== identity (no login) ====================== */
+function pickMe(){
+  const groups=[...S.teams.map(t=>({t,ps:teamMembers(t.id)})),{t:null,ps:S.players.filter(p=>!p.teamId||!T(p.teamId))}].filter(g=>g.ps.length);
+  openModal('คุณคือใคร?',`<p class="muted small" style="margin:0">ไม่มีระบบล็อกอิน เลือกโปรไฟล์ของคุณเพื่อให้ระบบรู้ว่าใครกำลังใช้งาน ทีมไหน และมีสิทธิ์อะไร (จำไว้ในเครื่องนี้)</p>
+  ${groups.map(g=>`<div><h3 style="margin-bottom:6px">${g.t?`<span class="team-chip" style="font-size:.95rem;color:var(--chalk)"><i style="background:${esc(g.t.color)};width:12px;height:12px"></i>${esc(g.t.name)}</span>`:'ผู้เล่นอิสระ (ไม่มีทีม)'}</h3>
+   <div class="pick-list">${g.ps.map(p=>`<div class="opt ${S.me===p.id?'on':''}" data-me="${p.id}" tabindex="0">${av(p)}<span style="flex:1;min-width:0"><b>${esc(p.name)}</b></span><span class="role ${p.role}">${ROLE_LABEL[p.role]}</span></div>`).join('')}</div></div>`).join('')}`,
+  [{label:'+ เพิ่มผู้เล่นใหม่',fn:()=>{setTimeout(()=>editPlayer(null,true),10)}},{label:'ปิด'}],{wide:true,after:root=>root.querySelectorAll('[data-me]').forEach(el=>{const f=()=>{S.me=el.dataset.me;save();closeModal();render();toast('ใช้งานในนาม '+P(S.me).name)};el.onclick=f;el.onkeydown=e=>{if(e.key==='Enter')f()}})});
+}
+$('#me-chip').onclick=pickMe;
+
+/* ====================== players ====================== */
+const EMOJIS=['🎯','🦅','🐍','🦊','🐯','🐺','🦁','🐉','⚡','🔥','❄️','🌟','👑','🚀','🍀','🐼'];
+const COLORS=['#f2b134','#d64a3d','#2f9d62','#4c9be0','#b072e0','#e07a3e','#3ec9c0','#e05fa0','#9aa63a','#7f8cff'];
+function editPlayer(id,asMe){
+  const p=id?P(id):{name:'',nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:'',role:'player'};
+  openModal(id?'แก้ไขผู้เล่น':'เพิ่มผู้เล่น',`<div class="form">
+   <label>ชื่อผู้เล่น<input id="pf-name" value="${esc(p.name)}" maxlength="40" placeholder="เช่น สมชาย ใจดี"></label>
+   <label>ฉายา (ไม่บังคับ)<input id="pf-nick" value="${esc(p.nick)}" maxlength="24" placeholder="เช่น The Hammer"></label>
+   <label>สังกัดทีม<select id="pf-team"><option value="">— ไม่มีทีม —</option>${S.teams.map(t=>`<option value="${t.id}" ${p.teamId===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label>
+   <label>บทบาท<select id="pf-role">${['player','referee','admin'].map(r=>`<option value="${r}" ${p.role===r?'selected':''}>${ROLE_LABEL[r]}</option>`).join('')}</select></label>
+   <label class="full">ไอคอนประจำตัว<select id="pf-emoji">${EMOJIS.map(e=>`<option ${p.emoji===e?'selected':''}>${e}</option>`).join('')}</select></label>
+   <label class="full">สีประจำตัว<select id="pf-color">${COLORS.map(c=>`<option value="${c}" ${p.color===c?'selected':''}>${c}</option>`).join('')}</select></label></div>`,
+  [{label:'ยกเลิก'},{label:'บันทึก',cls:'pri',fn:()=>{const name=$('#pf-name').value.trim();if(!name){toast('กรุณากรอกชื่อผู้เล่น');return false}
+    const data={name,nick:$('#pf-nick').value.trim(),teamId:$('#pf-team').value||null,role:$('#pf-role').value,emoji:$('#pf-emoji').value,color:$('#pf-color').value};
+    if(id)Object.assign(P(id),data);else{const np={id:uid(),created:Date.now(),...data};S.players.push(np);if(asMe||!S.me)S.me=np.id}
+    save();render();toast('บันทึกผู้เล่นแล้ว')}}])}
+function delPlayer(id){const p=P(id);const used=S.rooms.some(r=>!r.sim&&r.sides.some(s=>s.playerIds.includes(id)));
+  confirmBox('ลบผู้เล่น',`ลบ <b>${esc(p.name)}</b> ออกจากระบบ?${used?'<br><span class="muted small">ผู้เล่นคนนี้มีประวัติแข่งขัน ประวัติจะยังอยู่แต่แสดงชื่อเป็น “?”</span>':''}`,'ลบผู้เล่น',()=>{S.players=S.players.filter(x=>x.id!==id);S.teams.forEach(t=>{if(t.leaderId===id)t.leaderId=null});if(S.me===id)S.me=null;save();render()})}
+let plFilter='';
+const VIEWS={};
+VIEWS.players=()=>{const st=computeStats().players;const q=plFilter.toLowerCase();
+  const ps=S.players.filter(p=>!q||p.name.toLowerCase().includes(q)||(p.nick||'').toLowerCase().includes(q)||(T(p.teamId)?.name||'').toLowerCase().includes(q));
+  return `<div class="head"><div><h1>ผู้เล่น</h1><p>ทะเบียนผู้เล่นทั้งหมด พร้อมทีมที่สังกัดและบทบาท</p></div><div class="row"><button class="btn pri" onclick="editPlayer()">+ เพิ่มผู้เล่น</button></div></div>
+  <div class="row"><input id="pl-q" placeholder="ค้นหาชื่อ ฉายา หรือทีม" value="${esc(plFilter)}" style="max-width:340px"></div>
+  ${ps.length?`<div class="grid g3">${ps.map(p=>{const s=st[p.id];return `<div class="card"><div class="row" style="justify-content:space-between">${plHTML(p.id)}<span class="role ${p.role}">${ROLE_LABEL[p.role]}</span></div>
+  <div class="kv"><span>แมตช์ / ชนะ</span><span>${s.matches} / ${s.wins}</span><span>3-Dart Avg</span><span>${fmt2(s.avg)}</span><span>180s</span><span>${s.s180}</span></div>
+  <div class="row"><button class="btn sm" onclick="openProfile('${p.id}')">โปรไฟล์</button><button class="btn sm" onclick="editPlayer('${p.id}')">แก้ไข</button><button class="btn sm dng" onclick="delPlayer('${p.id}')">ลบ</button>${S.me===p.id?'<span class="pill st-playing">คุณ</span>':''}</div></div>`}).join('')}</div>`:'<div class="empty">ยังไม่มีผู้เล่น กด “เพิ่มผู้เล่น” เพื่อเริ่ม</div>'}`};
+AFTER.players=()=>{const i=$('#pl-q');i.oninput=()=>{plFilter=i.value;const pos=i.selectionStart;render();const j=$('#pl-q');j.focus();j.setSelectionRange(pos,pos)}};
+
+/* ====================== teams ====================== */
+function editTeam(id){
+  const t=id?T(id):{name:'',color:COLORS[S.teams.length%COLORS.length],leaderId:''};
+  const cur=id?teamMembers(id).map(p=>p.id):[];
+  openModal(id?'แก้ไขทีม':'สร้างทีมใหม่',`<div class="form">
+  <label>ชื่อทีม<input id="tf-name" value="${esc(t.name)}" maxlength="32" placeholder="เช่น Ubon Vipers"></label>
+  <label>สีทีม<select id="tf-color">${COLORS.map(c=>`<option value="${c}" ${t.color===c?'selected':''}>${c}</option>`).join('')}</select></label>
+  <label class="full">หัวหน้าทีม<select id="tf-leader"><option value="">— ยังไม่กำหนด —</option>${S.players.map(p=>`<option value="${p.id}" ${t.leaderId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label></div>
+  <div><h3 style="margin-bottom:6px">สมาชิกในทีม</h3><p class="muted small" style="margin:0 0 6px">ผู้เล่นหนึ่งคนอยู่ได้ทีมเดียว ถ้าเลือกคนที่อยู่ทีมอื่น ระบบจะย้ายมาทีมนี้</p>
+  <div class="pick-list">${S.players.map(p=>`<label class="opt ck"><input type="checkbox" class="tf-mem" value="${p.id}" ${cur.includes(p.id)?'checked':''}>${av(p)}<span style="min-width:0"><b>${esc(p.name)}</b><br>${teamChip(p.teamId)}</span></label>`).join('')}</div></div>`,
+  [{label:'ยกเลิก'},{label:'บันทึกทีม',cls:'pri',fn:()=>{const name=$('#tf-name').value.trim();if(!name){toast('กรุณาตั้งชื่อทีม');return false}
+    let tm=id?T(id):null;if(!tm){tm={id:uid(),created:Date.now()};S.teams.push(tm)}
+    Object.assign(tm,{name,color:$('#tf-color').value,leaderId:$('#tf-leader').value||null});
+    const sel=$$('.tf-mem').filter(c=>c.checked).map(c=>c.value);
+    S.players.forEach(p=>{if(sel.includes(p.id))p.teamId=tm.id;else if(p.teamId===tm.id)p.teamId=null});
+    if(tm.leaderId&&!sel.includes(tm.leaderId)){P(tm.leaderId).teamId=tm.id}
+    save();render();toast('บันทึกทีมแล้ว')}}],{wide:true})}
+function delTeam(id){confirmBox('ลบทีม',`ลบทีม <b>${esc(T(id).name)}</b>? สมาชิกจะกลายเป็นผู้เล่นอิสระ`,'ลบทีม',()=>{S.players.forEach(p=>{if(p.teamId===id)p.teamId=null});S.teams=S.teams.filter(t=>t.id!==id);save();render()})}
+VIEWS.teams=()=>{const ts=computeStats().teams;return `<div class="head"><div><h1>ทีม</h1><p>จัดการทีม หัวหน้าทีม และสมาชิก</p></div><button class="btn pri" onclick="editTeam()">+ สร้างทีม</button></div>
+ ${S.teams.length?`<div class="grid g3">${S.teams.map(t=>{const mem=teamMembers(t.id);const s=ts[t.id];return `<div class="card" style="border-top:4px solid ${esc(t.color)}">
+  <div class="row" style="justify-content:space-between"><h2>${esc(t.name)}</h2><span class="muted small">${mem.length} คน</span></div>
+  <div class="small muted">หัวหน้าทีม: ${t.leaderId&&P(t.leaderId)?esc(P(t.leaderId).name):'—'}</div>
+  <div class="roster">${mem.map(p=>`<div class="rp">${plHTML(p.id,{noTeam:true})}${t.leaderId===p.id?'<span class="role admin">C</span>':''}</div>`).join('')||'<span class="muted small">ยังไม่มีสมาชิก</span>'}</div>
+  <div class="kv"><span>แมตช์ทีม / ชนะ</span><span>${s.matches} / ${s.wins}</span><span>Team Avg</span><span>${fmt2(s.avg)}</span><span>180s</span><span>${s.s180}</span></div>
+  <div class="row"><button class="btn sm" onclick="editTeam('${t.id}')">แก้ไข / สมาชิก</button><button class="btn sm dng" onclick="delTeam('${t.id}')">ลบ</button></div></div>`}).join('')}</div>`:'<div class="empty">ยังไม่มีทีม</div>'}`};
+
+/* ====================== rooms ====================== */
+const genCode=()=>'DART-'+Math.random().toString(16).slice(2,6).toUpperCase();
+function newRoom(o){const s=S.settings;return Object.assign({id:uid(),code:genCode(),name:'',type:'single',teamSize:2,score:s.score,out:s.out,bestOf:s.bestOf,roundLimit:s.roundLimit,sides:[{teamId:null,playerIds:[]},{teamId:null,playerIds:[]}],events:[],starter:0,created:Date.now(),finishedAt:null,introDone:false},o)}
+function playerOpts(sel){return `<option value="">— เว้นว่าง (รอผู้เล่นเข้าร่วม) —</option>`+S.players.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)} · ${esc(T(p.teamId)?.name||'ไม่มีทีม')}</option>`).join('')}
+function teamOpts(sel){return `<option value="">— เว้นว่าง (รอทีมเข้าร่วม) —</option>`+S.teams.map(t=>`<option value="${t.id}" ${sel===t.id?'selected':''}>${esc(t.name)} (${teamMembers(t.id).length} คน)</option>`).join('')}
+function createRoomModal(){const s=S.settings;
+  openModal('สร้างห้องแข่งขัน',`<div class="form">
+  <label class="full">ชื่อห้อง<input id="rf-name" placeholder="เช่น Ubon Open 2026 · รอบคัดเลือก" maxlength="60"></label>
+  <label>ประเภท<select id="rf-type"><option value="single">เดี่ยว (1 vs 1)</option><option value="team">ทีม</option></select></label>
+  <label>ขนาดทีม<select id="rf-size">${[2,3,4].map(n=>`<option value="${n}">${n} vs ${n}</option>`).join('')}</select></label>
+  <label>คะแนนเริ่มต้น<select id="rf-score">${[701,601,501,401,301,201].map(n=>`<option ${n===s.score?'selected':''}>${n}</option>`).join('')}</select></label>
+  <label>กติกาปิดเกม<select id="rf-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
+  <label>จำนวนขา (Best of)<select id="rf-best">${[1,3,5,7,9].map(n=>`<option value="${n}" ${n===s.bestOf?'selected':''}>Best of ${n} (ชนะ ${Math.floor(n/2)+1})</option>`).join('')}</select></label>
+  <label>Sudden Death เมื่อครบ<select id="rf-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label>
+  <div class="full" id="rf-sides"></div></div>`,
+  [{label:'ยกเลิก'},{label:'สร้างห้อง',cls:'pri',fn:()=>{
+    const type=$('#rf-type').value,size=+$('#rf-size').value;
+    const room=newRoom({name:$('#rf-name').value.trim()||'ห้องแข่งขัน '+(S.rooms.length+1),type,teamSize:size,score:+$('#rf-score').value,out:$('#rf-out').value,bestOf:+$('#rf-best').value,roundLimit:+$('#rf-limit').value});
+    const a=$('#rf-a').value,b=$('#rf-b').value;
+    if(a&&a===b){toast('HOME กับ AWAY ต้องไม่ใช่คนเดียวกัน');return false}
+    if(type==='single'){if(a)room.sides[0].playerIds=[a];if(b)room.sides[1].playerIds=[b]}
+    else{[a,b].forEach((tid,i)=>{if(tid){room.sides[i].teamId=tid;room.sides[i].playerIds=teamMembers(tid).slice(0,size).map(p=>p.id)}})
+      if(type==='team'&&[a,b].some(tid=>tid&&teamMembers(tid).length<1)){toast('ทีมที่เลือกยังไม่มีสมาชิก');return false}}
+    S.rooms.unshift(room);save();toast('สร้างห้อง '+room.code+' แล้ว');render()}}]);
+  const sides=()=>{const t=$('#rf-type').value;$('#rf-size').disabled=t!=='team';$('#rf-sides').innerHTML=`<div class="form"><label>HOME ${t==='team'?'(ทีม)':'(ผู้เล่น)'}<select id="rf-a">${t==='team'?teamOpts(me()?.teamId):playerOpts(S.me)}</select></label><label>AWAY ${t==='team'?'(ทีม)':'(ผู้เล่น)'}<select id="rf-b">${t==='team'?teamOpts():playerOpts()}</select></label></div>`};
+  $('#rf-type').onchange=sides;sides()}
+function joinRoom(id){const room=S.rooms.find(r=>r.id===id);const m=me();if(!m){pickMe();return}
+  const i=room.sides.findIndex(s=>!s.playerIds.length);if(i<0)return;
+  if(room.type==='team'){if(!m.teamId){toast('คุณยังไม่มีทีม เข้าร่วมห้องทีมไม่ได้');return}
+    if(room.sides.some(s=>s.teamId===m.teamId)){toast('ทีมของคุณอยู่ในห้องนี้แล้ว');return}
+    room.sides[i].teamId=m.teamId;room.sides[i].playerIds=teamMembers(m.teamId).slice(0,room.teamSize).map(p=>p.id)}
+  else{if(room.sides.some(s=>s.playerIds.includes(m.id))){toast('คุณอยู่ในห้องนี้แล้ว');return}room.sides[i].playerIds=[m.id]}
+  save();toast('เข้าร่วมห้องในฝั่ง '+(i?'AWAY':'HOME'));render()}
+function delRoom(id){const r=S.rooms.find(x=>x.id===id);confirmBox('ลบห้อง',`ลบห้อง <b>${esc(r.name)}</b> (${r.code})? สถิติจากห้องนี้จะถูกลบด้วย`,'ลบห้อง',()=>{S.rooms=S.rooms.filter(x=>x.id!==id);if(S.ui.roomId===id)S.ui.roomId=null;save();render()})}
+function rematch(id){const r=S.rooms.find(x=>x.id===id);const n=newRoom({name:r.name+' (รีแมตช์)',type:r.type,teamSize:r.teamSize,score:r.score,out:r.out,bestOf:r.bestOf,roundLimit:r.roundLimit,sides:clone(r.sides)});S.rooms.unshift(n);save();openRoom(n.id)}
+function openRoom(id){S.ui.roomId=id;save();pend=[];go('match')}
+function statusPill(s){return `<span class="pill st-${s}">${s==='playing'?'<span class="live-dot"></span>':''}${({waiting:'รอผู้เล่น',ready:'พร้อมแข่ง',playing:'กำลังแข่ง',finished:'จบแล้ว'})[s]}</span>`}
+function roomCard(r){const s=roomStatus(r),st=replay(r);
+  const sideHTML=i=>r.type==='team'&&r.sides[i].teamId?`<div style="min-width:0"><b>${esc(sideName(r,i))}</b><div class="small muted">${r.sides[i].playerIds.map(id=>esc(pname(r,id))).join(', ')}</div></div>`:(r.sides[i].playerIds[0]?plHTML(r.sides[i].playerIds[0]):'<span class="muted">รอผู้เล่น…</span>');
+  return `<div class="card"><div class="row" style="justify-content:space-between"><span class="code">${r.code}</span>${statusPill(s)}</div>
+  <h3>${esc(r.name)}</h3><div class="small muted">${r.score} · ${OUT_LABEL[r.out]} · Best of ${r.bestOf} · ${r.type==='team'?r.teamSize+'v'+r.teamSize:'1v1'}${r.tour?' · ทัวร์นาเมนต์':''}</div>
+  <div class="vs"><div style="min-width:0">${sideHTML(0)}</div><div class="mid num">${st.legsWon[0]} : ${st.legsWon[1]}</div><div class="r" style="min-width:0">${sideHTML(1)}</div></div>
+  ${s==='finished'?`<div class="small">ผู้ชนะ: <b style="color:var(--amber)">${esc(sideName(r,st.winner))}</b></div>`:''}
+  <div class="row">${s==='waiting'?`<button class="btn sm pri" onclick="joinRoom('${r.id}')">เข้าร่วมในนามฉัน</button>`:`<button class="btn sm ${s==='finished'?'':'pri'}" onclick="openRoom('${r.id}')">${s==='finished'?'ดูผล':s==='ready'?'เริ่มแข่ง':'ให้คะแนน'}</button>`}
+  ${s==='finished'?`<button class="btn sm" onclick="rematch('${r.id}')">รีแมตช์</button>`:''}<button class="btn sm dng" onclick="delRoom('${r.id}')">ลบ</button></div></div>`}
+let roomQ='',roomF='';
+VIEWS.rooms=()=>{const rs=realRooms().filter(r=>(!roomF||roomStatus(r)===roomF)&&(!roomQ||(r.name+' '+r.code+' '+sideName(r,0)+' '+sideName(r,1)).toLowerCase().includes(roomQ.toLowerCase())));
+  return `<div class="head"><div><h1>ห้องแข่งขัน</h1><p>สร้างห้อง เข้าร่วม และเปิดหน้าให้คะแนน</p></div><button class="btn pri" onclick="createRoomModal()">+ สร้างห้อง</button></div>
+  <div class="row"><input id="rq" placeholder="ค้นหาชื่อห้อง รหัส (DART-xxxx) หรือชื่อผู้เล่น" value="${esc(roomQ)}" style="max-width:360px"><select id="rfst" style="max-width:200px"><option value="">ทุกสถานะ</option>${['waiting','ready','playing','finished'].map(s=>`<option value="${s}" ${roomF===s?'selected':''}>${({waiting:'รอผู้เล่น',ready:'พร้อมแข่ง',playing:'กำลังแข่ง',finished:'จบแล้ว'})[s]}</option>`).join('')}</select><span class="muted small">${rs.length} ห้อง</span></div>
+  ${rs.length?`<div class="grid g3">${rs.map(roomCard).join('')}</div>`:'<div class="empty">ไม่พบห้องที่ตรงเงื่อนไข</div>'}`};
+AFTER.rooms=()=>{const q=$('#rq');q.oninput=()=>{roomQ=q.value;const p=q.selectionStart;render();const j=$('#rq');j.focus();j.setSelectionRange(p,p)};$('#rfst').onchange=e=>{roomF=e.target.value;render()}};
+
+/* ====================== dartboard svg ====================== */
+const RR={be:6.35,b:15.9,ti:99,to:107,di:162,do:170};
+const pt=(r,deg)=>[r*Math.sin(deg*Math.PI/180),-r*Math.cos(deg*Math.PI/180)];
+function arc(r1,r2,a1,a2){const [x1,y1]=pt(r2,a1),[x2,y2]=pt(r2,a2),[x3,y3]=pt(r1,a2),[x4,y4]=pt(r1,a1);return `M${x1.toFixed(2)} ${y1.toFixed(2)}A${r2} ${r2} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}L${x3.toFixed(2)} ${y3.toFixed(2)}A${r1} ${r1} 0 0 0 ${x4.toFixed(2)} ${y4.toFixed(2)}Z`}
+function markPos(d){if(d.s===0){const a=Math.random()*360;return pt(178+Math.random()*12,a)}
+  if(d.s===25)return d.m===2?pt(Math.random()*5,Math.random()*360):pt(8+Math.random()*6,Math.random()*360);
+  const c=ORDER.indexOf(d.s)*18+(Math.random()*12-6);const r=d.m===3?103:d.m===2?166:(Math.random()<.5?30+Math.random()*60:115+Math.random()*40);return pt(r,c)}
+function boardSVG(marks=[],clickable=true){
+  let g='';
+  ORDER.forEach((n,i)=>{const a1=i*18-9,a2=i*18+9,dark=i%2===0;const sc=dark?'#151515':'#efe6cf',rc=dark?'#c8382d':'#2a8c52';
+    const p=(r1,r2,m,c)=>`<path class="${clickable?'seg':''}" d="${arc(r1,r2,a1,a2)}" fill="${c}" data-s="${n}" data-m="${m}"><title>${dLabel(D(n,m))}</title></path>`;
+    g+=p(RR.b,RR.ti,1,sc)+p(RR.ti,RR.to,3,rc)+p(RR.to,RR.di,1,sc)+p(RR.di,RR.do,2,rc);
+    const [tx,ty]=pt(186,i*18);g+=`<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="#efe6cf" font-family="Oswald,sans-serif" font-size="15" style="pointer-events:none">${n}</text>`});
+  g+=`<circle class="${clickable?'seg':''}" r="${RR.b}" fill="#2a8c52" data-s="25" data-m="1"><title>25</title></circle><circle class="${clickable?'seg':''}" r="${RR.be}" fill="#c8382d" data-s="25" data-m="2"><title>BULL 50</title></circle>`;
+  const mk=marks.map((m,i)=>`<g transform="translate(${m.x.toFixed(1)} ${m.y.toFixed(1)})" style="pointer-events:none"><circle r="5.5" fill="${m.c||'#f2b134'}" stroke="#000" stroke-width="1.5"/><text y="1" text-anchor="middle" dominant-baseline="central" font-size="7" font-weight="700" fill="#000" font-family="JetBrains Mono,monospace">${m.n??i+1}</text></g>`).join('');
+  return `<svg viewBox="-205 -205 410 410" role="img" aria-label="กระดานปาเป้า คลิกช่องเพื่อบันทึกลูกดอก"><circle r="204" fill="#0b0b0b" ${clickable?'class="seg" data-s="0" data-m="1"':''}><title>MISS (นอกกระดาน)</title></circle><circle r="171" fill="#000"/>${g}${mk}</svg>`}
+
+/* ====================== live scoring ====================== */
+let fsMode=false,autoSub=false;try{autoSub=localStorage.getItem('oche-autosub')==='1'}catch(e){}
+function setFs(on){fsMode=on;document.body.style.overflow=on?'hidden':'';
+  try{if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+    if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
+  render()}
+function toggleAuto(){autoSub=!autoSub;try{localStorage.setItem('oche-autosub',autoSub?'1':'0')}catch(e){}toast(autoSub?'บันทึกอัตโนมัติเมื่อครบ 3 ลูก: เปิด':'บันทึกอัตโนมัติ: ปิด');render()}
+function fillMiss(){const room=curRoom();if(!room)return;const st=replay(room);const before=st.rem[st.toThrow];while(pend.length<3){const e=evalDarts(pend,before,room.out);if(e.bust||e.fin)break;pend.push(D(0,1));const p=markPos(D(0,1));pendMarks.push({x:p[0],y:p[1]})}render()}
+let pend=[],mult=1,inputMode='board',stream=null,camOn=false,pendMarks=[];
+function curRoom(){return S.rooms.find(r=>r.id===S.ui.roomId&&!r.sim)}
+function roomAfterChange(room,prevFinished){
+  const st=replay(room);
+  if(st.finished&&!room.finishedAt){room.finishedAt=Date.now();save();onRoomFinished(room,st);showWinner(room,st)}
+  else if(!st.finished&&room.finishedAt){room.finishedAt=null;tourRevert(room)}
+  save();
+  return st}
+function addDart(d){const room=curRoom();if(!room)return;const st=replay(room);if(st.finished||st.needBull)return;
+  if(pend.length>=3)return;const r=evalDarts(pend,st.rem[st.toThrow],room.out);if(r.bust||r.fin)return;
+  pend.push(d);const p=markPos(d);pendMarks.push({x:p[0],y:p[1]});mult=1;render();
+  if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){}
+  if(autoSub){const e2=evalDarts(pend,st.rem[st.toThrow],room.out);if(pend.length===3||e2.bust||e2.fin){const n=pend.length;setTimeout(()=>{if(pend.length===n&&curRoom()===room)submitTurn()},700)}}}
+function submitTurn(quick){const room=curRoom();const st=replay(room);if(st.finished||st.needBull)return;
+  if(!quick&&!pend.length){toast('ยังไม่ได้บันทึกลูกดอก');return}
+  const ev=makeTurn(room,st,pend,quick);room.events.push(ev);pend=[];pendMarks=[];mult=1;
+  if(!ev.bust&&ev.total===180)toast('🎯 ONE HUNDRED AND EIGHTY! — '+pname(room,ev.pid));
+  else if(ev.bust)toast('BUST — คะแนนรอบนี้เป็น 0');
+  const legsBefore=st.legEnds.length;const st2=roomAfterChange(room);
+  if(!st2.finished&&st2.legEnds.length>legsBefore){const le=st2.legEnds[st2.legEnds.length-1];
+    if(room.type==='team')nextLegPrompt(room,le,st2);else toast(`จบ Leg ${le.leg} — ${sideName(room,le.winner)} ชนะ (${st2.legsWon[0]}-${st2.legsWon[1]})`)}
+  if(!st2.finished&&st2.needBull)setTimeout(()=>bullOffModal(room),300);
+  render()}
+function undo(){const room=curRoom();if(pend.length){pend.pop();pendMarks.pop();render();return}
+  if(!room.events.length){toast('ไม่มีรายการให้ย้อนกลับ');return}
+  const e=room.events.pop();roomAfterChange(room);toast('ย้อนกลับ: '+({turn:'เทิร์นล่าสุด',adjust:'การแก้คะแนนโดยกรรมการ',bull:'ผล Sudden Death',starter:'การเลือกผู้เริ่ม',order:'การจัดลำดับ'})[e.t]);render()}
+function editLastTurn(){const room=curRoom();const i=[...room.events].map(e=>e.t).lastIndexOf('turn');if(i<0){toast('ยังไม่มีเทิร์นให้แก้');return}
+  const e=room.events[i];if(i!==room.events.length-1){toast('แก้ได้เฉพาะเทิร์นล่าสุด (ใช้ Undo)');return}
+  room.events.pop();roomAfterChange(room);pend=e.darts?e.darts.filter((d,k)=>!(d.s===0&&k>=e.darts.findLastIndex(x=>x.s!==0)+1)):[];pendMarks=pend.map(d=>{const p=markPos(d);return{x:p[0],y:p[1]}});render();toast('ดึงเทิร์นล่าสุดกลับมาแก้ไข')}
+function tossModal(room){
+  openModal('สุ่มผู้เริ่มก่อน (Coin Toss)',`<div class="coin spin" id="coin">HOME ⇄ AWAY</div><p class="muted small" style="margin:0;text-align:center">กำลังเสี่ยงทายว่าฝ่ายใดได้ปาลูกแรกของ Leg นี้</p>`,[],{noClose:true});
+  let k=0;const names=[sideName(room,0),sideName(room,1)];const iv=setInterval(()=>{const c=$('#coin');if(c)c.textContent=names[k++%2]},120);
+  setTimeout(()=>{clearInterval(iv);const side=Math.random()<.5?0:1;room.events.push({t:'starter',side,ts:Date.now()});save();
+    openModal('ผลการสุ่ม',`<div class="coin">${side?'AWAY':'HOME'} · ${esc(names[side])}</div><p style="text-align:center;margin:0">ได้สิทธิ์ปาก่อนใน Leg นี้</p>`,[{label:'เริ่มเลย',cls:'pri'}],{onClose:render})},1600)}
+function setStarter(room,side){room.events.push({t:'starter',side,ts:Date.now()});save();render()}
+function orderModal(room,onDone){const st=replay(room);let ord=[st.order[0].slice(),st.order[1].slice()];
+  const pool=i=>room.sides[i].teamId?teamMembers(room.sides[i].teamId).map(p=>p.id):room.sides[i].playerIds;
+  const draw=()=>{$('#ord-body').innerHTML=[0,1].map(i=>`<div class="panel" style="padding:12px"><h3>${i?'AWAY':'HOME'} · ${esc(sideName(room,i))}</h3><div class="move">${ord[i].map((id,k)=>`<div class="it"><span class="mono muted">ไม้ ${k+1}</span><span style="flex:1;min-width:0">${esc(pname(room,id))}</span><button class="btn sm" data-mv="${i},${k},-1" ${k===0?'disabled':''} aria-label="เลื่อนขึ้น">↑</button><button class="btn sm" data-mv="${i},${k},1" ${k===ord[i].length-1?'disabled':''} aria-label="เลื่อนลง">↓</button>${ord[i].length>1?`<button class="btn sm dng" data-rm="${i},${k}" aria-label="ถอดออก">×</button>`:''}</div>`).join('')}
+    ${pool(i).filter(id=>!ord[i].includes(id)).map(id=>`<div class="it" style="border-style:dashed"><span style="flex:1" class="muted">${esc(pname(room,id))}</span><button class="btn sm" data-add="${i},${id}">+ ใส่ลงสนาม</button></div>`).join('')}</div></div>`).join('');
+    $$('[data-mv]').forEach(b=>b.onclick=()=>{const [i,k,d]=b.dataset.mv.split(',').map(Number);const a=ord[i];[a[k],a[k+d]]=[a[k+d],a[k]];draw()});
+    $$('[data-rm]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.rm.split(',').map(Number);ord[i].splice(k,1);draw()});
+    $$('[data-add]').forEach(b=>b.onclick=()=>{const [i,id]=b.dataset.add.split(',');ord[+i].push(id);draw()})};
+  openModal('จัดลำดับการปา (Throwing Order)',`<p class="muted small" style="margin:0">กำหนดว่าใครปาไม้ 1, ไม้ 2 … ในแต่ละรอบ ลำดับจะเริ่มนับใหม่จากไม้ 1</p><div class="grid g2" id="ord-body"></div>`,
+   [{label:'ยกเลิก'},{label:'บันทึกลำดับ',cls:'pri',fn:()=>{[0,1].forEach(i=>{if(ord[i].join()!==st.order[i].join()){if(!st.anyTurn)room.sides[i].playerIds=ord[i].slice();else room.events.push({t:'order',side:i,ids:ord[i].slice(),ts:Date.now()})}});save();render();onDone&&onDone()}}],{wide:true,after:draw})}
+function nextLegPrompt(room,le,st){openModal(`จบ Leg ${le.leg}`,`<p style="margin:0"><b style="color:var(--amber)">${esc(sideName(room,le.winner))}</b> ชนะ Leg นี้ · สกอร์รวม ${st.legsWon[0]} - ${st.legsWon[1]}</p><p class="muted" style="margin:0">Leg ${st.leg} ฝั่ง ${st.legStarter?'AWAY':'HOME'} เริ่มก่อน จะใช้ลำดับการปาเดิมหรือจัดใหม่?</p>`,[{label:'จัดลำดับใหม่',fn:()=>{setTimeout(()=>orderModal(room),10)}},{label:'ใช้ลำดับเดิม',cls:'pri'}])}
+function bullOffModal(room){const st=replay(room);if(!st.needBull&&!room._manualBull){}
+  openModal('SUDDEN DEATH · ดวล Bull',`<p style="margin:0">${room.roundLimit?`ครบ ${room.roundLimit} รอบแล้วยังปิด Leg ไม่ได้ `:''}ทั้งสองฝ่ายปาคนละ 1 ลูก ใครใกล้ Bullseye (50) ที่สุดชนะ Leg นี้</p><div class="faceoff"><div><div class="tag muted small">HOME</div><h2>${esc(sideName(room,0))}</h2></div><div class="vsb">VS</div><div><div class="tag muted small">AWAY</div><h2>${esc(sideName(room,1))}</h2></div></div>`,
+   [{label:'ยกเลิก'},{label:'HOME ใกล้กว่า',cls:'pri',fn:()=>bullWin(room,0)},{label:'AWAY ใกล้กว่า',cls:'pri',fn:()=>bullWin(room,1)}])}
+function bullWin(room,side){const st=replay(room);const n=st.legEnds.length;room.events.push({t:'bull',side,ts:Date.now()});pend=[];pendMarks=[];const st2=roomAfterChange(room);
+  if(!st2.finished&&room.type==='team'&&st2.legEnds.length>n)setTimeout(()=>nextLegPrompt(room,st2.legEnds[st2.legEnds.length-1],st2),20);render()}
+function refModal(room){if(!canRef()){toast('เฉพาะกรรมการหรือแอดมินเท่านั้น — เปลี่ยนผู้ใช้งานที่มุมขวาบน');return}const st=replay(room);
+  openModal('กรรมการแก้ไขคะแนน',`<div class="form"><label>คะแนนคงเหลือ HOME (ตอนนี้ ${st.rem[0]})<input type="number" id="rf-h" min="2" max="${room.score}" placeholder="เว้นว่าง = ไม่เปลี่ยน"></label><label>คะแนนคงเหลือ AWAY (ตอนนี้ ${st.rem[1]})<input type="number" id="rf-aw" min="2" max="${room.score}" placeholder="เว้นว่าง = ไม่เปลี่ยน"></label><label class="full">เหตุผล (บังคับ)<textarea id="rf-why" placeholder="เช่น ลูกที่ 2 ปักที่ T19 ไม่ใช่ S19 ตามภาพ VAR"></textarea></label></div><p class="muted small" style="margin:0">ทุกการแก้ไขถูกบันทึกใน Audit Log พร้อมชื่อ ${esc(me().name)}</p>`,
+   [{label:'ยกเลิก'},{label:'ยืนยันการแก้ไข',cls:'pri',fn:()=>{const h=$('#rf-h').value,a=$('#rf-aw').value,why=$('#rf-why').value.trim();
+     if(!why){toast('ต้องระบุเหตุผล');return false}if(h===''&&a===''){toast('ยังไม่ได้กรอกคะแนนใหม่');return false}
+     const nv=[h===''?null:+h,a===''?null:+a];if(nv.some(v=>v!==null&&(v<1||v>room.score))){toast('คะแนนต้องอยู่ระหว่าง 1 ถึง '+room.score);return false}
+     room.events.push({t:'adjust',rem:nv,reason:why,by:S.me,ts:Date.now()});
+     S.audit.unshift({id:uid(),roomId:room.id,room:room.name+' ('+room.code+')',by:S.me,byName:me().name,reason:why,old:st.rem.slice(),nw:[nv[0]??st.rem[0],nv[1]??st.rem[1]],leg:st.leg,ts:Date.now()});
+     roomAfterChange(room);render();toast('บันทึกการแก้ไขแล้ว')}}])}
+function introModal(room){room.introDone=true;save();
+  openModal('MATCH FACE-OFF',`<div class="small muted" style="text-align:center">${room.score} · ${OUT_LABEL[room.out]} · Best of ${room.bestOf} (ชนะ ${need(room)} ขา)</div>
+   <div class="faceoff">${[0,1].map(i=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">${room.sides[i].teamId?`<span class="av lg" style="background:${esc(T(room.sides[i].teamId)?.color||'#555')}33;border-color:${esc(T(room.sides[i].teamId)?.color||'#555')}">🛡️</span>`:av(P(room.sides[i].playerIds[0]),'lg')}<h2>${esc(sideName(room,i))}</h2><span class="tag small muted">${i?'AWAY SIDE':'HOME SIDE'}</span><span class="small muted">${room.sides[i].playerIds.map(id=>esc(pname(room,id))).join(' · ')}</span></div>`).join('<div class="vsb">VS</div>')}</div>
+   <p class="muted small" style="margin:0;text-align:center">เลือกวิธีกำหนดผู้เริ่มก่อน</p>`,
+   [{label:'HOME เริ่มก่อน',fn:()=>setStarter(room,0)},{label:'AWAY เริ่มก่อน',fn:()=>setStarter(room,1)},{label:'สุ่มเหรียญ',cls:'pri',fn:()=>{setTimeout(()=>tossModal(room),10)}}],{wide:true})}
+function showWinner(room,st){const w=st.winner;
+  openModal('🏆 MATCH WINNER',`<div class="coin" style="color:var(--amber)">${esc(sideName(room,w))}</div><p style="text-align:center;margin:0">${w?'AWAY':'HOME'} SIDE ชนะ <span class="num">${st.legsWon[0]} - ${st.legsWon[1]}</span></p>${room.tour?'<p class="muted small" style="text-align:center;margin:0">อัปเดตผังทัวร์นาเมนต์ให้อัตโนมัติแล้ว</p>':''}`,
+   [{label:'ปิด'},...(room.tour?[{label:'ไปที่ผังการแข่งขัน',cls:'pri',fn:()=>{S.ui.tourId=room.tour.tid;save();go('tournament')}}]:[{label:'รีแมตช์',cls:'pri',fn:()=>rematch(room.id)}])])}
+async function camStart(){try{stream=await navigator.mediaDevices.getUserMedia({video:true});camOn=true;render()}catch(e){toast('เปิดกล้องไม่ได้: เบราว์เซอร์ไม่อนุญาตหรือไม่มีกล้อง')}}
+function camStop(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}camOn=false}
+function snapshot(){const v=$('#cam');if(!v||!stream)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);const url=c.toDataURL('image/jpeg',.9);
+  openModal('ภาพตรวจสอบ (VAR)',`<img src="${url}" alt="ภาพกระดานจากกล้อง" style="border-radius:8px"><p class="muted small" style="margin:0">ใช้ประกอบการตัดสินของกรรมการ</p>`,[{label:'ปิด'},{label:'ดาวน์โหลดภาพ',cls:'pri',fn:()=>{c.toBlob(b=>saveFile('var-'+Date.now()+'.jpg',b,'image/jpeg'),'image/jpeg',.9)}}])}
+VIEWS.match=()=>{const room=curRoom();
+  if(!room){const rs=realRooms().filter(r=>['ready','playing'].includes(roomStatus(r)));
+    return `<div class="head"><div><h1>ให้คะแนนสด</h1><p>เลือกห้องที่ต้องการให้คะแนน</p></div><button class="btn pri" onclick="createRoomModal()">+ สร้างห้อง</button></div>${rs.length?`<div class="grid g3">${rs.map(roomCard).join('')}</div>`:'<div class="empty">ยังไม่มีห้องที่พร้อมแข่ง ไปที่ “ห้องแข่งขัน” เพื่อสร้างหรือเข้าร่วม</div>'}`}
+  if(roomStatus(room)==='waiting')return `<div class="empty">ห้อง ${esc(room.name)} ยังมีผู้เล่นไม่ครบ <button class="btn sm pri" onclick="joinRoom('${room.id}')">เข้าร่วมในนามฉัน</button> <button class="btn sm" onclick="S.ui.roomId=null;render()">เลือกห้องอื่น</button></div>`;
+  const st=replay(room);const side=st.toThrow;const before=st.rem[side];const ev=evalDarts(pend,before,room.out);
+  const sum=pend.reduce((a,d)=>a+d.v,0);const after=ev.bust?before:before-sum;
+  const roomTurns=room.events.filter(e=>e.t==='turn');
+  const sStats=i=>{const ts=roomTurns.filter(e=>e.side===i&&e.leg===st.leg);const all=roomTurns.filter(e=>e.side===i);const d=all.reduce((a,e)=>a+(e.darts?e.darts.length:e.n||3),0),p=all.reduce((a,e)=>a+e.total,0);return{avg:d?p/d*3:0,last:ts.length?(ts[ts.length-1].bust?'BUST':ts[ts.length-1].total):'-',hi:Math.max(0,...all.filter(e=>!e.bust).map(e=>e.total)),c180:all.filter(e=>!e.bust&&e.total===180).length}};
+  const sidePanel=i=>{const act=!st.finished&&side===i,ss=sStats(i);const co=!st.finished?checkout(st.rem[i]-(act&&!ev.bust?sum:0),room.out,act?3-pend.length:3):null;
+    return `<div class="side ${act?'active':''}"><div class="row" style="justify-content:space-between"><span class="tag">${i?'AWAY':'HOME'}${act?' · กำลังปา':''}</span><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div>
+    <h2 style="min-width:0;overflow-wrap:anywhere">${esc(sideName(room,i))}</h2>${room.type==='team'&&room.sides[i].teamId?'':teamChip(P(room.sides[i].playerIds[0])?.teamId)}
+    <div class="remain">${act&&pend.length&&!ev.bust?after:st.rem[i]}</div>
+    ${co&&!st.finished?`<div class="hint">ปิดได้: <b>${co.map(dLabel).join(' · ')}</b></div>`:''}
+    <div class="roster">${st.order[i].map((id,k)=>`<div class="rp ${act&&st.thrower(i)===id?'now':''}"><span class="ord">#${k+1}</span>${plHTML(id,{noTeam:room.type==='team'})}</div>`).join('')}</div>
+    <div class="kv"><span>Match Avg</span><span>${fmt2(ss.avg)}</span><span>เทิร์นล่าสุด</span><span>${ss.last}</span><span>สูงสุด</span><span>${ss.hi}</span><span>180s</span><span>${ss.c180}</span></div></div>`};
+  const curName=st.finished?'':pname(room,st.thrower(side));
+  // log
+  let logH='';let lastLeg=0;room.events.forEach((e,k)=>{if(e.leg&&e.leg!==lastLeg){lastLeg=e.leg;logH+=`<div class="sep">LEG ${e.leg}</div>`}
+    if(e.t==='turn')logH+=`<div class="ln"><span class="d">${e.side?'AWAY':'HOME'}</span><span style="min-width:0">${esc(pname(room,e.pid))} ${!e.bust&&e.total===e.before?'<span class="co-badge">CHECKOUT</span>':''}${e.darts?e.darts.map(d=>`<span class="chip ${d.m===3?'t':d.m===2?'d':''} ${d.s===0?'m':''}">${dLabel(d)}</span>`).join(''):'<span class="d">(กรอกยอดรวม)</span>'}</span><span class="tt">${e.bust?'<span class="bust">BUST</span>':'+'+e.total}</span><span class="d">${e.bust?e.before:e.before-e.total}</span></div>`;
+    else if(e.t==='adjust')logH+=`<div class="ln" style="border:1px solid var(--blue)"><span class="d">REF</span><span>กรรมการแก้คะแนน: ${esc(e.reason)}</span><span class="tt">${e.rem.map(v=>v??'-').join('/')}</span><span></span></div>`;
+    else if(e.t==='bull')logH+=`<div class="ln" style="border:1px solid var(--red)"><span class="d">BULL</span><span>Sudden Death: ${esc(sideName(room,e.side))} ชนะ</span><span></span><span></span></div>`;});
+  const lastLegEnd=st.legEnds[st.legEnds.length-1];
+  const prevMarks=!pend.length&&roomTurns.length?(()=>{const e=roomTurns[roomTurns.length-1];return e.darts?e.darts.map((d,k)=>{const p=markPos(d);return{x:p[0],y:p[1],n:k+1,c:'#8fa096'}}):[]})():[];
+  if(fsMode){const remShown=i=>(!st.finished&&side===i&&pend.length&&!ev.bust)?after:st.rem[i];
+    const co=!st.finished&&!st.needBull?checkout(ev.bust?before:after,room.out,3-pend.length):null;
+    const fsSide=i=>`<div class="fs-side ${i?'r':''} ${!st.finished&&side===i?'on':''}"><span>${i?'AWAY':'HOME'} · ${esc(sideName(room,i))}</span><b>${remShown(i)}</b><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div>`;
+    const mid=st.finished?`<small>จบการแข่งขัน</small><b style="color:var(--amber)">🏆 ${esc(sideName(room,st.winner))}</b>`:st.needBull?`<small>ครบ ${room.roundLimit} รอบ</small><button class="btn sm pri" onclick="bullOffModal(curRoom())">Sudden Death</button>`:`<small>LEG ${st.leg} · รอบ ${st.round} · ${st.legsWon[0]}-${st.legsWon[1]}</small><b>🎯 ${esc(curName)}</b>${co&&pend.length<3?`<small style="color:var(--green)">ปิด: ${co.map(dLabel).join(' ')}</small>`:''}`;
+    return `<div class="fs" id="fs"><div class="fs-top">${fsSide(0)}<div class="fs-mid">${mid}</div>${fsSide(1)}</div>
+      <div class="fs-board" id="bw"><div class="fs-aim" id="aim">แตะช่องบนเป้า</div>${boardSVG(pendMarks.length?pendMarks:prevMarks)}</div>
+      <div class="fs-bot"><div class="fs-sum">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b></div>`).join('')}<div class="fs-total">${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT</span>':`<small class="muted">รอบนี้</small><b>${sum}</b>`}</div></div>
+      <div class="fs-btns"><button class="btn" onclick="undo()">↶ Undo</button><button class="btn" onclick="addDart(D(0,1))">MISS</button><button class="btn" onclick="addDart(D(25,2))">BULL 50</button><button class="btn" onclick="fillMiss()">Miss ที่เหลือ</button><button class="btn ok" onclick="submitTurn()" ${pend.length&&!st.finished?'':'disabled'}>✓ บันทึก ${ev.bust?'(BUST)':'+'+sum}</button></div>
+      <div class="row" style="justify-content:space-between"><label class="ck small"><input type="checkbox" ${autoSub?'checked':''} onchange="toggleAuto()"> บันทึกอัตโนมัติเมื่อครบ 3 ลูก</label><button class="btn sm" onclick="setFs(false)">ออกจากเต็มจอ ✕</button></div></div></div>`}
+  const center=`<div class="panel center">
+    ${st.finished?`<div class="banner" style="justify-content:center"><b>🏆 จบการแข่งขัน · ${esc(sideName(room,st.winner))} ชนะ ${st.legsWon[0]}-${st.legsWon[1]}</b></div>`:
+     st.needBull?`<div class="banner"><b>ครบ ${room.roundLimit} รอบ · ต้องดวล Sudden Death</b><button class="btn pri" onclick="bullOffModal(curRoom())">ตัดสิน Bull-off</button></div>`:
+     `<div class="row" style="justify-content:space-between"><div><span class="muted small">LEG ${st.leg} · รอบ ${st.round}${room.roundLimit?'/'+room.roundLimit:''} · ตาของ</span><h2>${esc(curName)}</h2></div><div class="row">${st.legFresh?`<button class="btn sm" onclick="tossModal(curRoom())">🪙 สุ่มผู้เริ่ม</button>`:''}</div></div>
+    <div class="slots">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b><small>${pend[k]?pend[k].v+' แต้ม':''}</small></div>`).join('')}</div>
+    <div class="preview"><span>รอบนี้ <span class="tot">${ev.bust?0:sum}</span></span>${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT!</span>':''}<span class="muted">เหลือ <b class="num" style="color:var(--chalk)">${after}</b></span></div>
+    <div class="subtabs">${[['board','🎯 กดบนเป้า'],['pad','ปุ่มตัวเลข'],['quick','กรอกยอดรวม'],['cam','กล้อง / VAR']].map(([k,l])=>`<button class="btn sm ${inputMode===k?'on':''}" onclick="inputMode='${k}';render()">${l}</button>`).join('')}</div>
+    ${inputMode==='pad'?`<div class="mult">${[[1,'Single ×1'],[2,'Double ×2'],[3,'Treble ×3']].map(([m,l])=>`<button class="btn ${mult===m?'on':''}" onclick="mult=${m};render()">${l}</button>`).join('')}</div>
+      <div class="pad">${Array.from({length:20},(_,k)=>`<button class="btn" onclick="addDart(D(${k+1},mult))">${k+1}</button>`).join('')}</div>
+      <div class="pad2"><button class="btn" onclick="addDart(D(25,1))">25</button><button class="btn" onclick="addDart(D(25,2))">BULL 50</button><button class="btn" onclick="addDart(D(0,1))">MISS</button></div>`:''}
+    ${inputMode==='board'?`<div class="row" style="justify-content:space-between"><div class="aim" id="aim" style="flex:1">ชี้บนเป้าเพื่อดูช่อง แล้วคลิกเพื่อบันทึกลูกดอก</div><button class="btn sm" onclick="setFs(true)" title="ขยายเป้าเต็มจอ">⛶ เต็มจอ</button></div><div class="board-wrap big-board" id="bw">${boardSVG(pendMarks.length?pendMarks:prevMarks)}</div>
+      <div class="pad2"><button class="btn" onclick="addDart(D(0,1))">MISS นอกเป้า</button><button class="btn" onclick="addDart(D(25,1))">BULL 25</button><button class="btn" onclick="addDart(D(25,2))">BULLSEYE 50</button></div>
+      <p class="muted small" style="margin:0;text-align:center">วงนอกบาง = Double ×2 · วงกลางบาง = Treble ×3 · ช่องกว้าง = Single · ขอบดำรอบเป้า = MISS · จุดสีเทาคือลูกของเทิร์นก่อน</p>`:''}
+    ${inputMode==='quick'?`<div class="form"><label>คะแนนรวมรอบนี้ (0–180)<input type="number" id="qk-t" min="0" max="180" placeholder="เช่น 85"></label><label>ถ้าปิดเกม ใช้กี่ลูก<select id="qk-n"><option>3</option><option>2</option><option>1</option></select></label></div><button class="btn pri" onclick="(()=>{const v=$('#qk-t').value;if(v===''||+v<0||+v>180||!Number.isInteger(+v)){toast('กรอกตัวเลข 0–180');return}submitTurn({total:+v,n:+$('#qk-n').value})})()">บันทึกยอดรวม</button><p class="muted small" style="margin:0">เหมาะกับการกรอกเร็วแบบป้ายคะแนนในร้าน ระบบตรวจ Bust ให้อัตโนมัติ</p>`:''}
+    ${inputMode==='cam'?`${camOn?`<video id="cam" autoplay playsinline muted></video><div class="row"><button class="btn" onclick="snapshot()">📸 ถ่ายภาพ VAR</button><button class="btn" onclick="camStop();render()">ปิดกล้อง</button></div>`:`<div class="empty">กล้องปิดอยู่ <button class="btn sm pri" onclick="camStart()">เปิดกล้อง</button><br><span class="small">ใช้ถ่ายภาพกระดานจริงประกอบการตัดสินของกรรมการ</span></div>`}`:''}
+    ${inputMode!=='quick'?`<div class="row act-bar"><button class="btn" onclick="pend=[];pendMarks=[];render()">ล้าง</button><button class="btn" onclick="fillMiss()">Miss ที่เหลือ</button><button class="btn" onclick="editLastTurn()">แก้เทิร์นล่าสุด</button><span class="spacer"></span><button class="btn ok" onclick="submitTurn()" ${pend.length?'':'disabled'}>✓ บันทึก ${ev.bust?'(BUST)':'+'+sum}</button></div>`:''}`}
+  </div>`;
+  return `<div class="score-top"><div style="min-width:0"><div class="row"><span class="code mono muted">${room.code}</span>${statusPill(roomStatus(room))}<span class="pill" style="color:var(--muted)">BEST OF ${room.bestOf}</span></div><h1>${esc(room.name)}</h1><div class="muted small">${room.score} · ${OUT_LABEL[room.out]} · ${room.type==='team'?'ทีม '+room.teamSize+'v'+room.teamSize:'เดี่ยว 1v1'}${room.roundLimit?' · Sudden Death ที่ '+room.roundLimit+' รอบ':''}</div></div>
+    <div class="legs-box"><span>HOME</span><span class="big">${st.legsWon[0]}</span><span class="muted">:</span><span class="big">${st.legsWon[1]}</span><span>AWAY</span></div>
+    <div class="row"><button class="btn sm pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn sm" onclick="introModal(curRoom())">⚔️ Face-off</button>${room.type==='team'?`<button class="btn sm" onclick="orderModal(curRoom())">จัดลำดับการปา</button>`:''}<button class="btn sm" onclick="bullOffModal(curRoom())" ${st.finished?'disabled':''}>Sudden Death</button><button class="btn sm" onclick="refModal(curRoom())" title="${canRef()?'':'ต้องเป็นกรรมการหรือแอดมิน'}">🧑‍⚖️ กรรมการ</button><button class="btn sm" onclick="undo()">↶ Undo</button><button class="btn sm" onclick="S.ui.roomId=null;save();render()">เปลี่ยนห้อง</button></div></div>
+  <div class="arena">${sidePanel(0)}${center}${sidePanel(1)}</div>
+  <div class="panel"><div class="panel-h"><h2>บันทึกเทิร์น (Match Log)</h2><span class="muted small">${roomTurns.length} เทิร์น · ผู้ใช้งาน: ${esc(me()?.name||'ไม่ระบุ')}</span></div><div class="log">${logH||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
+AFTER.match=()=>{const room=curRoom();if(!room)return;
+  const bw=$('#bw');if(bw){bw.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;addDart(D(+t.dataset.s,+t.dataset.m))});
+    bw.addEventListener('mouseover',e=>{const t=e.target.closest('[data-s]');const a=$('#aim');if(!t||!a)return;const d=D(+t.dataset.s,+t.dataset.m);a.innerHTML=`เล็งอยู่ที่ <b>${dLabel(d)}</b> = ${d.v} แต้ม`});
+    bw.addEventListener('mouseleave',()=>{const a=$('#aim');if(a)a.textContent='ชี้บนเป้าเพื่อดูช่อง แล้วคลิกเพื่อบันทึกลูกดอก'})}
+  const v=$('#cam');if(v&&stream)v.srcObject=stream;
+  const st=replay(room);if(roomStatus(room)==='ready'&&!room.introDone&&!$('#mbg'))introModal(room);
+  const q=$('#qk-t');if(q)q.onkeydown=e=>{if(e.key==='Enter')$('#qk-t').nextElementSibling;};
+};
+document.addEventListener('keydown',e=>{if(route()!=='match'||$('#mbg'))return;if(e.target.matches('input,textarea,select'))return;
+  if(e.key==='Escape'&&fsMode){setFs(false)}
+  else if(e.key==='Enter'&&pend.length){e.preventDefault();submitTurn()}else if(e.key==='Backspace'){e.preventDefault();undo()}
+  else if(e.key==='d'||e.key==='D'){mult=2;render()}else if(e.key==='t'||e.key==='T'){mult=3;render()}else if(e.key==='s'||e.key==='S'){mult=1;render()}});
+
+/* ====================== simulator ====================== */
+let sim=null;
+function simStop(){if(sim&&sim.timer){clearTimeout(sim.timer);sim.timer=null;sim.paused=true}}
+function simSetup(){const type=$('#sm-type').value,size=+$('#sm-size').value;const n=type==='team'?size:1;
+  const fake={};const sides=[0,1].map(i=>{const ids=[];for(let k=0;k<n;k++){const id='ai'+i+k;ids.push(id);fake[id]={id,name:(i?'AWAY':'HOME')+' Bot'+(n>1?' '+(k+1):''),emoji:'🤖',color:i?'#4c9be0':'#f2b134'}}return{teamId:null,playerIds:ids}});
+  const lv=[$('#sm-h').value,$('#sm-a').value];
+  sim={room:newRoom({sim:true,name:'AI Simulation',type,teamSize:size,score:+$('#sm-score').value,out:$('#sm-out').value,bestOf:+$('#sm-best').value,roundLimit:+$('#sm-limit').value,sides,fake,labels:['HOME · '+LEVELS[lv[0]].name.split(' ')[0],'AWAY · '+LEVELS[lv[1]].name.split(' ')[0]]}),lv,speed:sim?.speed||1,darts:[],marks:[],paused:false,timer:null,cfg:{type,size,score:$('#sm-score').value,out:$('#sm-out').value,best:$('#sm-best').value,limit:$('#sm-limit').value,h:lv[0],a:lv[1]}};
+  sim.room.starter=Math.random()<.5?0:1;simTick()}
+function simTick(){if(!sim||sim.paused)return;const room=sim.room;const st=replay(room);
+  if(st.finished){sim.timer=null;sim.paused=true;render();toast('จบการจำลอง: '+sideName(room,st.winner)+' ชนะ');return}
+  if(st.needBull){room.events.push({t:'bull',side:Math.random()<.5?0:1,ts:Date.now()});sim.darts=[];sim.marks=[]}
+  else{const side=st.toThrow,before=st.rem[side];const e=evalDarts(sim.darts,before,room.out);
+    if(sim.darts.length===3||e.bust||e.fin){room.events.push(makeTurn(room,st,sim.darts));sim.darts=[];sim.marks=[]}
+    else{const a=LEVELS[sim.lv[side]].a;const left=before-sim.darts.reduce((x,d)=>x+d.v,0);const d=aiHit(aiAim(left,room.out,3-sim.darts.length),a);sim.darts.push(d);const p=markPos(d);sim.marks.push({x:p[0],y:p[1],c:side?'#4c9be0':'#f2b134'})}}
+  sim.timer=setTimeout(simTick,650/sim.speed);render()}
+VIEWS.simulator=()=>{const c=sim?.cfg||{type:'single',size:2,score:'501',out:'double',best:'3',limit:'0',h:'pro',a:'adv'};
+  const lvOpts=sel=>Object.entries(LEVELS).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${v.name}</option>`).join('');
+  let board='',score='',hist='';
+  if(sim){const room=sim.room,st=replay(room);const ts=room.events.filter(e=>e.t==='turn');
+    const avg=i=>{const a=ts.filter(e=>e.side===i);const d=a.reduce((x,e)=>x+e.darts.length,0);return d?a.reduce((x,e)=>x+e.total,0)/d*3:0};
+    board=`<div class="board-wrap">${boardSVG(sim.marks,false)}</div>`;
+    score=`<div class="grid g2">${[0,1].map(i=>`<div class="side ${!st.finished&&st.toThrow===i?'active':''}"><span class="tag">${i?'AWAY':'HOME'} · ${LEVELS[sim.lv[i]].name}</span><div class="row" style="justify-content:space-between"><b>${esc(pname(room,st.thrower(i)))}</b><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div><div class="remain">${st.rem[i]}</div><div class="kv"><span>Avg</span><span>${fmt2(avg(i))}</span><span>180s</span><span>${ts.filter(e=>e.side===i&&e.total===180).length}</span></div></div>`).join('')}</div>
+    <div class="muted small">LEG ${st.leg} · รอบ ${st.round}${st.finished?` · <b style="color:var(--amber)">จบแล้ว — ${esc(sideName(room,st.winner))} ชนะ ${st.legsWon[0]}-${st.legsWon[1]}</b>`:''}</div>`;
+    hist=ts.slice().reverse().slice(0,60).map(e=>`<div class="ln"><span class="d">L${e.leg} ${e.side?'AWAY':'HOME'}</span><span>${esc(pname(room,e.pid))} <span class="d">${e.darts.map(dLabel).join(' ')}</span></span><span class="tt">${e.bust?'<span class="bust">BUST</span>':e.total}</span><span class="d">${e.bust?e.before:e.before-e.total}</span></div>`).join('')}
+  return `<div class="head"><div><h1>AI Simulator</h1><p>จำลองการแข่งขันระหว่าง AI สองระดับฝีมือ ผลไม่ถูกนับในสถิติจริง</p></div><div class="row"><span class="muted small">ความเร็ว</span>${[1,2,4,8].map(x=>`<button class="btn sm ${(sim?.speed||1)===x?'on':''}" onclick="if(!sim)sim={speed:${x},paused:true,cfg:null,room:null};sim.speed=${x};render()">×${x}</button>`).join('')}</div></div>
+  <div class="grid g2"><div class="panel"><h2>ตั้งค่าการจำลอง</h2><div class="form">
+   <label>ประเภท<select id="sm-type"><option value="single" ${c.type==='single'?'selected':''}>เดี่ยว 1v1</option><option value="team" ${c.type==='team'?'selected':''}>ทีม</option></select></label>
+   <label>ขนาดทีม<select id="sm-size">${[2,3,4].map(n=>`<option ${+c.size===n?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>คะแนนเริ่ม<select id="sm-score">${[701,601,501,401,301,201].map(n=>`<option ${+c.score===n?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>กติกาปิด<select id="sm-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${c.out===k?'selected':''}>${v}</option>`).join('')}</select></label>
+   <label>Best of<select id="sm-best">${[1,3,5,7].map(n=>`<option ${+c.best===n?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>Sudden Death<select id="sm-limit">${[0,10,15].map(n=>`<option value="${n}" ${+c.limit===n?'selected':''}>${n?n+' รอบ':'ปิด'}</option>`).join('')}</select></label>
+   <label>ระดับ AI ฝั่ง HOME<select id="sm-h">${lvOpts(c.h)}</select></label><label>ระดับ AI ฝั่ง AWAY<select id="sm-a">${lvOpts(c.a)}</select></label></div>
+   <div class="row"><button class="btn pri" onclick="simStop();simSetup()">▶ เริ่มจำลอง</button><button class="btn" onclick="if(sim&&sim.room){sim.paused=true;simStop();render()}" ${sim?.room&&!sim.paused?'':'disabled'}>⏸ พัก</button><button class="btn" onclick="if(sim&&sim.room){sim.paused=false;simTick()}" ${sim?.room&&sim.paused&&!replay(sim.room).finished?'':'disabled'}>⏵ ต่อ</button><button class="btn" onclick="simStop();sim=sim?{speed:sim.speed,paused:true,cfg:sim.cfg,room:null}:null;render()">รีเซ็ต</button></div>
+   ${sim?.room?score:'<div class="empty">กด “เริ่มจำลอง” เพื่อดู AI แข่งกัน</div>'}</div>
+   <div class="panel">${sim?.room?board:boardSVG([],false).replace('<svg','<svg style="opacity:.5;max-width:430px;margin:0 auto;display:block;width:100%"')}</div></div>
+  <div class="panel"><h2>ประวัติเทิร์นที่จำลอง</h2><div class="log">${hist||'<span class="muted">ยังไม่มีข้อมูล</span>'}</div></div>`};
+AFTER.simulator=()=>{if(sim&&sim.room&&!sim.paused&&!sim.timer)simTick()};
+
+/* ====================== ranking & profile ====================== */
+let rkSort='avg',rkTab='players';
+VIEWS.ranking=()=>{const st=computeStats();
+  if(rkTab==='teams'){const rows=Object.values(st.teams).sort((a,b)=>b.wins-a.wins||b.avg-a.avg);
+    return rankHead()+`<div class="panel tbl-wrap"><table><thead><tr><th>#</th><th>ทีม</th><th class="n">สมาชิก</th><th class="n">แมตช์</th><th class="n">ชนะ</th><th class="n">Win %</th><th class="n">Team Avg</th><th class="n">180s</th></tr></thead><tbody>${rows.map((r,i)=>{const t=T(r.id);return `<tr><td class="num">${i+1}</td><td>${teamChip(r.id).replace('team-chip','team-chip" style="color:var(--chalk);font-size:.9rem')}</td><td class="n">${teamMembers(r.id).length}</td><td class="n">${r.matches}</td><td class="n">${r.wins}</td><td class="n">${pct(r.wins,r.matches)}</td><td class="n">${fmt2(r.avg)}</td><td class="n">${r.s180}</td></tr>`}).join('')||'<tr><td colspan="8" class="muted">ยังไม่มีทีม</td></tr>'}</tbody></table></div>`}
+  const key={avg:r=>r.avg,wins:r=>r.wins,wr:r=>r.wr,s180:r=>r.s180,matches:r=>r.matches,best:r=>r.best,high:r=>r.high}[rkSort];
+  const rows=Object.values(st.players).filter(r=>P(r.id)).sort((a,b)=>key(b)-key(a)||b.avg-a.avg);
+  const th=(k,l)=>`<th class="n sort" onclick="rkSort='${k}';render()" ${rkSort===k?'style="color:var(--amber)"':''}>${l}${rkSort===k?' ▾':''}</th>`;
+  return rankHead()+`<div class="panel tbl-wrap"><table><thead><tr><th>#</th><th>ผู้เล่น</th>${th('matches','แมตช์')}${th('wins','ชนะ')}${th('wr','Win %')}${th('avg','3-Dart Avg')}${th('high','สูงสุด')}${th('best','Best CO')}${th('s180','180s')}</tr></thead><tbody>${rows.map((r,i)=>`<tr class="click" onclick="openProfile('${r.id}')"><td class="num">${i+1}</td><td>${plHTML(r.id)}</td><td class="n">${r.matches}</td><td class="n">${r.wins}</td><td class="n">${pct(r.wins,r.matches)}</td><td class="n"><b>${fmt2(r.avg)}</b></td><td class="n">${r.high}</td><td class="n">${r.best||'-'}</td><td class="n">${r.s180}</td></tr>`).join('')}</tbody></table></div>`};
+function rankHead(){return `<div class="head"><div><h1>อันดับ</h1><p>คำนวณจากทุกแมตช์จริง (ไม่รวม AI จำลอง) · คลิกหัวคอลัมน์เพื่อเรียง · คลิกผู้เล่นเพื่อดูโปรไฟล์</p></div><div class="row"><button class="btn ${rkTab==='players'?'on':''}" onclick="rkTab='players';render()">รายบุคคล</button><button class="btn ${rkTab==='teams'?'on':''}" onclick="rkTab='teams';render()">รายทีม</button></div></div>`}
+function openProfile(id){S.ui.profileId=id;save();go('profile')}
+function spark(vals){if(vals.length<2)return '<div class="muted small">ต้องมีอย่างน้อย 2 แมตช์เพื่อแสดงแนวโน้ม</div>';const W=600,H=60,mx=Math.max(...vals)*1.1,mn=Math.min(...vals)*.9;const x=i=>i/(vals.length-1)*(W-10)+5,y=v=>H-5-(v-mn)/(mx-mn||1)*(H-10);
+  const d=vals.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join('');return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}L${x(vals.length-1)} ${H}L5 ${H}Z" fill="var(--amber)" opacity=".12"/><path d="${d}" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="${x(vals.length-1)}" cy="${y(vals[vals.length-1])}" r="4" fill="var(--amber)"/></svg>`}
+VIEWS.profile=()=>{const p=P(S.ui.profileId);if(!p)return '<div class="empty">ไม่พบผู้เล่น</div>';const s=computeStats().players[p.id];
+  const ms=realRooms().filter(r=>r.sides.some(sd=>sd.playerIds.includes(p.id))).slice(0,12);
+  return `<div class="row"><a class="btn sm" href="#ranking">← กลับไปหน้าอันดับ</a></div>
+  <div class="panel"><div class="prof">${av(p,'lg')}<div style="min-width:0;flex:1"><div class="row"><span class="role ${p.role}">${ROLE_LABEL[p.role]}</span>${teamChip(p.teamId)}</div><h1>${esc(p.name)}</h1><div class="muted small">${p.nick?'“'+esc(p.nick)+'” · ':''}สมาชิกตั้งแต่ ${new Date(p.created).toLocaleDateString('th-TH',{dateStyle:'medium'})}</div></div><div class="row"><button class="btn" onclick="editPlayer('${p.id}')">แก้ไข</button>${S.me!==p.id?`<button class="btn" onclick="S.me='${p.id}';save();render()">ใช้งานในนามคนนี้</button>`:'<span class="pill st-playing">คุณ</span>'}</div></div></div>
+  <div class="tiles">${[['แมตช์',s.matches],['ชนะ',s.wins],['Win Rate',pct(s.wins,s.matches)],['3-Dart Avg',fmt2(s.avg)],['เทิร์นสูงสุด',s.high],['180s',s.s180],['140+',s.s140],['Best Checkout',s.best||'-'],['Legs ที่ชนะ',s.legs],['ลูกดอกที่ปา',s.darts]].map(([k,v])=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+  <div class="panel"><div class="panel-h"><h2>แนวโน้มค่าเฉลี่ยรายแมตช์</h2><span class="muted small">${s.mAvg.length} แมตช์</span></div>${spark(s.mAvg.map(m=>m.avg))}</div>
+  <div class="panel tbl-wrap"><h2>แมตช์ล่าสุด</h2><table><thead><tr><th>ห้อง</th><th>คู่แข่ง</th><th>ผล</th><th>สถานะ</th></tr></thead><tbody>${ms.map(r=>{const st=replay(r);const i=r.sides.findIndex(sd=>sd.playerIds.includes(p.id));const s2=roomStatus(r);return `<tr class="click" onclick="openRoom('${r.id}')"><td>${esc(r.name)}<div class="code muted small mono">${r.code}</div></td><td>${esc(sideName(r,1-i))}</td><td class="num">${st.legsWon[i]} - ${st.legsWon[1-i]} ${s2==='finished'?(st.winner===i?'<span class="pill st-playing">ชนะ</span>':'<span class="pill st-finished">แพ้</span>'):''}</td><td>${statusPill(s2)}</td></tr>`}).join('')||'<tr><td colspan="4" class="muted">ยังไม่มีแมตช์</td></tr>'}</tbody></table></div>`};
+
+/* ====================== tournament ====================== */
+function T_(id){return S.tours.find(t=>t.id===id)}
+function entName(tour,id){if(id==='BYE')return 'BYE';if(!id)return 'รอผลการแข่งขัน';return tour.kind==='team'?(T(id)?.name||'?'):(P(id)?.name||'?')}
+function buildBracket(entrants){let n=1;while(n<entrants.length)n*=2;const slots=Array(n).fill('BYE');const half=n/2;
+  entrants.forEach((e,i)=>{if(i<half)slots[i*2]=e;else slots[(i-half)*2+1]=e});
+  const rounds=[];let cnt=n/2;rounds.push(Array.from({length:cnt},(_,j)=>({id:uid(),a:slots[j*2],b:slots[j*2+1],w:null,roomId:null})));
+  while(cnt>1){cnt/=2;rounds.push(Array.from({length:cnt},()=>({id:uid(),a:null,b:null,w:null,roomId:null})))}return rounds}
+function tourAdvance(tour){let ch=true;while(ch){ch=false;tour.rounds.forEach((rd,r)=>rd.forEach((m,j)=>{
+  if(!m.w&&m.a&&m.b&&(m.a==='BYE'||m.b==='BYE')){m.w=m.a==='BYE'?m.b:m.a;ch=true}
+  if(m.w&&r+1<tour.rounds.length){const nm=tour.rounds[r+1][Math.floor(j/2)];const k=j%2?'b':'a';if(nm[k]!==m.w){nm[k]=m.w;ch=true}}}))}
+  const f=tour.rounds[tour.rounds.length-1][0];tour.champion=f.w||null}
+function createTour(name,kind,teamSize,score,out,bestOf,entrants){const tour={id:uid(),name,kind,teamSize,score,out,bestOf,entrants,rounds:buildBracket(shuffle(entrants)),champion:null,created:Date.now()};tourAdvance(tour);S.tours.unshift(tour);S.ui.tourId=tour.id;save();return tour}
+function createTourModal(){
+  openModal('สร้างทัวร์นาเมนต์',`<div class="form"><label class="full">ชื่อรายการ<input id="tc-name" placeholder="เช่น Ubon Champions Cup 2026"></label>
+   <label>ประเภท<select id="tc-kind"><option value="single">เดี่ยว 1v1</option><option value="team">ทีม</option></select></label><label>ขนาดทีม<select id="tc-size">${[2,3,4].map(n=>`<option>${n}</option>`).join('')}</select></label>
+   <label>คะแนนเริ่ม<select id="tc-score">${[701,601,501,301].map(n=>`<option ${n===S.settings.score?'selected':''}>${n}</option>`).join('')}</select></label><label>Best of<select id="tc-best">${[1,3,5,7].map(n=>`<option ${n===S.settings.bestOf?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>กติกาปิด<select id="tc-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===S.settings.out?'selected':''}>${v}</option>`).join('')}</select></label></div>
+   <div><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3>เลือกผู้เข้าแข่งขัน (อย่างน้อย 2)</h3><div class="row"><button class="btn sm" id="tc-all">เลือกทั้งหมด</button><button class="btn sm" id="tc-rnd4">สุ่ม 4</button><button class="btn sm" id="tc-rnd8">สุ่ม 8</button></div></div><div class="pick-list" id="tc-list"></div><p class="muted small" id="tc-cnt" style="margin:6px 0 0"></p></div>`,
+  [{label:'ยกเลิก'},{label:'สุ่มจับคู่และสร้างผัง',cls:'pri',fn:()=>{const ids=$$('.tc-e').filter(c=>c.checked).map(c=>c.value);if(ids.length<2){toast('ต้องเลือกอย่างน้อย 2 ฝ่าย');return false}
+    const kind=$('#tc-kind').value;createTour($('#tc-name').value.trim()||'ทัวร์นาเมนต์ '+(S.tours.length+1),kind,+$('#tc-size').value,+$('#tc-score').value,$('#tc-out').value,+$('#tc-best').value,ids);render();toast('สร้างผังการแข่งขันแล้ว')}}],
+  {wide:true,after:()=>{const draw=()=>{const k=$('#tc-kind').value;$('#tc-size').disabled=k!=='team';const src=k==='team'?S.teams.map(t=>({id:t.id,h:`<span class="team-chip" style="color:var(--chalk)"><i style="background:${esc(t.color)}"></i>${esc(t.name)}</span><span class="muted small">${teamMembers(t.id).length} คน</span>`})):S.players.map(p=>({id:p.id,h:plHTML(p.id)}));
+    $('#tc-list').innerHTML=src.map(e=>`<label class="opt ck"><input type="checkbox" class="tc-e" value="${e.id}">${e.h}</label>`).join('');const cnt=()=>$('#tc-cnt').textContent='เลือกแล้ว '+$$('.tc-e').filter(c=>c.checked).length+' ฝ่าย (ถ้าไม่ครบกำลังของ 2 ระบบจะใส่ BYE ให้)';$$('.tc-e').forEach(c=>c.onchange=cnt);cnt()};
+    $('#tc-kind').onchange=draw;draw();$('#tc-all').onclick=()=>{$$('.tc-e').forEach(c=>c.checked=true);$$('.tc-e')[0]?.onchange()};
+    const rnd=n=>{const cs=shuffle($$('.tc-e'));cs.forEach((c,i)=>c.checked=i<n);cs[0]?.onchange()};$('#tc-rnd4').onclick=()=>rnd(4);$('#tc-rnd8').onclick=()=>rnd(8)}})}
+function quickTour(kind){const pool=kind==='team'?S.teams.filter(t=>teamMembers(t.id).length).map(t=>t.id):S.players.map(p=>p.id);if(pool.length<2){toast('ผู้เข้าแข่งขันไม่พอ');return}
+  createTour((kind==='team'?'Team Cup ':'Singles Cup ')+new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short'}),kind,2,S.settings.score,S.settings.out,S.settings.bestOf,shuffle(pool).slice(0,4));render()}
+function tourRoom(tid,r,j){const tour=T_(tid),m=tour.rounds[r][j];if(m.roomId&&S.rooms.find(x=>x.id===m.roomId))return S.rooms.find(x=>x.id===m.roomId);
+  const room=newRoom({name:`${tour.name} · ${roundName(tour,r)}`,type:tour.kind==='team'?'team':'single',teamSize:tour.teamSize,score:tour.score,out:tour.out,bestOf:tour.bestOf,tour:{tid,r,j}});
+  [m.a,m.b].forEach((e,i)=>{if(tour.kind==='team'){room.sides[i].teamId=e;room.sides[i].playerIds=teamMembers(e).slice(0,tour.teamSize).map(p=>p.id)}else room.sides[i].playerIds=[e]});
+  m.roomId=room.id;S.rooms.unshift(room);save();return room}
+function playTour(tid,r,j){const room=tourRoom(tid,r,j);openRoom(room.id)}
+function simTour(tid,r,j){const room=tourRoom(tid,r,j);room.introDone=true;playOut(room,[.3+Math.random()*.6,.3+Math.random()*.6]);roomAfterChange(room);closeModal();render()}
+function onRoomFinished(room,st){if(!room.tour)return;const tour=T_(room.tour.tid);if(!tour)return;const m=tour.rounds[room.tour.r]?.[room.tour.j];if(!m)return;m.w=st.winner===0?m.a:m.b;tourAdvance(tour);save()}
+function tourRevert(room){if(!room.tour)return;const tour=T_(room.tour.tid);if(!tour)return;const m=tour.rounds[room.tour.r]?.[room.tour.j];if(!m)return;
+  const nxt=tour.rounds[room.tour.r+1]?.[Math.floor(room.tour.j/2)];if(nxt&&nxt.roomId&&S.rooms.find(x=>x.id===nxt.roomId)){toast('แมตช์รอบถัดไปเริ่มไปแล้ว ผังจะไม่ถูกย้อน');return}
+  m.w=null;if(nxt){nxt[room.tour.j%2?'b':'a']=null}tour.champion=null;tourAdvance(tour);save()}
+function roundName(tour,r){const n=tour.rounds.length-r;return n===1?'รอบชิงชนะเลิศ':n===2?'รอบรองชนะเลิศ':n===3?'รอบ 8 ทีม':'รอบที่ '+(r+1)}
+function delTour(id){confirmBox('ลบทัวร์นาเมนต์','ลบผังการแข่งขันนี้? (ห้องแข่งขันที่สร้างไว้ยังอยู่)','ลบ',()=>{S.tours=S.tours.filter(t=>t.id!==id);if(S.ui.tourId===id)S.ui.tourId=S.tours[0]?.id||null;save();render()})}
+VIEWS.tournament=()=>{let tour=T_(S.ui.tourId)||S.tours[0];
+  const head=`<div class="head"><div><h1>ผังการแข่งขัน</h1><p>แพ้คัดออก (Single Elimination) อัปเดตผู้ชนะจากห้องแข่งขันอัตโนมัติ</p></div><div class="row"><button class="btn pri" onclick="createTourModal()">+ สร้างทัวร์นาเมนต์</button><button class="btn" onclick="quickTour('single')">สุ่มเดี่ยว 4 คน</button><button class="btn" onclick="quickTour('team')">สุ่มทีม 4 ทีม</button></div></div>`;
+  if(!tour)return head+'<div class="empty">ยังไม่มีทัวร์นาเมนต์</div>';
+  const sel=S.tours.length>1?`<select id="tsel" style="max-width:320px">${S.tours.map(t=>`<option value="${t.id}" ${t.id===tour.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select>`:'';
+  const ent=(m,k)=>{const id=m[k];const w=m.w&&m.w===id,l=m.w&&id&&m.w!==id;return `<div class="e ${w?'w':''} ${l?'l':''}"><b style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="${id?'':'muted'}">${esc(entName(tour,id))}</b>${w?'<span>✓</span>':''}</div>`};
+  return head+`<div class="panel"><div class="panel-h"><div><h2>${esc(tour.name)}</h2><div class="muted small">${tour.kind==='team'?'ทีม '+tour.teamSize+'v'+tour.teamSize:'เดี่ยว'} · ${tour.score} · ${OUT_LABEL[tour.out]} · Best of ${tour.bestOf} · ${tour.entrants.length} ฝ่าย</div></div><div class="row">${sel}<button class="btn sm dng" onclick="delTour('${tour.id}')">ลบผังนี้</button></div></div>
+  <div class="bracket">${tour.rounds.map((rd,r)=>`<div class="round"><h3>${roundName(tour,r).toUpperCase()}</h3>${rd.map((m,j)=>{const room=m.roomId&&S.rooms.find(x=>x.id===m.roomId);const ready=m.a&&m.b&&m.a!=='BYE'&&m.b!=='BYE';const stt=room?replay(room):null;
+    return `<div class="bm">${ent(m,'a')}${ent(m,'b')}${ready?`<div class="act">${m.w?`<button class="btn sm" onclick="openRoom('${m.roomId}')">ดูผล ${stt?stt.legsWon.join('-'):''}</button>`:`<button class="btn sm pri" onclick="playTour('${tour.id}',${r},${j})">${room?'ให้คะแนนต่อ':'เล่นแมตช์'}</button><button class="btn sm" onclick="simTour('${tour.id}',${r},${j})" title="ให้ AI จำลองผลแมตช์นี้">AI จำลองผล</button>`}</div>`:''}</div>`}).join('')}</div>`).join('')}
+   <div class="champ"><span class="muted small">CHAMPION</span><div style="font-size:2rem">🏆</div><h2>${tour.champion?esc(entName(tour,tour.champion)):'รอผู้ชนะ'}</h2></div></div></div>`};
+AFTER.tournament=()=>{const s=$('#tsel');if(s)s.onchange=()=>{S.ui.tourId=s.value;save();render()}};
+
+/* ====================== hall of fame ====================== */
+VIEWS['hall-of-fame']=()=>{const l=list180();const by={};l.forEach(x=>{by[x.pid]=by[x.pid]||{pid:x.pid,n:0,last:0};by[x.pid].n++;by[x.pid].last=Math.max(by[x.pid].last,x.ts)});
+  const rows=Object.values(by).sort((a,b)=>b.n-a.n||b.last-a.last);const today=l.filter(x=>dayKey(x.ts)===dayKey(Date.now())).length;
+  return `<div class="head"><div><h1>Hall of Fame 180</h1><p>หอเกียรติยศของผู้ที่ปาได้ 180 แต้มเต็ม (T20 × 3)</p></div></div>
+  <div class="tiles"><div class="tile"><div class="k">180 ทั้งหมด</div><div class="v">${l.length}</div></div><div class="tile"><div class="k">ผู้นำ</div><div class="v" style="font-size:1.15rem;padding-top:6px">${rows[0]?esc(P(rows[0].pid)?.name||'?'):'-'}</div></div><div class="tile"><div class="k">180 วันนี้</div><div class="v">${today}</div></div><div class="tile"><div class="k">ผู้เล่นที่เคยทำได้</div><div class="v">${rows.length}</div></div></div>
+  <div class="grid g2"><div class="panel tbl-wrap"><h2>อันดับผู้ทำ 180 สูงสุด</h2><table><thead><tr><th>#</th><th>ผู้เล่น</th><th class="n">จำนวน 180</th><th class="n">ล่าสุด</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="click" onclick="openProfile('${r.pid}')"><td class="num">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td>${plHTML(r.pid)}</td><td class="n"><b>${r.n}</b></td><td class="n small">${dt(r.last)}</td></tr>`).join('')||'<tr><td colspan="4" class="muted">ยังไม่มีใครทำ 180</td></tr>'}</tbody></table></div>
+  <div class="panel"><h2>ไทม์ไลน์ 180 ล่าสุด</h2><div class="log">${l.slice(0,40).map(x=>`<div class="ln" style="grid-template-columns:auto 1fr auto"><span class="tt" style="color:var(--amber)">180</span><span style="min-width:0">${esc(P(x.pid)?.name||'?')} <span class="d">${esc(x.room.name)}</span></span><span class="d">${dt(x.ts)}</span></div>`).join('')||'<span class="muted">ยังไม่มีข้อมูล</span>'}</div></div></div>`};
+
+/* ====================== dashboard ====================== */
+function barChart(days){const W=520,H=190,pl=28,pb=22,mx=Math.max(1,...days.map(d=>d.n));const top=Math.ceil(mx/2)*2||2;const bw=(W-pl-8)/days.length;
+  let g='';for(let t=0;t<=top;t+=Math.max(1,top/4)){const y=H-pb-(t/top)*(H-pb-10);g+=`<line x1="${pl}" x2="${W-4}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${pl-6}" y="${y+3}" text-anchor="end">${t}</text>`}
+  days.forEach((d,i)=>{const h=(d.n/top)*(H-pb-10);const x=pl+i*bw+bw*.18;g+=`<rect x="${x.toFixed(1)}" y="${(H-pb-h).toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${i===days.length-1?'var(--amber)':'color-mix(in srgb,var(--amber) 45%,var(--panel2))'}"><title>${d.l}: ${d.n} แมตช์</title></rect>`;if(i%2===days.length%2||i===days.length-1)g+=`<text x="${(x+bw*.32).toFixed(1)}" y="${H-6}" text-anchor="middle">${d.l}</text>`});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="จำนวนแมตช์ที่จบในแต่ละวัน">${g}</svg>`}
+function hbar(rows){if(!rows.length)return '<div class="muted small">ยังไม่มีข้อมูล</div>';const W=520,rh=26,H=rows.length*rh+6,lw=130,mx=Math.max(...rows.map(r=>r.v))*1.08;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="ค่าเฉลี่ย 3 ลูกของผู้เล่นอันดับต้น">${rows.map((r,i)=>{const w=(r.v/mx)*(W-lw-60);const y=i*rh+4;return `<text x="${lw-8}" y="${y+14}" text-anchor="end" style="fill:var(--chalk);font-family:var(--f-body);font-size:12px">${esc(r.l.slice(0,16))}</text><rect x="${lw}" y="${y+3}" width="${w.toFixed(1)}" height="16" rx="2" fill="${r.c}"/><text x="${(lw+w+6).toFixed(1)}" y="${y+15}">${fmt2(r.v)}</text>`}).join('')}</svg>`}
+VIEWS.dashboard=()=>{const rr=realRooms();const stats=computeStats();const fin=rr.filter(r=>r.finishedAt);const today=fin.filter(r=>dayKey(r.finishedAt)===dayKey(Date.now()));
+  const live=rr.filter(r=>roomStatus(r)==='playing'),wait=rr.filter(r=>['waiting','ready'].includes(roomStatus(r)));
+  const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=dayKey(d);days.push({l:d.getDate()+'/'+(d.getMonth()+1),n:fin.filter(r=>dayKey(r.finishedAt)===k).length})}
+  const top=Object.values(stats.players).filter(s=>P(s.id)&&s.darts>=9).sort((a,b)=>b.avg-a.avg).slice(0,6).map(s=>({l:P(s.id).name,v:s.avg,c:P(s.id).color}));
+  const rk=Object.values(stats.players).filter(s=>P(s.id)&&s.matches).sort((a,b)=>b.wins-a.wins||b.avg-a.avg).slice(0,5);
+  const recent=fin.slice().sort((a,b)=>b.finishedAt-a.finishedAt).slice(0,6);
+  return `${!S.players.length?`<div class="panel"><h2>เริ่มต้นใช้งาน</h2><p class="muted" style="margin:0">ยังไม่มีข้อมูลในระบบ เริ่มจากเพิ่มผู้เล่นและทีม หรือโหลดข้อมูลตัวอย่างเพื่อลองใช้ก่อน (ลบทิ้งได้ภายหลัง)</p><div class="row"><button class="btn pri" onclick="editPlayer(null,true)">+ เพิ่มผู้เล่นคนแรก (ตัวคุณ)</button><button class="btn" onclick="editTeam()">+ สร้างทีม</button><button class="btn" onclick="loadDemo()">โหลดข้อมูลตัวอย่าง</button></div></div>`:''}${S.demo?`<div class="banner"><span>กำลังแสดง <b>ข้อมูลตัวอย่าง</b> (ผู้เล่น ทีม และแมตช์สมมุติ) เพื่อให้เห็นการทำงานของระบบ</span><button class="btn sm" onclick="clearAll(false)">ล้างข้อมูลตัวอย่าง เริ่มใช้งานจริง</button></div>`:''}
+  <div class="head"><div><h1>ภาพรวมการแข่งขัน</h1><p>สรุปแมตช์ ห้องที่กำลังแข่ง และฟอร์มของผู้เล่น</p></div><div class="row"><button class="btn pri" onclick="createRoomModal()">+ สร้างห้องแข่งขัน</button><a class="btn" href="#simulator">เปิด AI Simulator</a></div></div>
+  <div class="tiles">${[['แมตช์ที่จบแล้ว',fin.length],['แมตช์วันนี้',today.length],['กำลังแข่ง',live.length],['ห้องรอ / พร้อม',wait.length],['180 ทั้งหมด',list180().length],['ผู้เล่น',S.players.length]].map(([k,v])=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+  <div class="panel"><div class="panel-h"><h2><span class="live-dot"></span> กำลังแข่งขันอยู่</h2><a href="#rooms" class="small">ดูทุกห้อง</a></div>${live.length?`<div class="grid g3">${live.map(roomCard).join('')}</div>`:'<div class="muted small">ตอนนี้ไม่มีแมตช์ที่กำลังแข่ง</div>'}</div>
+  <div class="grid g2"><div class="panel chart"><div class="panel-h"><h2>แมตช์ที่จบรายวัน</h2><span class="muted small">14 วันล่าสุด</span></div>${barChart(days)}</div><div class="panel chart"><div class="panel-h"><h2>Top 3-Dart Average</h2><span class="muted small">ขั้นต่ำ 9 ลูก</span></div>${hbar(top)}</div></div>
+  <div class="grid g2"><div class="panel tbl-wrap"><div class="panel-h"><h2>อันดับผู้เล่น</h2><a href="#ranking" class="small">ดูทั้งหมด</a></div><table><thead><tr><th>#</th><th>ผู้เล่น</th><th class="n">ชนะ</th><th class="n">Win %</th><th class="n">Avg</th><th class="n">180s</th></tr></thead><tbody>${rk.map((s,i)=>`<tr class="click" onclick="openProfile('${s.id}')"><td class="num">${i+1}</td><td>${plHTML(s.id)}</td><td class="n">${s.wins}/${s.matches}</td><td class="n">${pct(s.wins,s.matches)}</td><td class="n">${fmt2(s.avg)}</td><td class="n">${s.s180}</td></tr>`).join('')||'<tr><td colspan="6" class="muted">ยังไม่มีข้อมูล</td></tr>'}</tbody></table></div>
+  <div class="panel tbl-wrap"><h2>แมตช์ล่าสุด</h2><table><thead><tr><th>ห้อง</th><th>ผู้ชนะ</th><th class="n">สกอร์</th><th class="n">จบเมื่อ</th></tr></thead><tbody>${recent.map(r=>{const st=replay(r);return `<tr class="click" onclick="openRoom('${r.id}')"><td>${esc(r.name)}<div class="small muted">${r.type==='team'?'ทีม':'เดี่ยว'} · ${r.score}</div></td><td><b style="color:var(--amber)">${esc(sideName(r,st.winner))}</b><div class="small muted">ชนะ ${esc(sideName(r,1-st.winner))}</div></td><td class="n">${st.legsWon[0]}-${st.legsWon[1]}</td><td class="n small">${dt(r.finishedAt)}</td></tr>`}).join('')||'<tr><td colspan="4" class="muted">ยังไม่มีแมตช์ที่จบ</td></tr>'}</tbody></table></div></div>`};
+
+/* ====================== settings ====================== */
+function exportData(){const txt=JSON.stringify(S,null,1);openModal('สำรองข้อมูล (Export)',`<p class="muted small" style="margin:0">ดาวน์โหลดเป็นไฟล์ .json หรือคัดลอกข้อความไปเก็บไว้ ใช้นำเข้ากลับหรือย้ายไปเครื่องอื่นได้</p><textarea id="ex-t" readonly style="min-height:200px;font-family:var(--f-mono);font-size:.75rem">${esc(txt)}</textarea>`,
+  [{label:'คัดลอก',fn:()=>{navigator.clipboard.writeText(txt).then(()=>toast('คัดลอกแล้ว')).catch(()=>{$('#ex-t').select();toast('เลือกข้อความแล้ว กด Ctrl+C')});return false}},{label:'ดาวน์โหลด .json',cls:'pri',fn:()=>{saveFile('oche-backup-'+new Date().toISOString().slice(0,10)+'.json',txt,'application/json');return false}}],{wide:true})}
+function importData(){openModal('นำเข้าข้อมูล (Import)',`<p class="muted small" style="margin:0">เลือกไฟล์สำรอง .json หรือวางข้อความ ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด</p><input type="file" id="im-f" accept=".json,application/json"><textarea id="im-t" placeholder="หรือวาง JSON ที่นี่" style="min-height:160px;font-family:var(--f-mono);font-size:.75rem"></textarea>`,
+  [{label:'ยกเลิก'},{label:'นำเข้าและแทนที่',cls:'dng',fn:()=>{try{const o=JSON.parse($('#im-t').value);if(!o.players||!o.rooms)throw 0;const sk=S.skin,meId=S.me;S=Object.assign(clone(DEF),o);S.skin=sk;if(!P(S.me))S.me=meId;fixShape();save();render();toast('นำเข้าข้อมูลแล้ว')}catch(e){toast('ไฟล์ไม่ถูกต้อง');return false}}}],
+  {after:()=>{$('#im-f').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>$('#im-t').value=r.result;r.readAsText(f)}}})}
+function clearAll(keepPeople){const s=S.settings,sk=S.skin;if(keepPeople){S.rooms=[];S.tours=[];S.audit=[]}else{S=clone(DEF);S.settings=s;S.skin=sk}S.demo=false;save();render();toast('ล้างข้อมูลแล้ว')}
+function fbSave(){const t=$('#fb-cfg').value;const c={};let m;const re=/(\w+)\s*:\s*["']([^"']+)["']/g;while((m=re.exec(t)))c[m[1]]=m[2];
+  if(!c.projectId||!c.apiKey){toast('ไม่พบ apiKey / projectId ในข้อความที่วาง');return}
+  try{localStorage.setItem(FB_KEY,JSON.stringify(c))}catch(e){}toast('กำลังเชื่อมต่อ…');setTimeout(()=>location.reload(),500)}
+function fbOff(){confirmBox('ยกเลิกการเชื่อมต่อ','เครื่องนี้จะกลับไปใช้ข้อมูลในเครื่อง ข้อมูลบนฐานข้อมูลออนไลน์ยังอยู่ครบ','ยกเลิกการเชื่อมต่อ',()=>{try{localStorage.removeItem(FB_KEY)}catch(e){}location.reload()})}
+function fbShare(){const c=fbConfig();const url=location.origin+location.pathname+'#connect='+btoa(unescape(encodeURIComponent(JSON.stringify(c))));
+  openModal('ลิงก์เชื่อมต่อสำหรับเครื่องอื่น',`<p class="muted small" style="margin:0">เปิดลิงก์นี้บนมือถือหรือคอมเครื่องอื่นครั้งเดียว เครื่องนั้นจะเชื่อมต่อฐานข้อมูลเดียวกันอัตโนมัติ</p><textarea id="fb-link" readonly style="font-family:var(--f-mono);font-size:.75rem">${esc(url)}</textarea>`,[{label:'คัดลอก',cls:'pri',fn:()=>{navigator.clipboard.writeText(url).then(()=>toast('คัดลอกแล้ว')).catch(()=>{$('#fb-link').select()});return false}}])}
+function loadDemo(){const s=S.settings,sk=S.skin;S=clone(DEF);S.settings=s;S.skin=sk;seedDemo();save();render();toast('โหลดข้อมูลตัวอย่างแล้ว')}
+function resetModal(){if(S.players.length&&!isAdmin()){toast('เฉพาะแอดมินเท่านั้นที่รีเซ็ตระบบได้');return}
+  openModal('รีเซ็ตระบบ',`<p style="margin:0">เลือกระดับการล้างข้อมูล การกระทำนี้ย้อนกลับไม่ได้ (แนะนำให้สำรองข้อมูลก่อน)</p>`,[{label:'ยกเลิก'},{label:'ล้างเฉพาะแมตช์/ผัง/Log',cls:'dng',fn:()=>clearAll(true)},{label:'ล้างทั้งหมด',cls:'dng',fn:()=>clearAll(false)},{label:'โหลดข้อมูลตัวอย่าง',fn:loadDemo}])}
+VIEWS.config=()=>{const s=S.settings;return `<div class="head"><div><h1>ตั้งค่าระบบ</h1><p>ค่าเริ่มต้นของห้องใหม่ ข้อมูลสำรอง และบันทึกการแก้คะแนนของกรรมการ</p></div></div>
+  <div class="grid g2"><div class="panel"><h2>ค่าเริ่มต้น</h2><div class="form">
+   <label class="full">ชื่อระบบ / ลีก<input id="st-name" value="${esc(s.appName)}" maxlength="40"></label>
+   <label>คะแนนเริ่มต้น<select id="st-score">${[701,601,501,401,301,201].map(n=>`<option ${n===s.score?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>กติกาปิดเกม<select id="st-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
+   <label>Best of<select id="st-best">${[1,3,5,7,9].map(n=>`<option ${n===s.bestOf?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>Sudden Death เมื่อครบ<select id="st-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label></div>
+   <div class="row"><button class="btn pri" onclick="S.settings={appName:$('#st-name').value.trim()||'OCHE Dart League',score:+$('#st-score').value,out:$('#st-out').value,bestOf:+$('#st-best').value,roundLimit:+$('#st-limit').value};save();render();toast('บันทึกการตั้งค่าแล้ว')">บันทึกการตั้งค่า</button></div></div>
+  <div class="panel"><h2>ข้อมูลและการสำรอง</h2><p class="muted small" style="margin:0">ระบบนี้ไม่มีเซิร์ฟเวอร์และไม่มีล็อกอิน ข้อมูลทั้งหมดอยู่ในเบราว์เซอร์เครื่องนี้ ควรสำรองเป็นไฟล์อยู่เสมอ</p>
+   <div class="kv"><span>ผู้เล่น</span><span>${S.players.length}</span><span>ทีม</span><span>${S.teams.length}</span><span>ห้องแข่งขัน</span><span>${realRooms().length}</span><span>ทัวร์นาเมนต์</span><span>${S.tours.length}</span></div>
+   <div class="kv"><span>ที่เก็บข้อมูล</span><span>${cloud.state==='online'?'เซิร์ฟเวอร์ (ซิงก์ทุกเครื่อง)':'เครื่องนี้เท่านั้น'}</span><span>ธีมของเครื่องนี้</span><span>${(SKINS.find(s=>s[0]===(S.skin||'auto'))||SKINS[0])[1]}</span></div>
+   <div class="row"><button class="btn" onclick="skinModal()">🎨 เปลี่ยนธีม</button><button class="btn" onclick="exportData()">สำรองข้อมูล (Export)</button><button class="btn" onclick="importData()">นำเข้าข้อมูล (Import)</button><button class="btn dng" onclick="resetModal()">รีเซ็ตระบบ…</button></div></div></div>
+  ${cloud.kind==='host'?'':`<div class="panel"><div class="panel-h"><h2>ฐานข้อมูลออนไลน์ (ซิงก์ทุกเครื่อง)</h2><span class="sync ${cloud.state}"><i></i>${cloud.state==='online'?'เชื่อมต่อแล้ว · '+esc(fbConfig()?.projectId||''):'ยังไม่เชื่อมต่อ'}</span></div>
+   <p class="muted small" style="margin:0">ใช้ Firebase Cloud Firestore (ฟรี) เพื่อให้ทุกเครื่องเห็นสกอร์ชุดเดียวกันแบบสด วิธีเตรียม: 1) เข้า console.firebase.google.com สร้างโปรเจกต์ 2) Build → Firestore Database → Create database 3) Project settings → Your apps → เพิ่ม Web app (&lt;/&gt;) แล้วคัดลอก firebaseConfig มาวางด้านล่าง</p>
+   ${fbConfig()?`<div class="row"><button class="btn" onclick="fbShare()">คัดลอกลิงก์เชื่อมต่อสำหรับเครื่องอื่น</button>${window.OCHE_FIREBASE?'<span class="muted small">ตั้งค่าฝังในเว็บแล้ว ทุกเครื่องเชื่อมต่ออัตโนมัติ</span>':`<button class="btn dng" onclick="fbOff()">ยกเลิกการเชื่อมต่อ</button>`}</div>`:
+   `<label>firebaseConfig<textarea id="fb-cfg" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  ...&#10;};' style="font-family:var(--f-mono);font-size:.8rem;min-height:140px"></textarea></label><div class="row"><button class="btn pri" onclick="fbSave()">บันทึกและเชื่อมต่อ</button></div>`}</div>`}
+  <div class="panel tbl-wrap"><div class="panel-h"><h2>Audit Log · การแก้คะแนนโดยกรรมการ</h2><span class="muted small">${S.audit.length} รายการ</span></div><table><thead><tr><th>เวลา</th><th>ห้อง</th><th>กรรมการ</th><th>เหตุผล</th><th class="n">HOME</th><th class="n">AWAY</th></tr></thead><tbody>${S.audit.map(a=>`<tr><td class="small">${dt(a.ts)}</td><td>${esc(a.room)}<div class="small muted">Leg ${a.leg}</div></td><td>${esc(a.byName)}</td><td>${esc(a.reason)}</td><td class="n">${a.old[0]}→${a.nw[0]}</td><td class="n">${a.old[1]}→${a.nw[1]}</td></tr>`).join('')||'<tr><td colspan="6" class="muted">ยังไม่มีการแก้คะแนน</td></tr>'}</tbody></table></div>`};
+$('#about-btn').onclick=()=>openModal('เกี่ยวกับระบบ',`<p style="margin:0"><b>${esc(S.settings.appName)}</b> ระบบจัดการแข่งขันปาลูกดอกแบบออฟไลน์ ทำงานในไฟล์ HTML ไฟล์เดียว</p>
+ <div class="kv" style="font-size:.9rem"><span>ภาษา</span><span>HTML5 · CSS3 · JavaScript ES2020</span><span>เฟรมเวิร์ก</span><span>ไม่มี (Vanilla JS)</span><span>กราฟ / กระดาน</span><span>SVG วาดเอง</span><span>ฐานข้อมูล</span><span>Cloud Firestore (เรียลไทม์) / localStorage</span><span>โฮสติ้ง</span><span>GitHub Pages (HTTPS)</span><span>ฟอนต์</span><span>Oswald · IBM Plex Sans Thai · JetBrains Mono</span><span>กติกา</span><span>X01 · Double/Single/Master Out · Best of N</span><span>ยืนยันตัวตน</span><span>เลือกโปรไฟล์ (ไม่มีล็อกอิน)</span><span>สำรองข้อมูล</span><span>Export / Import JSON</span></div>
+ <p class="muted small" style="margin:0">คีย์ลัดหน้าให้คะแนน: S / D / T = เปลี่ยนตัวคูณ · Enter = ยืนยัน · Backspace = Undo</p>`,[{label:'ปิด',cls:'pri'}]);
+
+/* ====================== demo seed ====================== */
+function seedDemo(){
+  const ppl=[['อนุชา ศรีสุข','The Hammer','🔨'],['กิตติพัฒน์ บุญมา','Kit','🦅'],['ณัฐวุฒิ แสงทอง','Nate','⚡'],['พรชัย วงศ์ดี','Snake','🐍'],['ธีรภัทร จันทร์เพ็ญ','Jeng','🐯'],['ศุภชัย ทองคำ','Gold','👑'],['วรวุฒิ พึ่งบุญ','Wolf','🐺'],['ปิยะพงษ์ ใจกล้า','Pi','🚀'],['สุริยา ดวงแก้ว','Sun','🌟'],['ชยพล มีสุข','Chai','🔥'],['เอกชัย ศักดิ์ดี','Ek','🦁'],['ภูมิ รุ่งเรือง','Phum','🍀']];
+  S.players=ppl.map(([name,nick,emoji],i)=>({id:'p'+i,name,nick,emoji,color:COLORS[i%COLORS.length],teamId:null,role:i===0?'admin':i===1?'referee':'player',created:Date.now()-(40-i)*86400000}));
+  S.teams=[['Ubon Vipers','#2f9d62'],['Mekong Hammers','#d64a3d'],['Isan Eagles','#4c9be0'],['Moon River DC','#b072e0']].map(([name,color],i)=>({id:'t'+i,name,color,leaderId:'p'+i*3,created:Date.now()-30*86400000}));
+  S.players.forEach((p,i)=>p.teamId='t'+Math.floor(i/3));
+  S.me='p0';
+  const skill=S.players.map((p,i)=>[.9,.7,.55,.8,.5,.65,.4,.6,.35,.75,.45,.55][i]);
+  const mk=(o,daysAgo,lv,maxTurns)=>{const r=newRoom(o);r.introDone=true;r.created=Date.now()-daysAgo*86400000-3600000;r.starter=Math.random()<.5?0:1;playOut(r,lv,maxTurns);
+    let t=r.created;r.events.forEach(e=>{t+=40000;e.ts=t});const st=replay(r);if(st.finished)r.finishedAt=t;S.rooms.unshift(r);return r};
+  const sg=(a,b,d)=>mk({name:'ลีกประจำสัปดาห์ · '+S.players[a].name.split(' ')[0]+' vs '+S.players[b].name.split(' ')[0],sides:[{teamId:null,playerIds:['p'+a]},{teamId:null,playerIds:['p'+b]}],score:501,bestOf:3},d,[skill[a],skill[b]]);
+  [[0,3,12],[1,4,11],[2,5,9],[9,6,8],[3,7,7],[0,9,5],[10,11,4],[5,8,3],[1,2,2],[4,6,1],[0,1,0],[7,9,0]].forEach(([a,b,d])=>sg(a,b,d));
+  const tg=(a,b,d,maxT)=>mk({name:'Team League · '+S.teams[a].name+' vs '+S.teams[b].name,type:'team',teamSize:3,score:701,bestOf:3,sides:[{teamId:'t'+a,playerIds:teamMembers('t'+a).map(p=>p.id)},{teamId:'t'+b,playerIds:teamMembers('t'+b).map(p=>p.id)}]},d,[.65,.6],maxT);
+  tg(0,1,6);tg(2,3,3);tg(1,3,0,9);
+  const w=newRoom({name:'Friday Night Open · รอคู่แข่ง',sides:[{teamId:null,playerIds:['p8']},{teamId:null,playerIds:[]}]});S.rooms.unshift(w);
+  const tour=createTour('Ubon Champions Cup 2026','single',2,501,'double',3,['p0','p3','p9','p1']);
+  [0,1].forEach(j=>{const room=tourRoom(tour.id,0,j);room.introDone=true;const sd=room.sides.map(s=>skill[+s.playerIds[0].slice(1)]);playOut(room,sd);let t=Date.now()-86400000+j*3600000;room.events.forEach(e=>{t+=40000;e.ts=t});room.finishedAt=t;room.created=Date.now()-86400000;onRoomFinished(room,replay(room))});
+  S.audit=[{id:uid(),roomId:S.rooms[3].id,room:S.rooms[3].name,by:'p1',byName:S.players[1].name,reason:'ตัวอย่าง: ลูกที่ 2 ปักที่ T19 ตามภาพ VAR ไม่ใช่ S19',old:[301,280],nw:[263,280],leg:1,ts:Date.now()-2*86400000}];
+  S.ui.roomId=null;S.demo=true}
+
+/* ====================== boot ====================== */
+load();render();
+if(cloud.state==='local'){if(!S.me)setTimeout(pickMe,300)}else initCloud();
+</script>
+
+</body>
+</html>
