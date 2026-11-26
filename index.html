@@ -85,6 +85,27 @@ main{max-width:1240px;margin:0 auto;padding-block:22px 30px;padding-left:max(16p
 .slog .r{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.8rem;padding:4px 6px;border-radius:6px;background:var(--bg)}
 .slog .r .p{font-family:var(--f-mono);font-weight:700}
 .big-board{max-width:560px}
+.kbd-hint{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:.76rem;color:var(--muted)}
+.kbd-hint kbd{font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--bg);color:var(--chalk)}
+.kbd-buf{display:none;font-family:var(--f-mono);font-weight:700;font-size:1rem;color:var(--amber-ink);background:var(--amber);border-radius:6px;padding:1px 10px}.kbd-buf.on{display:inline-block}
+@media (hover:none){.kbd-hint{display:none}}
+.tlogo{border-radius:10px;object-fit:cover;flex:none;display:inline-block;vertical-align:middle;background:#fff}
+.tlogo.ph{display:inline-grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:700}
+.team-chip .tlogo{border-radius:4px}
+.logo-field{display:flex;gap:12px;align-items:center}.logo-prev{width:84px;height:84px;border-radius:14px;border:2px dashed var(--line);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-size:.8rem;background:var(--bg)}.logo-prev img{width:100%;height:100%;object-fit:cover}
+.swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.sw{width:30px;height:30px;border-radius:8px;cursor:pointer;position:relative;flex-direction:row}.sw input{position:absolute;opacity:0}.sw span{position:absolute;inset:-3px;border-radius:10px;border:3px solid transparent}.sw input:checked+span{border-color:var(--chalk)}
+.tgrid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}.tgrid.big{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.tpick{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border:2px solid var(--line);border-radius:12px;background:var(--bg);cursor:pointer;color:var(--chalk);font-size:.85rem;text-align:center}
+.tpick.on{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 16%,var(--bg))}
+.tcard{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:center;min-width:0}.tcard b{overflow-wrap:anywhere}
+.join-head{text-align:center}.join-head h1{font-size:clamp(1.5rem,4vw,2.2rem)}
+.join-opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.join-opt{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:2px solid var(--line);border-radius:14px;background:var(--panel);color:var(--chalk);cursor:pointer;text-align:left;font-size:.88rem}
+.join-opt:hover{border-color:var(--amber)}.join-opt b{font-family:var(--f-display);font-size:1.25rem;letter-spacing:.02em}.join-opt span:not(.ic){color:var(--muted)}.join-opt .ic{font-size:2rem;line-height:1}.join-opt[disabled]{opacity:.45;cursor:not-allowed}
+.join-hero{text-align:center;align-items:center}
+.qr-box{background:#fff;border-radius:14px;padding:12px;max-width:240px;margin:0 auto;width:100%;aspect-ratio:1;display:grid;place-items:center}.qr-box svg{width:100%;height:auto}
+.qr-box.big{max-width:min(30vw,340px)}
+.claim{border-color:var(--amber)}
 .multi-list{display:flex;flex-direction:column;gap:6px}.ml-row{display:flex;align-items:center;gap:8px}.ml-dot{width:10px;height:10px;border-radius:50%;flex:none}
 .multi-sides{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
 .multi-sides .side .remain{font-size:clamp(2.4rem,5vw,3.6rem)}.multi-sides .side .roster,.multi-sides .side .slog,.multi-sides .side .slog-h{display:none}
@@ -138,7 +159,7 @@ body.display-mode::before{display:none}
 .dsp-tap{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.82);color:#fff;border:0;font-family:var(--f-display);font-size:clamp(1.6rem,4vw,3rem);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer}
 .dsp-tap small{font-family:var(--f-body);font-size:1rem;opacity:.75}
 .dsp-idle{grid-template-rows:auto 1fr}.dsp-brand{display:flex;align-items:center;gap:2vw}.dsp-brand h1{font-size:clamp(2rem,5vw,5rem)}.dsp-brand p{color:var(--muted);font-size:clamp(1rem,1.8vw,1.8rem);margin:0}
-.dsp-idle-grid{display:grid;grid-template-columns:1fr 1fr;gap:2vw;align-content:start}.dsp-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1vh}
+.dsp-idle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22vw),1fr));gap:2vw;align-content:start}.dsp-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:2vh 2vw;display:flex;flex-direction:column;gap:1vh}
 .dsp-card h2{font-size:clamp(1.2rem,2vw,2rem)}.dsp-li{display:flex;justify-content:space-between;gap:1vw;font-size:clamp(1rem,1.6vw,1.6rem);padding:.4em 0;border-bottom:1px solid var(--line)}
 .dsp-splash{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:75;background:var(--amber);color:var(--amber-ink);font-family:var(--f-display);font-size:clamp(2rem,5vw,5rem);padding:.4em 1em;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;animation:fxpop .5s cubic-bezier(.2,1.6,.4,1)}
 @media (max-width:900px){.dsp-main{grid-template-columns:1fr 1fr}.dsp-center{grid-column:1/-1;order:-1}.dsp-idle-grid{grid-template-columns:1fr}}
@@ -363,7 +384,7 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
 'use strict';
 /* ====================== storage & helpers ====================== */
 const KEY='oche-dart-league-v1';
-const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10,sdT:50},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
+const DEF={settings:{appName:'OCHE Dart League',score:501,out:'double',bestOf:3,roundLimit:10,sdT:50},players:[],teams:[],rooms:[],tours:[],audit:[],roles:{},reg:{open:true,needCode:false,adminTeams:false},me:null,ui:{roomId:null,profileId:null,tourId:null},demo:false};
 const PREF_KEY='oche-dart-prefs-v1';
 let S;
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -420,7 +441,7 @@ const myPlayer=()=>cloud.user?S.players.find(p=>p.uid===cloud.user.uid):null;
 function syncMe(){if(cloud.state!=='local'){const m=myPlayer();S.me=m?m.id:null}}
 function isAdminUser(){return !!(cloud.user&&(S.roles[cloud.user.uid]==='admin'||(cloud.user.email&&ADMINS.includes(cloud.user.email.toLowerCase()))))}
 /* the admin email list lives only in the private security rules; on sign-in we try to claim the admin role and the rules decide */
-function tryClaimAdmin(){if(!cloud.user||!cloud.db||S.roles[cloud.user.uid]||cloud.triedAdmin)return;cloud.triedAdmin=true;cloud.db.doc('roles/'+cloud.user.uid).set({role:'admin'}).catch(()=>{})}
+function tryClaimAdmin(){if(!cloud.user||cloud.user.anon||!cloud.db||S.roles[cloud.user.uid]||cloud.triedAdmin)return;cloud.triedAdmin=true;cloud.db.doc('roles/'+cloud.user.uid).set({role:'admin'}).catch(()=>{})}
 function roleOf(p){if(!p)return 'player';if(cloud.state==='local')return p.role||'player';if(p.uid&&S.roles[p.uid])return S.roles[p.uid];return p.role==='admin'?'admin':'player'}
 function canAct(level){if(cloud.state==='local')return level==='admin'?(isAdmin()||!S.players.length):true;
   if(!cloud.user)return false;if(level==='user')return true;if(level==='admin')return isAdminUser();return isAdminUser()||S.roles[cloud.user.uid]==='referee'||S.roles[cloud.user.uid]==='admin'}
@@ -429,11 +450,13 @@ function gate(level){if(canAct(level))return true;
   if(cloud.state!=='local'&&!myPlayer()&&level==='user'){onboardModal();return false}
   toast(level==='admin'?'เฉพาะแอดมินเท่านั้น':'เฉพาะกรรมการหรือแอดมินเท่านั้น');return false}
 async function signIn(){try{const prov=new firebase.auth.GoogleAuthProvider();prov.setCustomParameters({prompt:'select_account'});
+    const cu=cloud.auth.currentUser;if(cu&&cu.isAnonymous){try{await cu.linkWithPopup(prov);await cu.reload();cloud.user=Object.assign(cloud.user,{anon:false,email:cloud.auth.currentUser.email,name:cloud.auth.currentUser.displayName});toast('ผูกบัญชี Google แล้ว ใช้ข้ามเครื่องได้');closeModal();render();return}
+      catch(e){if(e&&e.code==='auth/credential-already-in-use'){toast('บัญชี Google นี้เคยใช้กับระบบแล้ว ออกจากระบบแล้วล็อกอินด้วย Google แทน');return}if(e&&(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'))return;throw e}}
     try{await cloud.auth.signInWithPopup(prov)}catch(e){if(e&&(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'))await cloud.auth.signInWithRedirect(prov);else if(e&&e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')throw e}
     closeModal()}catch(e){toast('เข้าสู่ระบบไม่สำเร็จ: '+(e.code||e.message||e))}}
 function signOut(){cloud.auth.signOut().then(()=>{toast('ออกจากระบบแล้ว');closeModal();render()})}
 const GLOGO='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
-function loginModal(){openModal('เข้าสู่ระบบ',`<p style="margin:0">เข้าสู่ระบบเพื่อสร้างห้อง เข้าร่วมแมตช์ และบันทึกคะแนน ไม่ต้องสมัครสมาชิก ใช้บัญชี Google ที่มีอยู่แล้วได้เลย</p>
+function loginModal(){openModal('เข้าร่วม / เข้าสู่ระบบ',`<p style="margin:0">เลือกวิธีที่สะดวก ไม่ต้องสมัครสมาชิก</p><div class="row"><button class="btn pri" onclick="closeModal();go('join');setTimeout(quickJoinModal,150)">🙋 ใส่ชื่อเข้าร่วม (ไม่ต้องล็อกอิน)</button><button class="btn" onclick="closeModal();go('join');setTimeout(teamRegModal,150)">👥 กัปตันลงทะเบียนทีม</button></div><p class="muted small" style="margin:0">หรือ</p>
   <button class="btn" style="padding:12px;font-size:1rem;background:#fff;color:#1f1f1f;border-color:#dadce0" onclick="signIn()">${GLOGO} เข้าสู่ระบบด้วย Google</button>
   <p class="muted small" style="margin:0">ดูสกอร์สด อันดับ และผังการแข่งขันได้โดยไม่ต้องเข้าสู่ระบบ · แอดมินใช้อีเมลที่ลงทะเบียนไว้ในระบบ</p>`,[{label:'ไว้ทีหลัง'}])}
 function onboardModal(){const u=cloud.user;if(!u)return loginModal();const free=S.players.filter(p=>!p.uid);
@@ -446,7 +469,7 @@ function onboardModal(){const u=cloud.user;if(!u)return loginModal();const free=
      S.players.push({id:u.uid,uid:u.uid,name,nick:$('#ob-nick').value.trim(),emoji:$('#ob-emoji').value,color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:$('#ob-team').value||null,role:isAdminUser()?'admin':'player',created:Date.now()});
      syncMe();save();render();toast('สร้างโปรไฟล์แล้ว ยินดีต้อนรับ '+name)}}],
    {wide:true,after:root=>root.querySelectorAll('[data-claim]').forEach(el=>{const f=()=>{const p=P(el.dataset.claim);if(!p||p.uid)return;p.uid=u.uid;if(isAdminUser())p.role='admin';syncMe();save();closeModal();render();toast('เชื่อมโปรไฟล์ '+p.name+' กับบัญชีของคุณแล้ว')};el.onclick=f;el.onkeydown=e=>{if(e.key==='Enter')f()}})})}
-function accountModal(){const u=cloud.user;const m=myPlayer();
+function accountModal(){const u=cloud.user;const m=myPlayer();if(u&&u.anon){openModal('ผู้เล่นบนเครื่องนี้',`<div class="prof">${m?av(m,'lg'):'<span class="av lg">👤</span>'}<div><h2>${esc(m?m.name:'ยังไม่ได้ลงทะเบียน')}</h2><div class="row">${m&&m.teamId?teamChip(m.teamId):''}<span class="role">GUEST</span></div></div></div><p class="muted small" style="margin:0">เข้าแบบไม่ล็อกอิน ระบบจำผู้เล่นไว้ในเครื่องนี้ ถ้าจะใช้หลายเครื่อง ให้ผูกบัญชี Google (สถิติไม่หาย)</p>`,[...(m?[{label:'แก้ไข / เปลี่ยนทีม',fn:()=>{setTimeout(()=>editPlayer(m.id),10)}}]:[{label:'ลงทะเบียน',cls:'pri',fn:()=>{go('join')}}]),{label:'ผูกบัญชี Google',cls:'pri',fn:()=>{signIn();return false}},{label:'ออกจากระบบ',cls:'dng',fn:()=>{setTimeout(()=>confirmBox('ออกจากระบบ','ถ้าออก เครื่องนี้จะไม่ใช่ '+esc(m?m.name:'ผู้เล่นนี้')+' อีก (ถ้าไม่ได้ผูก Google จะกลับมาเป็นคนเดิมไม่ได้ ให้แอดมินยกเลิกการเชื่อมแล้วกด ฉันคือคนนี้ ใหม่)','ออกจากระบบ',signOut),10)}}]);return}
   openModal('บัญชีของฉัน',`<div class="prof">${m?av(m,'lg'):`<span class="av lg">👤</span>`}<div style="min-width:0"><h2>${esc(m?m.name:u.name||'ผู้ใช้')}</h2><div class="muted small">${esc(u.email||'')}</div><div class="row" style="margin-top:4px"><span class="role ${roleOf(m||{uid:u.uid})}">${isAdminUser()?'ADMIN':ROLE_LABEL[roleOf(m||{uid:u.uid})]}</span>${m?teamChip(m.teamId):''}</div></div></div>`,
    [...(m?[{label:'ดูโปรไฟล์',fn:()=>openProfile(m.id)},{label:'แก้ไข / เปลี่ยนทีม',fn:()=>{setTimeout(()=>editPlayer(m.id),10)}}]:[{label:'ตั้งค่าโปรไฟล์',cls:'pri',fn:()=>{setTimeout(onboardModal,10)}}]),{label:'ออกจากระบบ',cls:'dng',fn:signOut}])}
 async function initCloud(){
@@ -457,10 +480,13 @@ async function initCloud(){
   const parse=snap=>{if(!snap.exists)return null;const d=snap.data();if(d&&typeof d.json==='string'){try{return JSON.parse(d.json)}catch(e){return null}}const o=clone(d);if(!o.id)o.id=snap.id;return o};
   const timer=setTimeout(()=>{if(cloud.state==='connecting'){cloud.slow=true;render()}},10000);
   const total=Object.keys(META_DOCS).length+Object.keys(COLLS).length;
-  const afterReady=()=>{if(cloud.state!=='online'||!cloud.authReady)return;tryClaimAdmin();syncMe();render();if(cloud.user&&!myPlayer()&&!$('#mbg')&&!isDisplay())setTimeout(onboardModal,300)};
+  const afterReady=()=>{if(cloud.state!=='online'||!cloud.authReady)return;tryClaimAdmin();if(cloud.subAdminCode)setTimeout(cloud.subAdminCode,800);syncMe();render();if(cloud.user&&!cloud.user.anon&&!joiningFlow&&!myPlayer()&&!$('#mbg')&&!isDisplay()&&route()!=='join')setTimeout(onboardModal,300)};
   const done=()=>{if(cloud.state==='connecting'&&Object.keys(cloud.seen).length>=total){cloud.state='online';cloud.slow=false;clearTimeout(timer);afterReady()}};
-  cloud.auth.onAuthStateChanged(u=>{cloud.user=u?{uid:u.uid,email:u.email,name:u.displayName,photo:u.photoURL}:null;cloud.triedAdmin=false;cloud.authReady=true;syncMe();if(cloud.state==='online')afterReady();else render()});
+  cloud.auth.onAuthStateChanged(u=>{cloud.user=u?{uid:u.uid,email:u.email,name:u.displayName,photo:u.photoURL,anon:!!u.isAnonymous}:null;cloud.triedAdmin=false;cloud.authReady=true;syncMe();if(cloud.state==='online')afterReady();else render()});
   cloud.auth.getRedirectResult().catch(e=>{if(e&&e.code)toast('เข้าสู่ระบบไม่สำเร็จ: '+e.code)});
+  db.doc('config/reg').onSnapshot(snap=>{S.reg=Object.assign({open:true,needCode:false,adminTeams:false},snap.exists?snap.data():{});if(cloud.state==='online')remoteRender()},()=>{});
+  const subAdminCode=()=>{if(cloud._regSub||!isAdminUser())return;cloud._regSub=db.doc('config/regAdmin').onSnapshot(snap=>{S.regCode=snap.exists?snap.data().code:'';remoteRender()},()=>{cloud._regSub=null})};
+  cloud.subAdminCode=subAdminCode;
   Object.keys(META_DOCS).forEach(k=>{const p='league/'+k;
     db.doc(p).onSnapshot(snap=>{applyMeta(k,parse(snap));cloud.written[p]=snap.exists?ser(META_DOCS[k]()):undefined;
       if(!snap.metadata.fromCache)cloud.seen[p]=1;done();if(cloud.state==='online')remoteRender()},e=>{cloud.seen[p]=1;done()})});
@@ -493,13 +519,14 @@ const ROLE_LABEL={admin:'ADMIN',referee:'REFEREE',player:'PLAYER'};
 const P=id=>S.players.find(p=>p.id===id);
 const T=id=>S.teams.find(t=>t.id===id);
 const teamMembers=tid=>S.players.filter(p=>p.teamId===tid);
+const teamOrder=tid=>{const t=T(tid),m=teamMembers(tid).map(p=>p.id);const o=(t&&t.order||[]).filter(id=>m.includes(id));return o.concat(m.filter(id=>!o.includes(id)))};
 const me=()=>P(S.me);
 const canRef=()=>{if(cloud.state!=='local')return canAct('staff');const m=me();return !!m&&(m.role==='admin'||m.role==='referee')};
 const isAdmin=()=>{if(cloud.state!=='local')return isAdminUser();const m=me();return !!m&&m.role==='admin'};
 
 /* ====================== people rendering ====================== */
 function av(p,cls=''){if(!p)return `<span class="av ${cls}" style="background:var(--panel2)">?</span>`;return `<span class="av ${cls}" style="background:${esc(p.color)}33;border-color:${esc(p.color)}">${esc(p.emoji||'🎯')}</span>`}
-function teamChip(tid){const t=T(tid);return t?`<span class="team-chip"><i style="background:${esc(t.color)}"></i>${esc(t.name)}</span>`:`<span class="team-chip"><i style="background:var(--line)"></i>ไม่มีทีม</span>`}
+function teamChip(tid){const t=T(tid);return t?`<span class="team-chip">${safeImg(t.logo)?`<img class="tlogo" src="${safeImg(t.logo)}" alt="" style="width:16px;height:16px">`:`<i style="background:${esc(t.color)}"></i>`}${esc(t.name)}</span>`:`<span class="team-chip"><i style="background:var(--line)"></i>ไม่มีทีม</span>`}
 function plHTML(id,opt={}){const p=P(id)||opt.fake;if(!p)return '<span class="muted">—</span>';
   return `<span class="pl">${av(p)}<span class="t"><b>${esc(p.name)}${p.nick?` <span class="muted small">“${esc(p.nick)}”</span>`:''}</b>${opt.noTeam?'':teamChip(p.teamId)}</span></span>`}
 function sideName(room,i){if(room.labels)return room.labels[i];const s=room.sides[i];if(!s)return '—';if(s.teamId){const t=T(s.teamId);return t?t.name:'ทีมที่ถูกลบ'}const p=P(s.playerIds[0]);return p?p.name:'รอผู้เล่น'}
@@ -638,8 +665,8 @@ function confirmBox(title,msg,okLabel,fn,danger=true){openModal(title,`<p style=
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mx'))closeModal()});
 
 /* ====================== router ====================== */
-const ROUTES=[['dashboard','ภาพรวม'],['rooms','ห้องแข่งขัน'],['match','ให้คะแนนสด'],['simulator','AI จำลอง'],['ranking','อันดับ'],['players','ผู้เล่น'],['teams','ทีม'],['tournament','ผังการแข่งขัน'],['hall-of-fame','Hall of Fame 180'],['config','ตั้งค่า']];
-function route(){return (location.hash||'').slice(1)||'dashboard'}
+const ROUTES=[['dashboard','ภาพรวม'],['rooms','ห้องแข่งขัน'],['match','ให้คะแนนสด'],['simulator','AI จำลอง'],['ranking','อันดับ'],['players','ผู้เล่น'],['teams','ทีม'],['tournament','ผังการแข่งขัน'],['hall-of-fame','Hall of Fame 180'],['join','ลงทะเบียน'],['config','ตั้งค่า']];
+function route(){const h=(location.hash||'').slice(1)||'dashboard';return h.startsWith('join')?'join':h}
 function go(r){if(location.hash.slice(1)===r)render();else location.hash=r}
 window.addEventListener('hashchange',render);
 function render(){
@@ -695,7 +722,7 @@ function editPlayer(id,asMe){
     if(cloud.state!=='local'&&admin&&id&&p.uid){const ref=cloud.db.doc('roles/'+p.uid);(role==='player'?ref.delete():ref.set({role})).catch(cloudErr)}
     save();render();toast('บันทึกผู้เล่นแล้ว')}}],
   {after:()=>{const u=$('#pf-unlink');if(u)u.onclick=()=>{const pp=P(id);if(pp.uid&&cloud.db)cloud.db.doc('roles/'+pp.uid).delete().catch(()=>{});delete pp.uid;pp.role='player';save();closeModal();render();toast('ยกเลิกการเชื่อมบัญชีแล้ว')}}})}
-function joinUrl(){return location.origin+location.pathname+'#join'}
+function joinUrl(){return joinLink()}
 function inviteModal(){const url=joinUrl();
   openModal('เชิญผู้เล่นเข้าระบบ',`<p style="margin:0">ให้ผู้เล่นสแกน QR ด้วยกล้องมือถือ (ไม่ต้องใช้ LINE) หรือส่งลิงก์ให้ กด “เข้าสู่ระบบด้วย Google” ครั้งเดียว แล้วตั้งชื่อ + เลือกทีม ก็เข้าร่วมได้ทันที</p>
    <div id="qr" style="display:grid;place-items:center;background:#fff;border-radius:12px;padding:14px;max-width:260px;margin:0 auto"></div>
@@ -724,30 +751,36 @@ VIEWS.players=()=>{const st=computeStats().players;const q=plFilter.toLowerCase(
 AFTER.players=()=>{const i=$('#pl-q');i.oninput=()=>{plFilter=i.value;const pos=i.selectionStart;render();const j=$('#pl-q');j.focus();j.setSelectionRange(pos,pos)}};
 
 /* ====================== teams ====================== */
-function editTeam(id){
-  const t=id?T(id):{name:'',color:COLORS[S.teams.length%COLORS.length],leaderId:''};
-  const cur=id?teamMembers(id).map(p=>p.id):[];
+function editTeam(id){if(id&&!canEditTeam(T(id))){toast('แก้ไขได้เฉพาะกัปตันของทีมนี้หรือแอดมิน');return}
+  if(!id&&!isAdmin()){return teamRegModal()}
+  const t=id?T(id):{name:'',color:COLORS[S.teams.length%COLORS.length],leaderId:'',logo:''};const st={logo:t.logo||''};
+  const cur=id?teamMembers(id).map(p=>p.id):[];const adm=isAdmin();
+  const pool=adm?S.players:S.players.filter(p=>p.teamId===id||(!p.uid&&!p.teamId));
   openModal(id?'แก้ไขทีม':'สร้างทีมใหม่',`<div class="form">
-  <label>ชื่อทีม<input id="tf-name" value="${esc(t.name)}" maxlength="32" placeholder="เช่น Ubon Vipers"></label>
-  <label>สีทีม<select id="tf-color">${COLORS.map(c=>`<option value="${c}" ${t.color===c?'selected':''}>${c}</option>`).join('')}</select></label>
-  <label class="full">หัวหน้าทีม<select id="tf-leader"><option value="">— ยังไม่กำหนด —</option>${S.players.map(p=>`<option value="${p.id}" ${t.leaderId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label></div>
-  <div><h3 style="margin-bottom:6px">สมาชิกในทีม</h3><p class="muted small" style="margin:0 0 6px">ผู้เล่นหนึ่งคนอยู่ได้ทีมเดียว ถ้าเลือกคนที่อยู่ทีมอื่น ระบบจะย้ายมาทีมนี้</p>
-  <div class="pick-list">${S.players.map(p=>`<label class="opt ck"><input type="checkbox" class="tf-mem" value="${p.id}" ${cur.includes(p.id)?'checked':''}>${av(p)}<span style="min-width:0"><b>${esc(p.name)}</b><br>${teamChip(p.teamId)}</span></label>`).join('')}</div></div>`,
+  <label class="full">ชื่อทีม<input id="tf-name" value="${esc(t.name)}" maxlength="32" placeholder="เช่น Ubon Vipers"></label>
+  <div class="full">${logoField(t.logo)}</div>
+  <div class="full"><span class="small muted">สีทีม</span>${colorPick(t.color)}</div>
+  <label class="full">กัปตัน / หัวหน้าทีม<select id="tf-leader"><option value="">— ยังไม่กำหนด —</option>${pool.map(p=>`<option value="${p.id}" ${t.leaderId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label>
+  <label class="full">เพิ่มสมาชิกใหม่ (บรรทัดละคน)<textarea id="tf-new" style="min-height:70px" placeholder="พิมพ์ชื่อสมาชิกที่ยังไม่มีในระบบ"></textarea></label></div>
+  <div><h3 style="margin-bottom:6px">สมาชิกในทีม</h3><p class="muted small" style="margin:0 0 6px">${adm?'ผู้เล่นหนึ่งคนอยู่ได้ทีมเดียว ถ้าเลือกคนที่อยู่ทีมอื่น ระบบจะย้ายมาทีมนี้':'เลือกได้จากสมาชิกทีมนี้และผู้เล่นที่ยังไม่มีทีม'}</p>
+  <div class="pick-list">${pool.map(p=>`<label class="opt ck"><input type="checkbox" class="tf-mem" value="${p.id}" ${cur.includes(p.id)?'checked':''} ${!adm&&p.uid&&p.uid!==myUid()?'disabled':''}>${av(p)}<span style="min-width:0"><b>${esc(p.name)}</b><br>${teamChip(p.teamId)}</span></label>`).join('')}</div></div>`,
   [{label:'ยกเลิก'},{label:'บันทึกทีม',cls:'pri',fn:()=>{const name=$('#tf-name').value.trim();if(!name){toast('กรุณาตั้งชื่อทีม');return false}
-    let tm=id?T(id):null;if(!tm){tm={id:uid(),created:Date.now()};S.teams.push(tm)}
-    Object.assign(tm,{name,color:$('#tf-color').value,leaderId:$('#tf-leader').value||null});
+    let tm=id?T(id):null;if(!tm){tm={id:uid(),created:Date.now(),captainUid:myUid()||'local'};S.teams.push(tm)}
+    Object.assign(tm,{name,color:(document.querySelector('input[name=tcol]:checked')||{}).value||tm.color||COLORS[0],logo:st.logo||'',leaderId:$('#tf-leader').value||null});
     const sel=$$('.tf-mem').filter(c=>c.checked).map(c=>c.value);
-    S.players.forEach(p=>{if(sel.includes(p.id))p.teamId=tm.id;else if(p.teamId===tm.id)p.teamId=null});
-    if(tm.leaderId&&!sel.includes(tm.leaderId)){P(tm.leaderId).teamId=tm.id}
-    save();render();toast('บันทึกทีมแล้ว')}}],{wide:true})}
-function delTeam(id){confirmBox('ลบทีม',`ลบทีม <b>${esc(T(id).name)}</b>? สมาชิกจะกลายเป็นผู้เล่นอิสระ`,'ลบทีม',()=>{S.players.forEach(p=>{if(p.teamId===id)p.teamId=null});S.teams=S.teams.filter(t=>t.id!==id);save();render()})}
-VIEWS.teams=()=>{const ts=computeStats().teams;return `<div class="head"><div><h1>ทีม</h1><p>จัดการทีม หัวหน้าทีม และสมาชิก</p></div><button class="btn pri" onclick="editTeam()">+ สร้างทีม</button></div>
+    S.players.forEach(p=>{if(sel.includes(p.id))p.teamId=tm.id;else if(p.teamId===tm.id&&(adm||!p.uid||p.uid===myUid()))p.teamId=null});
+    $('#tf-new').value.split('\n').map(x=>x.trim().slice(0,40)).filter(Boolean).forEach(n=>{const p={id:uid(),name:n,nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:tm.color,teamId:tm.id,role:'player',created:Date.now()};S.players.push(p)});
+    tm.order=teamMembers(tm.id).map(p=>p.id);
+    if(tm.leaderId&&P(tm.leaderId)&&(adm||!P(tm.leaderId).uid))P(tm.leaderId).teamId=tm.id;
+    save();render();toast('บันทึกทีมแล้ว')}}],{wide:true,after:()=>bindLogo(st)})}
+function delTeam(id){if(!canEditTeam(T(id))){toast('ลบได้เฉพาะกัปตันของทีมนี้หรือแอดมิน');return}confirmBox('ลบทีม',`ลบทีม <b>${esc(T(id).name)}</b>? สมาชิกจะกลายเป็นผู้เล่นอิสระ`,'ลบทีม',()=>{S.players.forEach(p=>{if(p.teamId===id&&(isAdmin()||!p.uid||p.uid===myUid()))p.teamId=null});S.teams=S.teams.filter(t=>t.id!==id);save();render()})}
+VIEWS.teams=()=>{const ts=computeStats().teams;return `<div class="head"><div><h1>ทีม</h1><p>ทีม โลโก้ กัปตัน และสมาชิก · กัปตันแก้ไขทีมตัวเองได้</p></div><div class="row"><button class="btn pri" onclick="teamRegModal()">👥 ลงทะเบียนทีม (กัปตัน)</button>${isAdmin()?`<button class="btn" onclick="editTeam()">+ สร้างทีม (แอดมิน)</button>`:''}</div></div>
  ${S.teams.length?`<div class="grid g3">${S.teams.map(t=>{const mem=teamMembers(t.id);const s=ts[t.id];return `<div class="card" style="border-top:4px solid ${esc(t.color)}">
-  <div class="row" style="justify-content:space-between"><h2>${esc(t.name)}</h2><span class="muted small">${mem.length} คน</span></div>
+  <div class="row" style="justify-content:space-between"><div class="row">${teamLogo(t,40)}<h2>${esc(t.name)}</h2></div><span class="muted small">${mem.length} คน</span></div>
   <div class="small muted">หัวหน้าทีม: ${t.leaderId&&P(t.leaderId)?esc(P(t.leaderId).name):'—'}</div>
   <div class="roster">${mem.map(p=>`<div class="rp">${plHTML(p.id,{noTeam:true})}${t.leaderId===p.id?'<span class="role admin">C</span>':''}</div>`).join('')||'<span class="muted small">ยังไม่มีสมาชิก</span>'}</div>
   <div class="kv"><span>แมตช์ทีม / ชนะ</span><span>${s.matches} / ${s.wins}</span><span>Team Avg</span><span>${fmt2(s.avg)}</span><span>180s</span><span>${s.s180}</span></div>
-  <div class="row"><button class="btn sm" onclick="editTeam('${t.id}')">แก้ไข / สมาชิก</button><button class="btn sm dng" onclick="delTeam('${t.id}')">ลบ</button></div></div>`}).join('')}</div>`:'<div class="empty">ยังไม่มีทีม</div>'}`};
+  <div class="row">${canEditTeam(t)?`<button class="btn sm pri" onclick="teamQRModal('${t.id}')">📲 QR ทีม</button><button class="btn sm" onclick="editTeam('${t.id}')">แก้ไข / สมาชิก</button><button class="btn sm dng" onclick="delTeam('${t.id}')">ลบ</button>`:`<button class="btn sm" onclick="quickJoinModal('${t.id}')">เข้าทีมนี้</button>`}</div></div>`}).join('')}</div>`:'<div class="empty">ยังไม่มีทีม</div>'}`};
 
 /* ====================== rooms ====================== */
 const genCode=()=>'DART-'+Math.random().toString(16).slice(2,6).toUpperCase();
@@ -764,7 +797,8 @@ function createRoomModal(){const s=S.settings;
   <label>กติกาปิดเกม<select id="rf-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
   <label>จำนวนขา (Best of)<select id="rf-best">${[1,3,5,7,9].map(n=>`<option value="${n}" ${n===s.bestOf?'selected':''}>Best of ${n} (ชนะ ${Math.floor(n/2)+1})</option>`).join('')}</select></label>
   <label>Sudden Death เมื่อทุกฝ่ายเหลือ ≤${S.settings.sdT??50} แล้วปาครบ<select id="rf-limit">${[0,8,10,12,15,20].map(n=>`<option value="${n}" ${n===s.roundLimit?'selected':''}>${n?n+' รอบ':'ปิดใช้งาน'}</option>`).join('')}</select></label>
-  <div class="full" id="rf-sides"></div></div>`,
+  <div class="full" id="rf-sides"></div>
+  <div class="full row"><input id="rf-quick" maxlength="40" placeholder="มีคนมาใหม่? พิมพ์ชื่อแล้วกดเพิ่ม" style="flex:1;min-width:160px"><button type="button" class="btn sm" id="rf-quick-btn">+ ผู้เล่นด่วน</button></div></div>`,
   [{label:'ยกเลิก'},{label:'สร้างห้อง',cls:'pri',fn:()=>{
     const type=$('#rf-type').value,size=+$('#rf-size').value,n=+$('#rf-n').value;
     const room=newRoom({name:$('#rf-name').value.trim()||'ห้องแข่งขัน '+(S.rooms.length+1),type,teamSize:size,score:+$('#rf-score').value,out:$('#rf-out').value,bestOf:+$('#rf-best').value,roundLimit:+$('#rf-limit').value,sides:Array.from({length:n},()=>({teamId:null,playerIds:[]}))});
@@ -772,11 +806,14 @@ function createRoomModal(){const s=S.settings;
     if(new Set(chosen).size!==chosen.length){toast('เลือกซ้ำกัน แต่ละฝ่ายต้องไม่ซ้ำ');return false}
     if(type==='single')picks.forEach((v,i)=>{if(v)room.sides[i].playerIds=[v]});
     else{if(chosen.some(tid=>teamMembers(tid).length<1)){toast('ทีมที่เลือกยังไม่มีสมาชิก');return false}
-      picks.forEach((tid,i)=>{if(tid){room.sides[i].teamId=tid;room.sides[i].playerIds=teamMembers(tid).slice(0,size).map(p=>p.id)}})}
+      picks.forEach((tid,i)=>{if(tid){room.sides[i].teamId=tid;room.sides[i].playerIds=teamOrder(tid).slice(0,size)}})}
     S.rooms.unshift(room);save();toast('สร้างห้อง '+room.code+' แล้ว');render()}}]);
   const sides=()=>{const t=$('#rf-type').value,n=+$('#rf-n').value;$('#rf-size').disabled=t!=='team';const keep=$$('.rf-side').map(x=>x.value);
     $('#rf-sides').innerHTML=`<div class="form">${Array.from({length:n},(_,i)=>`<label>${n===2?(i?'AWAY':'HOME'):'ฝ่ายที่ '+(i+1)} ${t==='team'?'(ทีม)':'(ผู้เล่น)'}<select class="rf-side">${t==='team'?teamOpts(i===0&&!keep.length?me()?.teamId:keep[i]):playerOpts(i===0&&!keep.length?S.me:keep[i])}</select></label>`).join('')}</div><p class="muted small" style="margin:6px 0 0">ผลัดกันปาตามลำดับฝ่าย ใครปิดเกมได้ก่อนชนะ Leg · เว้นว่างไว้ให้ผู้เล่นกด “เข้าร่วม” เองได้</p>`};
-  $('#rf-type').onchange=sides;$('#rf-n').onchange=sides;sides()}
+  $('#rf-type').onchange=sides;$('#rf-n').onchange=sides;sides();
+  $('#rf-quick-btn').onclick=async()=>{const n=$('#rf-quick').value.trim();if(!n){toast('พิมพ์ชื่อก่อน');return}if(!(await ensureGuest()))return;
+    const p=withCode({id:uid(),name:n.slice(0,40),nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:null,role:'player',created:Date.now()});S.players.push(p);save();
+    const empty=$$('.rf-side').find(x=>!x.value);sides();const s2=$$('.rf-side');const idx=empty?s2.findIndex((x,k)=>!x.value):-1;if($('#rf-type').value==='single'&&idx>=0)s2[idx].value=p.id;$('#rf-quick').value='';toast('เพิ่ม '+p.name+' แล้ว')}}
 function joinRoom(id){const room=S.rooms.find(r=>r.id===id);const m=me();if(!m){pickMe();return}
   const i=room.sides.findIndex(s=>!s.playerIds.length);if(i<0)return;
   if(room.type==='team'){if(!m.teamId){toast('คุณยังไม่มีทีม เข้าร่วมห้องทีมไม่ได้');return}
@@ -789,7 +826,7 @@ function rematch(id){const r=S.rooms.find(x=>x.id===id);const n=newRoom({name:r.
 function openRoom(id){S.ui.roomId=id;save();pend=[];go('match')}
 function statusPill(s){return `<span class="pill st-${s}">${s==='playing'?'<span class="live-dot"></span>':''}${({waiting:'รอผู้เล่น',ready:'พร้อมแข่ง',playing:'กำลังแข่ง',finished:'จบแล้ว'})[s]}</span>`}
 function roomCard(r){const s=roomStatus(r),st=replay(r);
-  const sideHTML=i=>r.type==='team'&&r.sides[i].teamId?`<div style="min-width:0"><b>${esc(sideName(r,i))}</b><div class="small muted">${r.sides[i].playerIds.map(id=>esc(pname(r,id))).join(', ')}</div></div>`:(r.sides[i].playerIds[0]?plHTML(r.sides[i].playerIds[0]):'<span class="muted">รอผู้เล่น…</span>');
+  const sideHTML=i=>r.type==='team'&&r.sides[i].teamId?`<div style="min-width:0"><b>${teamLogo(T(r.sides[i].teamId),22)} ${esc(sideName(r,i))}</b><div class="small muted">${r.sides[i].playerIds.map(id=>esc(pname(r,id))).join(', ')}</div></div>`:(r.sides[i].playerIds[0]?plHTML(r.sides[i].playerIds[0]):'<span class="muted">รอผู้เล่น…</span>');
   return `<div class="card"><div class="row" style="justify-content:space-between"><span class="code">${r.code}</span>${statusPill(s)}</div>
   <h3>${esc(r.name)}</h3><div class="small muted">${r.score} · ${OUT_LABEL[r.out]} · Best of ${r.bestOf} · ${modeLabel(r)}${r.tour?' · ทัวร์นาเมนต์':''}</div>
   ${NS(r)===2?`<div class="vs"><div style="min-width:0">${sideHTML(0)}</div><div class="mid num">${st.legsWon[0]} : ${st.legsWon[1]}</div><div class="r" style="min-width:0">${sideHTML(1)}</div></div>`
@@ -938,7 +975,7 @@ function refModal(room){if(!canRef()){toast('เฉพาะกรรมกา�
      roomAfterChange(room);render();toast('บันทึกการแก้ไขแล้ว')}}])}
 function introModal(room){room.introDone=true;save();
   openModal('MATCH FACE-OFF',`<div class="small muted" style="text-align:center">${room.score} · ${OUT_LABEL[room.out]} · Best of ${room.bestOf} (ชนะ ${need(room)} ขา)</div>
-   <div class="faceoff ${NS(room)>2?'multi':''}">${room.sides.map((x,i)=>i).map(i=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">${room.sides[i].teamId?`<span class="av lg" style="background:${esc(T(room.sides[i].teamId)?.color||'#555')}33;border-color:${esc(T(room.sides[i].teamId)?.color||'#555')}">🛡️</span>`:av(P(room.sides[i].playerIds[0]),'lg')}<h2>${esc(sideName(room,i))}</h2><span class="tag small muted">${NS(room)===2?(i?'AWAY SIDE':'HOME SIDE'):'ผู้เล่นที่ '+(i+1)}</span><span class="small muted">${room.sides[i].playerIds.map(id=>esc(pname(room,id))).join(' · ')}</span></div>`).join('<div class="vsb">VS</div>')}</div>
+   <div class="faceoff ${NS(room)>2?'multi':''}">${room.sides.map((x,i)=>i).map(i=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">${room.sides[i].teamId?teamLogo(T(room.sides[i].teamId),64):av(P(room.sides[i].playerIds[0]),'lg')}<h2>${esc(sideName(room,i))}</h2><span class="tag small muted">${NS(room)===2?(i?'AWAY SIDE':'HOME SIDE'):'ผู้เล่นที่ '+(i+1)}</span><span class="small muted">${room.sides[i].playerIds.map(id=>esc(pname(room,id))).join(' · ')}</span></div>`).join('<div class="vsb">VS</div>')}</div>
    <p class="muted small" style="margin:0;text-align:center">เลือกวิธีกำหนดผู้เริ่มก่อน</p>`,
    [...room.sides.map((x,i)=>({label:esc(sideName(room,i))+' เริ่ม',fn:()=>setStarter(room,i)})),{label:'🎰 สุ่มผู้เริ่ม',cls:'pri',fn:()=>{setTimeout(()=>tossModal(room),10)}}],{wide:true})}
 function showWinner(room,st){const w=st.winner;
@@ -964,7 +1001,7 @@ VIEWS.match=()=>{const room=curRoom();
   const sStats=i=>{const ts=roomTurns.filter(e=>e.side===i&&e.leg===st.leg);const all=roomTurns.filter(e=>e.side===i);const d=all.reduce((a,e)=>a+(e.darts?e.darts.length:e.n||3),0),p=all.reduce((a,e)=>a+e.total,0);return{avg:d?p/d*3:0,last:ts.length?(ts[ts.length-1].bust?'BUST':ts[ts.length-1].total):'-',hi:Math.max(0,...all.filter(e=>!e.bust).map(e=>e.total)),c180:all.filter(e=>!e.bust&&e.total===180).length}};
   const sidePanel=i=>{const act=!st.finished&&side===i,ss=sStats(i);const co=!st.finished?checkout(st.rem[i]-(act&&!ev.bust?sum:0),room.out,act?3-pend.length:3):null;
     return `<div class="side ${act?'active':''}" data-si="${i}"><div class="row" style="justify-content:space-between"><span class="tag">${sideTag(room,i)}${act?' · กำลังปา':''}</span><span class="dots">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</span></div>
-    <h2 style="min-width:0;overflow-wrap:anywhere">${esc(sideName(room,i))}</h2>${room.type==='team'&&room.sides[i].teamId?'':teamChip(P(room.sides[i].playerIds[0])?.teamId)}
+    <h2 style="min-width:0;overflow-wrap:anywhere">${room.sides[i].teamId&&T(room.sides[i].teamId)?teamLogo(T(room.sides[i].teamId),30)+' ':''}${esc(sideName(room,i))}</h2>${room.type==='team'&&room.sides[i].teamId?'':teamChip(P(room.sides[i].playerIds[0])?.teamId)}
     <div class="remain">${act&&pend.length&&!ev.bust?after:st.rem[i]}</div>
     ${co&&!st.finished?(()=>{const ops=checkoutOptions(st.rem[i]-(act&&!ev.bust?sum:0),room.out,act?3-pend.length:3,3);return `<div class="hint">ปิดได้: <b>${co.map(dLabel).join(' · ')}</b>${ops.length>1?`<div class="small muted">หรือ ${ops.filter(r=>r.map(dLabel).join()!==co.map(dLabel).join()).slice(0,2).map(r=>r.map(dLabel).join(' · ')).join(' / ')}</div>`:''}</div>`})():''}
     <div class="roster">${st.order[i].map((id,k)=>`<div class="rp ${act&&st.thrower(i)===id?'now':''}"><span class="ord">#${k+1}</span>${plHTML(id,{noTeam:room.type==='team'})}</div>`).join('')}</div>
@@ -991,7 +1028,7 @@ VIEWS.match=()=>{const room=curRoom();
       <div class="fs-board" id="bw"><div class="fs-aim" id="aim">${pend.length?statusLine(ev,before,after,sum,room.out).replace(/<[^>]+>/g,''):'แตะช่องบนเป้าตรงจุดที่ลูกดอกปัก'}</div>${boardSVG(pendMarks.length?pendMarks:prevMarks)}</div>
       <div class="fs-bot"><div class="fs-sum">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':k===pend.length&&!st.finished?'nx':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b></div>`).join('')}<div class="fs-total">${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT</span>':`<small class="muted">รอบนี้</small><b>${sum}</b>`}</div></div>
       <div class="fs-btns"><button class="btn" onclick="undo()">↶ Undo</button><button class="btn" onclick="addDart(D(0,1))">MISS</button><button class="btn" onclick="addDart(D(25,2))">BULL 50</button><button class="btn" onclick="fillMiss()">Miss ที่เหลือ</button><button class="btn ok" onclick="submitTurn()" ${pend.length&&!st.finished?'':'disabled'}>✓ บันทึก ${ev.bust?'(BUST)':'+'+sum}</button></div>
-      <div class="row" style="justify-content:space-between"><label class="ck small"><input type="checkbox" ${autoSub?'checked':''} onchange="toggleAuto()"> บันทึกอัตโนมัติเมื่อครบ 3 ลูก</label><button class="btn sm" onclick="setFs(false)">ออกจากเต็มจอ ✕</button></div></div></div>`}
+      ${KBD_HINT}<div class="row" style="justify-content:space-between"><label class="ck small"><input type="checkbox" ${autoSub?'checked':''} onchange="toggleAuto()"> บันทึกอัตโนมัติเมื่อครบ 3 ลูก</label><button class="btn sm" onclick="setFs(false)">ออกจากเต็มจอ ✕</button></div></div></div>`}
   const center=`<div class="panel center">
     ${st.finished?`<div class="banner" style="justify-content:center"><b>🏆 จบการแข่งขัน · ${esc(sideName(room,st.winner))} ชนะ ${legsStr(st,'-')}</b></div>`:
      st.needBull?`<div class="banner"><b>ช่วงปิดเกมครบ ${room.roundLimit} รอบ · ต้องดวล Sudden Death</b><button class="btn pri" onclick="bullOffModal(curRoom())">ตัดสิน Bull-off</button></div>`:
@@ -999,6 +1036,7 @@ VIEWS.match=()=>{const room=curRoom();
     <div class="slots">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':k===pend.length&&!st.finished?'nx':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b><small>${pend[k]?pend[k].v+' แต้ม':''}</small></div>`).join('')}</div>
     <div class="preview"><span>รอบนี้ <span class="tot">${ev.bust?0:sum}</span></span>${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT!</span>':''}<span class="muted">เหลือ <b class="num" style="color:var(--chalk)">${after}</b></span></div>${statusLine(ev,before,after,sum,room.out)}
     <div class="subtabs">${[['board','🎯 กดบนเป้า'],['pad','ปุ่มตัวเลข'],['quick','กรอกยอดรวม'],['cam','📷 กล้อง / VAR'],['dual','จอคู่ (เป้า+กล้อง)']].map(([k,l])=>`<button class="btn sm ${inputMode===k?'on':''}" onclick="inputMode='${k}';render()">${l}</button>`).join('')}</div>
+    ${KBD_HINT}
     ${inputMode==='pad'?`<div class="mult">${[[1,'Single ×1'],[2,'Double ×2'],[3,'Treble ×3']].map(([m,l])=>`<button class="btn ${mult===m?'on':''}" onclick="mult=${m};render()">${l}</button>`).join('')}</div>
       <div class="pad">${Array.from({length:20},(_,k)=>`<button class="btn" onclick="addDart(D(${k+1},mult))">${k+1}</button>`).join('')}</div>
       <div class="pad2"><button class="btn" onclick="addDart(D(25,1))">25</button><button class="btn" onclick="addDart(D(25,2))">BULL 50</button><button class="btn" onclick="addDart(D(0,1))">MISS</button></div>`:''}
@@ -1015,7 +1053,7 @@ VIEWS.match=()=>{const room=curRoom();
     <div class="row"><button class="btn sm pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn sm ${displayWin&&!displayWin.closed?'on':''}" onclick="openDisplay()" title="เปิดจอแสดงผลสำหรับผู้ชม (จอที่สอง)">🖥️ จอผู้ชม</button><button class="btn sm" onclick="introModal(curRoom())">⚔️ Face-off</button>${room.sides.some(x=>x.playerIds.length>1)||room.type==='team'?`<button class="btn sm" onclick="orderModal(curRoom())">จัดลำดับการปา</button>`:''}<button class="btn sm" onclick="bullOffModal(curRoom())" ${st.finished?'disabled':''}>Sudden Death</button><button class="btn sm" onclick="refModal(curRoom())" title="${canRef()?'':'ต้องเป็นกรรมการหรือแอดมิน'}">🧑‍⚖️ กรรมการ</button><button class="btn sm" onclick="undo()">↶ Undo</button><button class="btn sm ${soundOn?'on':''}" onclick="toggleSound()" title="เสียงเอฟเฟกต์">${soundOn?'🔊':'🔇'}</button><button class="btn sm ${callerOn?'on':''}" onclick="toggleCaller()" title="ผู้ประกาศคะแนนแบบ PDC">🗣️ Caller</button><button class="btn sm" onclick="S.ui.roomId=null;save();render()">เปลี่ยนห้อง</button></div></div>
   ${NS(room)===2?`<div class="arena">${sidePanel(0)}${center}${sidePanel(1)}</div>`:`<div class="multi-sides n${NS(room)}">${room.sides.map((x,i)=>sidePanel(i)).join('')}</div><div class="arena-one">${center}</div>`}
   <div class="panel"><div class="panel-h"><h2>บันทึกเทิร์น (Match Log)</h2><span class="muted small">${roomTurns.length} เทิร์น · ผู้ใช้งาน: ${esc(me()?.name||'ไม่ระบุ')}</span></div><div class="log">${logH||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
-AFTER.match=()=>{postLive();const room=curRoom();if(!room)return;
+AFTER.match=()=>{postLive();kbShow();const room=curRoom();if(!room)return;
   const bw=$('#bw');if(bw){bw.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;const svg=bw.querySelector('svg');addDart(D(+t.dataset.s,+t.dataset.m),svg?svgPoint(svg,e):null)});
     bw.addEventListener('mouseover',e=>{const t=e.target.closest('[data-s]');const a=$('#aim');if(!t||!a)return;const d=D(+t.dataset.s,+t.dataset.m);a.innerHTML=`เล็งอยู่ที่ <b>${dLabel(d)}</b> = ${d.v} แต้ม`});
     bw.addEventListener('mouseleave',()=>{const a=$('#aim');if(a)a.textContent='ชี้บนเป้าเพื่อดูช่อง แล้วคลิกเพื่อบันทึกลูกดอก'})}
@@ -1023,10 +1061,31 @@ AFTER.match=()=>{postLive();const room=curRoom();if(!room)return;
   const st=replay(room);if(roomStatus(room)==='ready'&&!room.introDone&&!$('#mbg')&&canAct('user'))introModal(room);
   const q=$('#qk-t');if(q)q.onkeydown=e=>{if(e.key==='Enter')$('#qk-t').nextElementSibling;};
 };
-document.addEventListener('keydown',e=>{if(route()!=='match'||$('#mbg'))return;if(e.target.matches('input,textarea,select'))return;
-  if(e.key==='Escape'&&fsMode){setFs(false)}
-  else if(e.key==='Enter'&&pend.length){e.preventDefault();submitTurn()}else if(e.key==='Backspace'){e.preventDefault();undo()}
-  else if(e.key==='d'||e.key==='D'){mult=2;render()}else if(e.key==='t'||e.key==='T'){mult=3;render()}else if(e.key==='s'||e.key==='S'){mult=1;render()}});
+/* ---- keyboard scoring: works with Thai or English layout (uses physical keys) ----
+   T/D/S (or numpad * / -) = multiplier · digits = number (1-20, 25, 50) · 0, M, numpad . = miss · B = bull
+   Space commits the typed number now · Enter = save turn · Backspace = clear typing / remove last dart · F = full screen */
+let kbBuf='',kbTimer=null;
+const KB_MULT={KeyS:1,NumpadSubtract:1,KeyD:2,NumpadDivide:2,KeyT:3,NumpadMultiply:3};
+function kbShow(){const txt=kbBuf?((mult===3?'T':mult===2?'D':'')+kbBuf+'…'):(mult>1?(mult===3?'Treble':'Double')+' ×'+mult+' → พิมพ์เลข':'');$$('.kbd-buf').forEach(el=>{el.textContent=txt;el.classList.toggle('on',!!txt)})}
+function kbCommit(){clearTimeout(kbTimer);kbTimer=null;if(!kbBuf)return;const n=+kbBuf,m=mult;kbBuf='';
+  if(n===0)addDart(D(0,1));else if(n>=1&&n<=20)addDart(D(n,m));else if(n===25)addDart(D(25,m>=2?2:1));else if(n===50)addDart(D(25,2));
+  else{toast('ไม่มีช่อง '+n+' บนกระดาน (ใช้ 1–20, 25, 50)');kbShow()}}
+function kbDigit(d){clearTimeout(kbTimer);
+  if(kbBuf.length===1){const two=+(kbBuf+d);if((two>=10&&two<=20)||two===25||two===50){kbBuf+=d;kbCommit();return}kbCommit();}
+  kbBuf=d;if(d==='0'||'346789'.includes(d)){kbCommit();return}
+  kbShow();kbTimer=setTimeout(kbCommit,900)}
+document.addEventListener('keydown',e=>{if(route()!=='match'||$('#mbg'))return;if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const c=e.code||'';
+  if(e.key==='Escape'||c==='Escape'){if(kbBuf){kbBuf='';kbShow()}else if(fsMode)setFs(false);return}
+  if(c.startsWith('Digit')||(c.startsWith('Numpad')&&/\d$/.test(c))){e.preventDefault();kbDigit(c.slice(-1));return}
+  if(c in KB_MULT){e.preventDefault();mult=KB_MULT[c];if(kbBuf){kbCommit()}else render();kbShow();return}
+  if(c==='KeyB'){e.preventDefault();kbBuf='';addDart(D(25,mult>=2?2:1));return}
+  if(c==='KeyM'||c==='NumpadDecimal'){e.preventDefault();kbBuf='';addDart(D(0,1));return}
+  if(c==='Space'){e.preventDefault();if(kbBuf)kbCommit();return}
+  if(c==='Enter'||c==='NumpadEnter'){e.preventDefault();if(kbBuf){kbCommit();return}if(pend.length)submitTurn();return}
+  if(c==='Backspace'){e.preventDefault();if(kbBuf){kbBuf='';clearTimeout(kbTimer);kbShow()}else undo();return}
+  if(c==='KeyF'){e.preventDefault();setFs(!fsMode);return}});
+const KBD_HINT=`<div class="kbd-hint"><span class="kbd-buf"></span><span>⌨️ พิมพ์ได้เลย: <kbd>T</kbd>/<kbd>D</kbd> ตัวคูณ · ตัวเลข <kbd>1</kbd>–<kbd>20</kbd> <kbd>25</kbd> <kbd>50</kbd> · <kbd>B</kbd> Bull · <kbd>0</kbd>/<kbd>M</kbd> Miss · <kbd>Enter</kbd> บันทึก · <kbd>⌫</kbd> ลบ · <kbd>F</kbd> เต็มจอ</span></div>`;
 
 /* ====================== simulator ====================== */
 let sim=null;
@@ -1257,7 +1316,9 @@ VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCH
   if(!room||roomStatus(room)==='waiting'){const lives=realRooms().filter(r=>roomStatus(r)==='playing').slice(0,4);const st=computeStats().players;
     const top=Object.values(st).filter(s=>P(s.id)&&s.matches).sort((a,b)=>b.avg-a.avg).slice(0,5);
     return `${gate}<div class="dsp dsp-idle"><div class="dsp-brand"><svg width="90" height="90" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#111" stroke="#efe6cf" stroke-width="2"/><circle cx="20" cy="20" r="12" fill="none" stroke="#d64a3d" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="#2f9d62"/><circle cx="20" cy="20" r="2.5" fill="#d64a3d"/></svg><div><h1>${name}</h1><p>รอเลือกห้องแข่งจากจอควบคุม…</p></div></div>
-      <div class="dsp-idle-grid"><div class="dsp-card"><h2>กำลังแข่งขัน</h2>${lives.map(r=>{const s=replay(r);return `<div class="dsp-li"><b>${esc(sideName(r,0))}</b><span class="mono">${s.rem.join(' · ')}</span><b>${NS(r)===2?esc(sideName(r,1)):'+'+(NS(r)-1)+' คน'}</b></div>`}).join('')||'<p class="muted">ยังไม่มีแมตช์</p>'}</div>
+      <div class="dsp-idle-grid"><div class="dsp-card dsp-join">${regCfg().open?`<h2>สแกนเพื่อลงทะเบียน</h2><div class="qr-box big" data-qr="${esc(joinLink())}"></div><p class="muted" style="margin:0;text-align:center">ไม่ต้องล็อกอิน · กัปตันลงทั้งทีมได้${regCfg().needCode&&adminCode()?` · รหัสงาน <b class="mono">${esc(adminCode())}</b>`:''}</p>`:'<h2>ปิดรับลงทะเบียน</h2>'}</div>
+      <div class="dsp-card"><h2>ทีมที่ลงทะเบียน (${S.teams.length})</h2><div class="tgrid">${S.teams.map(t=>`<div class="tcard">${teamLogo(t,54)}<b>${esc(t.name)}</b><span class="muted small">${teamMembers(t.id).length} คน</span></div>`).join('')||'<p class="muted">ยังไม่มีทีม</p>'}</div></div>
+      <div class="dsp-card"><h2>กำลังแข่งขัน</h2>${lives.map(r=>{const s=replay(r);return `<div class="dsp-li"><b>${esc(sideName(r,0))}</b><span class="mono">${s.rem.join(' · ')}</span><b>${NS(r)===2?esc(sideName(r,1)):'+'+(NS(r)-1)+' คน'}</b></div>`}).join('')||'<p class="muted">ยังไม่มีแมตช์</p>'}</div>
       <div class="dsp-card"><h2>Top 3-Dart Average</h2>${top.map((s,i)=>`<div class="dsp-li"><span class="mono">${i+1}</span><b>${esc(P(s.id).name)}</b><span class="mono">${fmt2(s.avg)}</span></div>`).join('')||'<p class="muted">ยังไม่มีสถิติ</p>'}</div></div></div>`}
   const st=replay(room);const side=st.toThrow;const before=st.rem[side];
   const lp=live.roomId===room.id&&!st.finished?live.pend:[];const lm=live.roomId===room.id?live.marks:[];
@@ -1266,7 +1327,7 @@ VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCH
   const marks=lp.length?lm:(lastT&&lastT.darts?lastT.darts.map((d,k)=>{const p=lastT.pos&&lastT.pos[k]?lastT.pos[k]:markPos(d);return{x:p[0],y:p[1],n:k+1,c:'#8fa096'}}):[]);
   const avgOf=i=>{const a=turns.filter(e=>e.side===i);const d=a.reduce((x,e)=>x+(e.darts?e.darts.length:e.n||3),0);return d?a.reduce((x,e)=>x+e.total,0)/d*3:0};
   const sidePanel=i=>{const on=!st.finished&&side===i;const rem=on&&lp.length&&!ev.bust?after:st.rem[i];const co=!st.finished?checkout(rem,room.out,on?3-lp.length:3):null;const won=st.finished&&st.winner===i;
-    return `<div class="dsp-side ${on?'on':''} ${won?'won':''}" data-si="${i}"><div class="dsp-tag" style="${NS(room)>2?'color:'+SIDE_COL[i%8]:''}">${sideTag(room,i)}${on?' · กำลังปา':''}${won?' · ผู้ชนะ':''}</div><div class="dsp-name">${esc(sideName(room,i))}</div>
+    return `<div class="dsp-side ${on?'on':''} ${won?'won':''}" data-si="${i}"><div class="dsp-tag" style="${NS(room)>2?'color:'+SIDE_COL[i%8]:''}">${sideTag(room,i)}${on?' · กำลังปา':''}${won?' · ผู้ชนะ':''}</div><div class="dsp-name">${room.sides[i].teamId&&T(room.sides[i].teamId)?teamLogo(T(room.sides[i].teamId),56)+' ':''}${esc(sideName(room,i))}</div>
       <div class="dsp-roster">${st.order[i].map(id=>`<span class="${on&&st.thrower(i)===id?'now':''}">${esc(pname(room,id))}</span>`).join('')}</div>
       <div class="dsp-rem">${rem}</div><div class="dsp-legs">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</div>
       <div class="dsp-stat"><span>AVG <b>${fmt2(avgOf(i))}</b></span><span>180s <b>${turns.filter(e=>e.side===i&&!e.bust&&e.total===180).length}</b></span></div>
@@ -1279,7 +1340,7 @@ VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCH
      <div class="dsp-board">${boardSVG(marks,false)}</div>
      <div class="dsp-slots">${[0,1,2].map(k=>`<div class="${lp[k]?'f':''}"><small>ลูก ${k+1}</small><b>${lp[k]?dLabel(lp[k]):'–'}</b></div>`).join('')}<div class="tot"><small>รอบนี้</small><b>${ev.bust?0:sum}</b></div></div>${status}</div>${NS(room)===2?sidePanel(1):''}</div>
    <div class="dsp-ticker"><span class="muted">ล่าสุด</span>${ticker||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
-AFTER.display=()=>{const room=dispRoom();if(!room){dispSeen=null;return}const st=replay(room);const turns=room.events.filter(e=>e.t==='turn');
+AFTER.display=()=>{renderQRs();const room=dispRoom();if(!room){dispSeen=null;return}const st=replay(room);const turns=room.events.filter(e=>e.t==='turn');
   const now={roomId:room.id,turns:turns.length,legs:st.legEnds.length,finished:st.finished};
   if(dispSeen&&dispSeen.roomId===room.id){
     if(now.turns>dispSeen.turns){const e=turns[turns.length-1];if(!e.bust&&e.total===180)fx180(pname(room,e.pid));else if(e.bust)SFX.bust();else if(e.total===e.before)SFX.checkout();else if(callerOn)say(e.total===0?'No score':String(e.total))}
@@ -1289,12 +1350,129 @@ function dispSplash(text){const d=document.createElement('div');d.className='dsp
 if(liveCh&&isDisplay())setTimeout(()=>{try{liveCh.postMessage({t:'hello'})}catch(e){}},300);
 
 /* ====================== permission gates (online mode) ====================== */
-VIEWS.join=()=>{if(cloud.state==='local')return VIEWS.dashboard();const m=myPlayer();
-  return `<div class="panel" style="max-width:560px;margin:0 auto;text-align:center;align-items:center;padding:28px 20px"><div style="font-size:3rem">🎯</div><h1>เข้าร่วม ${esc(S.settings.appName)}</h1>
-   ${!cloud.user?`<p class="muted" style="margin:0">กดปุ่มด้านล่าง ล็อกอินด้วย Google ครั้งเดียว แล้วตั้งชื่อและเลือกทีม ก็พร้อมแข่งได้ทันที</p><button class="btn" style="padding:12px 18px;font-size:1rem;background:#fff;color:#1f1f1f;border-color:#dadce0" onclick="signIn()">${GLOGO} เข้าสู่ระบบด้วย Google</button>`
-   :m?`<p style="margin:0">คุณเข้าร่วมแล้วในชื่อ <b>${esc(m.name)}</b> ${m.teamId?'· ทีม '+esc(T(m.teamId)?.name||''):''}</p><div class="row" style="justify-content:center"><a class="btn pri" href="#rooms">ไปที่ห้องแข่งขัน</a><button class="btn" onclick="editPlayer('${m.id}')">แก้ไข / เปลี่ยนทีม</button></div>`
-   :`<p style="margin:0">ล็อกอินแล้ว เหลือขั้นตอนเดียว: ตั้งโปรไฟล์ผู้เล่น</p><button class="btn pri" onclick="onboardModal()">ตั้งค่าโปรไฟล์</button>`}</div>`};
-const GATES={createRoomModal:'user',joinRoom:'user',addDart:'user',submitTurn:'user',undo:'user',editLastTurn:'user',tossModal:'user',orderModal:'user',bullOffModal:'user',introModal:'user',rematch:'user',fillMiss:'user',createTourModal:'user',quickTour:'user',playTour:'user',simTour:'user',editTeam:'admin',delTeam:'admin',delPlayer:'admin',delTour:'admin',delRoom:'staff',resetModal:'admin',importData:'admin',loadDemo:'admin',clearAll:'admin',quickAddPlayers:'admin',saveSettings:'admin'};
+/* ====================== registration: quick join, captain sign-up, team QR, event code ====================== */
+let joinCtx={team:null,code:''},joiningFlow=false;
+function parseJoin(){const h=(location.hash||'').slice(1);if(!h.startsWith('join'))return;joinCtx.team=null;const parts=h.split('.');
+  for(let i=1;i<parts.length-1;i+=2){if(parts[i]==='t')joinCtx.team=parts[i+1];if(parts[i]==='c'){joinCtx.code=parts[i+1];try{sessionStorage.setItem('oche-join-code',joinCtx.code)}catch(e){}}}}
+parseJoin();window.addEventListener('hashchange',parseJoin);
+const joinCode=()=>{if(joinCtx.code)return joinCtx.code;try{return sessionStorage.getItem('oche-join-code')||''}catch(e){return ''}};
+const regCfg=()=>Object.assign({open:true,needCode:false,adminTeams:false},S.reg||{});
+const adminCode=()=>cloud.state==='local'?(S.reg&&S.reg.code)||'':S.regCode||'';
+function joinLink(teamId){const code=isAdmin()?adminCode():joinCode();return location.origin+location.pathname+'#join'+(teamId?'.t.'+teamId:'')+(regCfg().needCode&&code?'.c.'+code:'')}
+const safeImg=u=>typeof u==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u)?u:'';
+function teamLogo(t,size){size=size||28;if(!t)return '';const img=safeImg(t.logo);
+  return img?`<img class="tlogo" src="${img}" alt="" style="width:${size}px;height:${size}px">`:`<span class="tlogo ph" style="width:${size}px;height:${size}px;background:${esc(t.color||'#555')};font-size:${Math.round(size*.42)}px">${esc((t.name||'?').trim().slice(0,2).toUpperCase())}</span>`}
+function waitUser(ms){return new Promise(res=>{const t0=Date.now();const k=()=>{if(cloud.user||Date.now()-t0>ms)return res(!!cloud.user);setTimeout(k,80)};k()})}
+async function ensureGuest(){if(cloud.state==='local'||cloud.user)return true;
+  try{joiningFlow=true;await cloud.auth.signInAnonymously();return await waitUser(6000)}catch(e){toast('เข้าร่วมไม่สำเร็จ: '+(e.code||e.message||e)+' ลองอีกครั้ง');return false}}
+function regGuard(forTeam){const c=regCfg();if(isAdmin())return true;
+  if(!c.open){toast('ตอนนี้ปิดรับลงทะเบียน ติดต่อแอดมินของงาน');return false}
+  if(forTeam&&c.adminTeams){toast('งานนี้ให้แอดมินเป็นผู้สร้างทีม เลือกทีมที่มีอยู่แล้วได้เลย');return false}
+  if(c.needCode&&!joinCode()){codeModal();return false}
+  if(c.needCode&&cloud.state==='local'&&joinCode()!==adminCode()){toast('รหัสงานไม่ถูกต้อง');return false}
+  return true}
+function codeModal(){openModal('ใส่รหัสงาน',`<p class="muted small" style="margin:0">งานนี้ต้องใช้รหัส 4 หลัก ดูได้ที่จอผู้ชม หรือถามแอดมิน (ถ้าสแกน QR จากงาน รหัสจะติดมาเอง)</p><input id="jc" inputmode="numeric" maxlength="6" placeholder="เช่น 7314" style="font-size:1.6rem;text-align:center;letter-spacing:.3em">`,
+  [{label:'ยกเลิก'},{label:'ตกลง',cls:'pri',fn:()=>{const v=$('#jc').value.trim();if(!/^\d{4,6}$/.test(v)){toast('รหัสต้องเป็นตัวเลข 4 หลัก');return false}joinCtx.code=v;try{sessionStorage.setItem('oche-join-code',v)}catch(e){}render();toast('บันทึกรหัสแล้ว ลองอีกครั้ง')}}])}
+const withCode=o=>{const c=joinCode();if(regCfg().needCode&&c)o.joinCode=c;return o};
+/* ---- logo upload: crop to square, shrink to ~10 KB so it fits in the database ---- */
+function readLogo(file){return new Promise((ok,no)=>{if(!file)return ok('');if(!/^image\//.test(file.type))return no(new Error('ต้องเป็นไฟล์รูปภาพ'));
+  const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const S2=160,c=document.createElement('canvas');c.width=c.height=S2;const g=c.getContext('2d');g.fillStyle='#ffffff';g.fillRect(0,0,S2,S2);
+    const s=Math.min(im.width,im.height);g.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,S2,S2);let q=.82,u=c.toDataURL('image/jpeg',q);while(u.length>40000&&q>.3){q-=.12;u=c.toDataURL('image/jpeg',q)}ok(u)};im.onerror=()=>no(new Error('อ่านรูปไม่ได้'));im.src=fr.result};fr.onerror=()=>no(fr.error);fr.readAsDataURL(file)})}
+function logoField(cur){return `<div class="logo-field"><div class="logo-prev" id="lg-prev">${cur?`<img src="${safeImg(cur)}" alt="">`:'<span>โลโก้</span>'}</div><div style="display:flex;flex-direction:column;gap:6px"><label class="btn sm" style="cursor:pointer">📷 เลือก / ถ่ายรูปโลโก้<input type="file" accept="image/*" id="lg-file" hidden></label><button type="button" class="btn sm" id="lg-clear">ไม่ใช้โลโก้</button><span class="small muted">ระบบตัดเป็นสี่เหลี่ยมจัตุรัสให้อัตโนมัติ</span></div></div>`}
+function bindLogo(state){const f=$('#lg-file');if(!f)return;f.onchange=async()=>{try{state.logo=await readLogo(f.files[0]);$('#lg-prev').innerHTML=`<img src="${state.logo}" alt="">`}catch(e){toast(e.message)}};$('#lg-clear').onclick=()=>{state.logo='';$('#lg-prev').innerHTML='<span>โลโก้</span>'}}
+const colorPick=(sel)=>`<div class="swatches">${COLORS.map(c=>`<label class="sw" style="background:${c}"><input type="radio" name="tcol" value="${c}" ${sel===c?'checked':''}><span></span></label>`).join('')}</div>`;
+const myUid=()=>cloud.state==='local'?null:(cloud.user&&cloud.user.uid);
+function canEditTeam(t){if(!t)return false;if(cloud.state==='local'||isAdmin())return true;return !!(cloud.user&&t.captainUid===cloud.user.uid)}
+/* ---- A) captain registers the whole team ---- */
+function teamRegModal(){if(!regGuard(true))return;const mine=myPlayer?myPlayer():null;const st={logo:''};
+  openModal('ลงทะเบียนทีม (กัปตัน)',`<p class="muted small" style="margin:0">กรอกครั้งเดียวได้ทั้งทีม ลูกทีมไม่ต้องมีมือถือก็แข่งได้ ภายหลังใครสแกนแล้วกด “ฉันคือคนนี้” ชื่อจะผูกกับมือถือคนนั้นเอง</p>
+   <div class="form"><label class="full">ชื่อทีม<input id="tr-name" maxlength="32" placeholder="เช่น Ubon Vipers"></label>
+   <div class="full">${logoField('')}</div>
+   <div class="full"><span class="small muted">สีประจำทีม</span>${colorPick(COLORS[S.teams.length%COLORS.length])}</div>
+   <label class="full">ชื่อกัปตัน (คุณ)<input id="tr-cap" maxlength="40" value="${esc(mine?mine.name:(cloud.user&&cloud.user.name)||'')}" placeholder="ชื่อที่ใช้แข่ง"></label>
+   <label class="full">สมาชิกในทีม · บรรทัดละ 1 คน เรียงตามลำดับมือ (ไม่ต้องใส่ชื่อกัปตันซ้ำ)<textarea id="tr-mem" style="min-height:140px" placeholder="ต้น&#10;บอส&#10;เจ"></textarea></label></div>`,
+   [{label:'ยกเลิก'},{label:'ลงทะเบียนทีม',cls:'pri',fn:()=>{submitTeamReg(st);return false}}],{wide:true,after:()=>bindLogo(st)})}
+async function submitTeamReg(st){const name=$('#tr-name').value.trim(),cap=$('#tr-cap').value.trim();const mem=[...new Set($('#tr-mem').value.split('\n').map(x=>x.trim().slice(0,40)).filter(Boolean))].filter(x=>x!==cap);
+  if(!name){toast('กรุณาตั้งชื่อทีม');return}if(!cap){toast('กรุณาใส่ชื่อกัปตัน');return}
+  if(S.teams.some(t=>t.name.trim().toLowerCase()===name.toLowerCase())){toast('มีทีมชื่อนี้แล้ว ถ้าเป็นทีมของคุณ ให้ขอ QR ประจำทีมจากกัปตันเดิม');return}
+  if(!(await ensureGuest()))return;const u=myUid();const col=(document.querySelector('input[name=tcol]:checked')||{}).value||COLORS[0];
+  const tm=withCode({id:uid(),name,color:col,logo:st.logo||'',captainUid:u||'local',leaderId:null,created:Date.now()});
+  let capP=myPlayer?myPlayer():null;if(cloud.state==='local')capP=null;
+  if(capP){capP.teamId=tm.id;capP.name=cap}else{capP=withCode({id:u||uid(),uid:u||undefined,name:cap,nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:col,teamId:tm.id,role:'player',created:Date.now()});if(!u)delete capP.uid;S.players.push(capP);if(cloud.state==='local')S.me=capP.id}
+  tm.leaderId=capP.id;const ids=[capP.id];
+  mem.forEach(n=>{const ex=S.players.find(p=>!p.uid&&!p.teamId&&p.name.toLowerCase()===n.toLowerCase());if(ex){ex.teamId=tm.id;ids.push(ex.id);return}
+    const p=withCode({id:uid(),name:n,nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:col,teamId:tm.id,role:'player',created:Date.now()});S.players.push(p);ids.push(p.id)});
+  tm.order=ids;S.teams.push(tm);joiningFlow=false;save();closeModal();render();SFX.chime();toast('ลงทะเบียนทีม '+name+' แล้ว ('+ids.length+' คน)');setTimeout(()=>teamQRModal(tm.id),250)}
+/* ---- B) player joins: name + team, or "this is me" ---- */
+function quickJoinModal(teamId){if(!regGuard(false))return;const mine=myPlayer?myPlayer():null;
+  if(mine&&cloud.state!=='local'){openModal('คุณลงทะเบียนแล้ว',`<p style="margin:0">เครื่องนี้ผูกกับ <b>${esc(mine.name)}</b> ${mine.teamId?'· ทีม '+esc(T(mine.teamId)?.name||''):''}</p>`,[{label:'ลงชื่อให้เพื่อน (คนไม่มีมือถือ)',fn:()=>{setTimeout(()=>friendJoinModal(teamId),10)}},{label:'แก้ไข / เปลี่ยนทีม',cls:'pri',fn:()=>{setTimeout(()=>editPlayer(mine.id),10)}}]);return}
+  let sel=teamId&&T(teamId)?teamId:'';
+  const draw=()=>{const q=($('#qj-name')?$('#qj-name').value:'').trim().toLowerCase();
+    const free=S.players.filter(p=>!p.uid&&(sel?p.teamId===sel:(q.length>=2&&p.name.toLowerCase().includes(q))));
+    $('#qj-teams').innerHTML=`<div class="tgrid">${S.teams.map(t=>`<button type="button" class="tpick ${sel===t.id?'on':''}" data-tp="${t.id}">${teamLogo(t,44)}<span>${esc(t.name)}</span></button>`).join('')}<button type="button" class="tpick ${sel===''?'on':''}" data-tp=""><span class="tlogo ph" style="width:44px;height:44px;background:var(--line)">—</span><span>ไม่มีทีม</span></button></div>`;
+    $('#qj-me').innerHTML=free.length?`<div class="small muted" style="margin-bottom:4px">${sel?'ชื่อในทีมนี้ที่ยังไม่มีเจ้าของ แตะชื่อตัวเองได้เลย':'ชื่อนี้มีอยู่แล้ว คุณคือคนนี้ไหม?'}</div><div class="row">${free.map(p=>`<button type="button" class="btn sm claim" data-claim="${p.id}">🙋 ฉันคือ ${esc(p.name)}${p.teamId?' · '+esc(T(p.teamId)?.name||''):''}</button>`).join('')}</div>`:'';
+    $$('[data-tp]').forEach(b=>b.onclick=()=>{sel=b.dataset.tp;draw()});
+    $$('[data-claim]').forEach(b=>b.onclick=()=>claimPlayer(b.dataset.claim))};
+  openModal(sel?'เข้าร่วมทีม '+esc(T(sel).name):'เข้าร่วมเป็นผู้เล่น',`${sel?`<div class="row">${teamLogo(T(sel),56)}<div><h2>${esc(T(sel).name)}</h2><span class="muted small">${teamMembers(sel).length} คนในทีม</span></div></div>`:''}
+   <label>ชื่อที่ใช้แข่ง<input id="qj-name" maxlength="40" placeholder="พิมพ์ชื่อของคุณ" autocomplete="nickname"></label>
+   <div id="qj-me"></div><div><span class="small muted">เลือกทีม</span><div id="qj-teams"></div></div>`,
+   [{label:'ยกเลิก'},{label:'เข้าร่วม',cls:'pri',fn:()=>{submitQuickJoin(sel,false);return false}}],{after:()=>{draw();$('#qj-name').oninput=draw}})}
+async function submitQuickJoin(sel,friend){const name=$('#qj-name').value.trim();if(!name){toast('กรุณาพิมพ์ชื่อ');return}
+  const dup=S.players.find(p=>p.name.trim().toLowerCase()===name.toLowerCase()&&(p.teamId||'')===sel);if(dup&&!dup.uid&&!friend){toast('มีชื่อนี้ในทีมแล้ว กด “ฉันคือ '+dup.name+'” แทน');return}
+  if(dup&&friend){toast('มีชื่อนี้ในทีมแล้ว');return}
+  if(!(await ensureGuest()))return;const u=friend?null:myUid();
+  const p=withCode({id:u||uid(),name,nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:sel&&T(sel)?T(sel).color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:sel||null,role:'player',created:Date.now()});
+  if(u)p.uid=u;S.players.push(p);if(cloud.state==='local'&&!friend)S.me=p.id;if(sel&&T(sel)){const t=T(sel);t.order=(t.order||[]).concat(p.id)}
+  joiningFlow=false;save();closeModal();render();SFX.chime();toast(friend?'เพิ่ม '+name+' แล้ว':'ยินดีต้อนรับ '+name+'! เข้าร่วมเรียบร้อย')}
+async function claimPlayer(pid){const p=P(pid);if(!p||p.uid)return;if(!(await ensureGuest()))return;
+  if(cloud.state==='local'){S.me=p.id}else{if(myPlayer()){toast('เครื่องนี้ผูกกับผู้เล่นคนอื่นอยู่แล้ว');return}p.uid=myUid()}
+  joiningFlow=false;save();closeModal();render();SFX.chime();toast('ยืนยันแล้ว คุณคือ '+p.name)}
+function friendJoinModal(teamId){let sel=teamId||'';openModal('ลงชื่อให้เพื่อน',`<p class="muted small" style="margin:0">สำหรับคนไม่มีมือถือ ชื่อนี้จะไม่ผูกกับเครื่องคุณ ภายหลังเจ้าตัวกด “ฉันคือคนนี้” ได้</p><label>ชื่อ<input id="qj-name" maxlength="40"></label><label>ทีม<select id="qj-team"><option value="">— ไม่มีทีม —</option>${S.teams.map(t=>`<option value="${t.id}" ${sel===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label>`,
+  [{label:'ยกเลิก'},{label:'เพิ่ม',cls:'pri',fn:()=>{submitQuickJoin($('#qj-team').value,true);return false}}])}
+/* ---- team QR ---- */
+async function renderQRs(root){const els=[...(root||document).querySelectorAll('[data-qr]')].filter(e=>!e.dataset.done);if(!els.length)return;
+  try{if(!window.qrcode)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js');
+    els.forEach(el=>{const q=qrcode(0,'M');q.addData(el.dataset.qr);q.make();el.innerHTML=q.createSvgTag({cellSize:6,margin:2,scalable:true});el.dataset.done='1'})}catch(e){els.forEach(el=>el.innerHTML='<span style="color:#333">QR ไม่พร้อม ใช้ลิงก์แทน</span>')}}
+function teamQRModal(tid){const t=T(tid);if(!t)return;const url=joinLink(tid);const free=teamMembers(tid).filter(p=>!p.uid);
+  openModal('QR ประจำทีม '+esc(t.name),`<div class="row">${teamLogo(t,56)}<div><h2>${esc(t.name)}</h2><span class="muted small">${teamMembers(tid).length} คน · ลูกทีมสแกนแล้วแตะชื่อตัวเอง หรือพิมพ์ชื่อใหม่</span></div></div>
+   <div class="qr-box" data-qr="${esc(url)}"></div><textarea id="tq-link" readonly style="font-family:var(--f-mono);font-size:.78rem;min-height:0;height:46px">${esc(url)}</textarea>
+   ${free.length?`<div class="small muted">ยังไม่ได้ผูกมือถือ: ${free.map(p=>esc(p.name)).join(', ')}</div>`:''}`,
+   [{label:'คัดลอกลิงก์',cls:'pri',fn:()=>{navigator.clipboard.writeText(url).then(()=>toast('คัดลอกแล้ว ส่งในกลุ่ม LINE ของทีมได้เลย')).catch(()=>$('#tq-link').select());return false}}],{after:root=>renderQRs(root)})}
+/* ---- admin: registration controls ---- */
+async function setReg(patch){const c=Object.assign(regCfg(),patch);if(cloud.state==='local'){S.reg=Object.assign(S.reg||{},patch);save();render();return}
+  try{await cloud.db.doc('config/reg').set({open:!!c.open,needCode:!!c.needCode,adminTeams:!!c.adminTeams});S.reg=Object.assign(S.reg||{},patch);render()}catch(e){cloudErr(e)}}
+async function newEventCode(){const code=String(Math.floor(1000+Math.random()*9000));
+  if(cloud.state==='local'){S.reg=Object.assign(S.reg||{},{code,needCode:true});save();render();toast('รหัสงานใหม่: '+code);return}
+  try{const old=S.regCode;await cloud.db.doc('joinCodes/'+code).set({created:Date.now()});await cloud.db.doc('config/regAdmin').set({code});if(old&&old!==code)cloud.db.doc('joinCodes/'+old).delete().catch(()=>{});
+    S.regCode=code;await setReg({needCode:true});toast('รหัสงานใหม่: '+code+' (ลิงก์/QR เก่าใช้ไม่ได้แล้ว)')}catch(e){cloudErr(e)}}
+const isToday=ts=>ts&&dayKey(ts)===dayKey(Date.now());
+function drawToday(kind){const pool=kind==='team'?S.teams.filter(t=>isToday(t.created)&&teamMembers(t.id).length).map(t=>t.id):S.players.filter(p=>isToday(p.created)).map(p=>p.id);
+  if(pool.length<2){toast('วันนี้ลงทะเบียน'+(kind==='team'?'ทีม':'ผู้เล่น')+'ยังไม่ถึง 2');return}
+  createTour((kind==='team'?'Team Cup ':'Singles Cup ')+new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short'}),kind,2,S.settings.score,S.settings.out,S.settings.bestOf,pool);go('tournament');toast('จับฉลากผังจาก '+pool.length+(kind==='team'?' ทีม':' คน'))}
+VIEWS.join=()=>{const m=myPlayer?myPlayer():(cloud.state==='local'?me():null);const c=regCfg();const t=joinCtx.team&&T(joinCtx.team);const adm=isAdmin();
+  const tToday=S.teams.filter(x=>isToday(x.created)),pToday=S.players.filter(x=>isToday(x.created));
+  const closed=!c.open&&!adm;
+  const hero=t?`<div class="panel join-hero"><div class="row" style="justify-content:center">${teamLogo(t,72)}<div style="text-align:left"><span class="muted small">เชิญเข้าทีม</span><h1>${esc(t.name)}</h1></div></div>
+     ${closed?'<p class="muted">ปิดรับลงทะเบียนแล้ว</p>':`<div class="small muted">แตะชื่อตัวเอง หรือเพิ่มชื่อใหม่</div><div class="row" style="justify-content:center">${teamMembers(t.id).filter(p=>!p.uid).map(p=>`<button class="btn" onclick="claimPlayer('${p.id}')">🙋 ${esc(p.name)}</button>`).join('')}</div>
+     <div class="row" style="justify-content:center"><button class="btn pri" onclick="quickJoinModal('${t.id}')">+ ชื่อฉันไม่มีในรายการ</button>${cloud.state!=='local'&&!cloud.user?`<button class="btn" onclick="signIn()">${GLOGO} ใช้ Google</button>`:''}</div>`}</div>`
+   :`<div class="join-head"><h1>ลงทะเบียน · ${esc(S.settings.appName)}</h1><p class="muted">ไม่ต้องสมัคร ไม่ต้องล็อกอิน เลือกวิธีที่สะดวก</p></div>
+     ${m?`<div class="banner"><span>เครื่องนี้คือ <b>${esc(m.name)}</b>${m.teamId?' · ทีม '+esc(T(m.teamId)?.name||''):''}</span><span class="row"><a class="btn sm pri" href="#rooms">ไปห้องแข่งขัน</a><button class="btn sm" onclick="editPlayer('${m.id}')">แก้ไข / เปลี่ยนทีม</button></span></div>`:''}
+     ${closed?'<div class="empty">ตอนนี้ปิดรับลงทะเบียน ติดต่อแอดมินของงาน</div>':`<div class="join-opts">
+       <button class="join-opt" onclick="teamRegModal()" ${c.adminTeams&&!adm?'disabled':''}><span class="ic">👥</span><b>ลงทะเบียนทั้งทีม</b><span>สำหรับกัปตัน · ตั้งชื่อทีม ใส่โลโก้ และรายชื่อสมาชิกในครั้งเดียว</span></button>
+       <button class="join-opt" onclick="quickJoinModal()"><span class="ic">🙋</span><b>เข้าร่วมเป็นผู้เล่น</b><span>พิมพ์ชื่อ แล้วแตะโลโก้ทีม · ถ้ากัปตันใส่ชื่อไว้แล้ว กด “ฉันคือคนนี้”</span></button>
+       <button class="join-opt" onclick="friendJoinModal()"><span class="ic">✍️</span><b>ลงชื่อให้เพื่อน</b><span>สำหรับคนไม่มีมือถือ ใส่ชื่อแทนได้</span></button>
+       ${cloud.state!=='local'?`<button class="join-opt" onclick="signIn()" ${cloud.user&&!cloud.user.anon?'disabled':''}><span class="ic">${GLOGO}</span><b>${cloud.user&&cloud.user.anon?'ผูกบัญชี Google':'ล็อกอินด้วย Google'}</b><span>ไม่บังคับ · เก็บสถิติไว้ใช้ข้ามเครื่อง</span></button>`:''}</div>`}`;
+  const teamsGrid=`<div class="panel"><div class="panel-h"><h2>ทีมที่ลงทะเบียน</h2><span class="muted small">${S.teams.length} ทีม · ${S.players.length} คน</span></div><div class="tgrid big">${S.teams.map(x=>`<div class="tcard">${teamLogo(x,48)}<b>${esc(x.name)}</b><span class="muted small">${teamMembers(x.id).length} คน${isToday(x.created)?' · ใหม่วันนี้':''}</span>${canEditTeam(x)?`<span class="row" style="justify-content:center"><button class="btn sm" onclick="teamQRModal('${x.id}')">QR ทีม</button><button class="btn sm" onclick="editTeam('${x.id}')">แก้ไข</button></span>`:`<button class="btn sm" onclick="quickJoinModal('${x.id}')">เข้าทีมนี้</button>`}</div>`).join('')||'<span class="muted">ยังไม่มีทีม</span>'}</div></div>`;
+  const admin=adm?`<div class="panel"><div class="panel-h"><h2>แอดมิน · การลงทะเบียน</h2><span class="pill ${c.open?'st-playing':'st-finished'}">${c.open?'เปิดรับอยู่':'ปิดรับ'}</span></div>
+     <div class="row"><label class="ck"><input type="checkbox" ${c.open?'checked':''} onchange="setReg({open:this.checked})"> เปิดรับลงทะเบียน</label><label class="ck"><input type="checkbox" ${c.needCode?'checked':''} onchange="${adminCode()?'setReg({needCode:this.checked})':'newEventCode()'}"> ต้องใช้รหัสงาน</label><label class="ck"><input type="checkbox" ${c.adminTeams?'checked':''} onchange="setReg({adminTeams:this.checked})"> เฉพาะแอดมินสร้างทีม</label></div>
+     ${c.needCode?`<div class="row"><span>รหัสงาน: <b class="mono" style="font-size:1.6rem;letter-spacing:.2em">${esc(adminCode()||'—')}</b></span><button class="btn sm" onclick="newEventCode()">สุ่มรหัสใหม่</button></div>`:''}
+     <div class="grid g2"><div><div class="qr-box" data-qr="${esc(joinLink())}"></div><p class="small muted" style="text-align:center;margin:4px 0 0">QR ลงทะเบียนทั่วไป (ขึ้นบนจอผู้ชมด้วย)</p></div>
+     <div><h3>เช็คอินวันนี้</h3><p class="small muted" style="margin:0">${tToday.length} ทีม · ${pToday.length} คน</p><div class="log" style="max-height:220px">${pToday.slice().sort((a,b)=>b.created-a.created).map(p=>`<div class="ln" style="grid-template-columns:auto 1fr auto"><span>${p.teamId&&T(p.teamId)?teamLogo(T(p.teamId),22):''}</span><span>${esc(p.name)} <span class="d">${esc(T(p.teamId)?.name||'ไม่มีทีม')}</span></span><span class="d">${new Date(p.created).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}${p.uid?' 📱':''}</span></div>`).join('')||'<span class="muted small">ยังไม่มีใครลงทะเบียนวันนี้</span>'}</div>
+     <div class="row" style="margin-top:8px"><button class="btn sm pri" onclick="drawToday('team')">จับฉลากผังจากทีมวันนี้</button><button class="btn sm" onclick="drawToday('single')">จับฉลากเดี่ยวจากผู้เล่นวันนี้</button></div></div></div></div>`:'';
+  return hero+teamsGrid+admin};
+AFTER.join=()=>renderQRs();
+
+const GATES={createRoomModal:'user',joinRoom:'user',addDart:'user',submitTurn:'user',undo:'user',editLastTurn:'user',tossModal:'user',orderModal:'user',bullOffModal:'user',introModal:'user',rematch:'user',fillMiss:'user',createTourModal:'user',quickTour:'user',playTour:'user',simTour:'user',editTeam:'user',delTeam:'user',delPlayer:'admin',delTour:'admin',delRoom:'staff',resetModal:'admin',importData:'admin',loadDemo:'admin',clearAll:'admin',quickAddPlayers:'admin',saveSettings:'admin'};
 Object.entries(GATES).forEach(([fn,lv])=>{const orig=window[fn];if(typeof orig==='function')window[fn]=function(...a){return gate(lv)?orig.apply(this,a):undefined}});
 
 /* ====================== boot ====================== */

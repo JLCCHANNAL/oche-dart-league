@@ -2,45 +2,81 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    // แอดมิน = อีเมล Google ที่อยู่ในรายการนี้ (ต้องตรงกับ OCHE_ADMINS ใน config.js)
     // อีเมลแอดมินอยู่ในไฟล์นี้เท่านั้น (ไม่เปิดเผยบนหน้าเว็บ)
     function isOwnerEmail() {
       return signedIn() && request.auth.token.email_verified == true
         && request.auth.token.email.lower() in ['ADMIN_EMAIL'];
     }
-    function isAdmin() {
-      return isOwnerEmail() || (signedIn()
+    function roleIs(r) {
+      return signedIn()
         && exists(/databases/$(database)/documents/roles/$(request.auth.uid))
-        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == 'admin');
+        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == r;
     }
-    function isStaff() {
-      return isAdmin() || (signedIn()
-        && exists(/databases/$(database)/documents/roles/$(request.auth.uid))
-        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role in ['referee', 'admin']);
+    function isAdmin() { return isOwnerEmail() || roleIs('admin'); }
+    function isStaff() { return isAdmin() || roleIs('referee'); }
+
+    // การลงทะเบียน: เปิด/ปิด, รหัสงาน, ใครสร้างทีมได้
+    function regExists() { return exists(/databases/$(database)/documents/config/reg); }
+    function reg() { return get(/databases/$(database)/documents/config/reg).data; }
+    function regOpen() { return !regExists() || reg().get('open', true) == true; }
+    function codeOK() {
+      return !regExists() || reg().get('needCode', false) != true
+        || (request.resource.data.get('joinCode', null) is string
+            && exists(/databases/$(database)/documents/joinCodes/$(request.resource.data.joinCode)));
     }
-    // ทุกคนดูข้อมูลได้ (สกอร์สด อันดับ ผังการแข่งขัน)
+    function canRegister() { return isAdmin() || (signedIn() && regOpen() && codeOK()); }
+    function teamsOpen() { return !regExists() || reg().get('adminTeams', false) != true; }
+    function isCaptainOf(tid) {
+      return signedIn() && tid is string
+        && exists(/databases/$(database)/documents/teams/$(tid))
+        && get(/databases/$(database)/documents/teams/$(tid)).data.get('captainUid', '') == request.auth.uid;
+    }
+    function unclaimed(d) { return d.get('uid', null) == null; }
+
+    match /config/reg      { allow read: if true; allow write: if isAdmin(); }
+    match /config/regAdmin { allow read, write: if isAdmin(); }
+    // ใครก็อ่านรายการรหัสไม่ได้ ระบบแค่เช็คว่ามีอยู่จริง
+    match /joinCodes/{code} { allow read: if false; allow write: if isAdmin(); }
+
     match /league/settings { allow read: if true; allow write: if isAdmin(); }
     match /league/tours    { allow read: if true; allow write: if signedIn(); }
     match /league/audit    { allow read: if true; allow write: if isStaff(); }
-    match /teams/{id}      { allow read: if true; allow write: if isAdmin(); }
-    match /roles/{uid}     { allow read: if true; allow write: if isAdmin(); }
+    match /roles/{uid}     { allow read: if true; allow write: if isAdmin() || (isOwnerEmail() && uid == request.auth.uid); }
+
+    match /teams/{id} {
+      allow read: if true;
+      // กัปตันลงทะเบียนทีมเองได้ (ตัวเองเป็นกัปตัน)
+      allow create: if isAdmin() || (canRegister() && teamsOpen()
+        && request.resource.data.get('captainUid', '') == request.auth.uid);
+      // กัปตันแก้ได้เฉพาะทีมตัวเอง และโอนกัปตันให้คนอื่นเองไม่ได้
+      allow update: if isAdmin() || (signedIn()
+        && resource.data.get('captainUid', '') == request.auth.uid
+        && request.resource.data.get('captainUid', '') == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.get('captainUid', '') == request.auth.uid);
+    }
+
     match /rooms/{id} {
       allow read: if true;
       allow create, update: if signedIn() && request.resource.data.json is string;
       allow delete: if isStaff();
     }
+
     match /players/{id} {
       allow read: if true;
-      allow delete: if isAdmin();
-      // ผู้เล่นสร้างโปรไฟล์ของตัวเองได้ (บทบาท player เท่านั้น)
-      allow create: if isAdmin() || (signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.role == 'player');
-      // ผู้เล่นแก้โปรไฟล์ตัวเอง / เปลี่ยนทีม / เชื่อมชื่อที่แอดมินเพิ่มไว้ (เปลี่ยนบทบาทเองไม่ได้)
-      allow update: if isAdmin() || (signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.role == resource.data.get('role', 'player')
-        && (resource.data.get('uid', null) == request.auth.uid || resource.data.get('uid', null) == null));
+      // ลงทะเบียนตัวเอง (ผูกกับเครื่องนี้) หรือเพิ่มชื่อที่ยังไม่มีเจ้าของ (กัปตันลงชื่อลูกทีม / ลงชื่อให้เพื่อน)
+      allow create: if isAdmin() || (canRegister()
+        && request.resource.data.get('role', 'player') == 'player'
+        && (request.resource.data.get('uid', null) == request.auth.uid || unclaimed(request.resource.data)));
+      allow update: if isAdmin()
+        // เจ้าของแก้โปรไฟล์ตัวเอง / เปลี่ยนทีม / กด "ฉันคือคนนี้" กับชื่อที่ยังไม่มีเจ้าของ
+        || (signedIn() && request.resource.data.get('uid', null) == request.auth.uid
+            && request.resource.data.get('role', 'player') == resource.data.get('role', 'player')
+            && (resource.data.get('uid', null) == request.auth.uid || unclaimed(resource.data)))
+        // กัปตันจัดการลูกทีมที่ยังไม่ผูกมือถือ
+        || (signedIn() && unclaimed(resource.data) && unclaimed(request.resource.data)
+            && request.resource.data.get('role', 'player') == resource.data.get('role', 'player')
+            && (isCaptainOf(resource.data.get('teamId', null)) || isCaptainOf(request.resource.data.get('teamId', null))));
+      allow delete: if isAdmin() || (unclaimed(resource.data) && isCaptainOf(resource.data.get('teamId', null)));
     }
   }
 }
