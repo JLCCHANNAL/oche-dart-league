@@ -787,12 +787,15 @@ const genCode=()=>'DART-'+Math.random().toString(16).slice(2,6).toUpperCase();
 function newRoom(o){const s=S.settings;return Object.assign({id:uid(),code:genCode(),name:'',type:'single',teamSize:2,score:s.score,out:s.out,bestOf:s.bestOf,roundLimit:s.roundLimit,sdT:s.sdT??50,sides:[{teamId:null,playerIds:[]},{teamId:null,playerIds:[]}],events:[],starter:0,created:Date.now(),finishedAt:null,introDone:false},o)}
 function playerOpts(sel){return `<option value="">— เว้นว่าง (รอผู้เล่นเข้าร่วม) —</option>`+S.players.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)} · ${esc(T(p.teamId)?.name||'ไม่มีทีม')}</option>`).join('')}
 function teamOpts(sel){return `<option value="">— เว้นว่าง (รอทีมเข้าร่วม) —</option>`+S.teams.map(t=>`<option value="${t.id}" ${sel===t.id?'selected':''}>${esc(t.name)} (${teamMembers(t.id).length} คน)</option>`).join('')}
+function nSideOpts(t,size,sel){return [2,3,4,5,6,7,8].map(n=>{const v=t==='team'?String(size):'1';
+  const lbl=t==='team'?(n+' ทีม ('+Array(n).fill(v).join('v')+' · ทีมละ '+size+' คน)'):(n===2?'2 คน (1 vs 1)':n+' คน ('+Array(n).fill('1').join(' vs ')+')');
+  return `<option value="${n}" ${n===sel?'selected':''}>${lbl}</option>`}).join('')}
 function createRoomModal(){const s=S.settings;
   openModal('สร้างห้องแข่งขัน',`<div class="form">
   <label class="full">ชื่อห้อง<input id="rf-name" placeholder="เช่น Ubon Open 2026 · รอบคัดเลือก" maxlength="60"></label>
   <label>ประเภท<select id="rf-type"><option value="single">เดี่ยว (ตัวต่อตัว)</option><option value="team">ทีม</option></select></label>
-  <label>จำนวนฝ่ายที่แข่งกัน<select id="rf-n">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}">${n===2?'2 ฝ่าย (1 vs 1)':n+' ฝ่าย ('+Array(n).fill('1').join(' vs ')+')'}</option>`).join('')}</select></label>
-  <label>ขนาดทีม (ถ้าเป็นทีม)<select id="rf-size">${[2,3,4].map(n=>`<option value="${n}">ทีมละ ${n} คน</option>`).join('')}</select></label>
+  <label>จำนวนฝ่ายที่แข่งกัน<select id="rf-n">${nSideOpts('single',2,2)}</select></label>
+  <label>ขนาดทีม<select id="rf-size">${[2,3,4].map(n=>`<option value="${n}">ทีมละ ${n} คน</option>`).join('')}</select></label>
   <label>คะแนนเริ่มต้น<select id="rf-score">${[701,601,501,401,301,201].map(n=>`<option ${n===s.score?'selected':''}>${n}</option>`).join('')}</select></label>
   <label>กติกาปิดเกม<select id="rf-out">${Object.entries(OUT_LABEL).map(([k,v])=>`<option value="${k}" ${k===s.out?'selected':''}>${v}</option>`).join('')}</select></label>
   <label>จำนวนขา (Best of)<select id="rf-best">${[1,3,5,7,9].map(n=>`<option value="${n}" ${n===s.bestOf?'selected':''}>Best of ${n} (ชนะ ${Math.floor(n/2)+1})</option>`).join('')}</select></label>
@@ -808,9 +811,9 @@ function createRoomModal(){const s=S.settings;
     else{if(chosen.some(tid=>teamMembers(tid).length<1)){toast('ทีมที่เลือกยังไม่มีสมาชิก');return false}
       picks.forEach((tid,i)=>{if(tid){room.sides[i].teamId=tid;room.sides[i].playerIds=teamOrder(tid).slice(0,size)}})}
     S.rooms.unshift(room);save();toast('สร้างห้อง '+room.code+' แล้ว');render()}}]);
-  const sides=()=>{const t=$('#rf-type').value,n=+$('#rf-n').value;$('#rf-size').disabled=t!=='team';const keep=$$('.rf-side').map(x=>x.value);
+  const sides=()=>{const t=$('#rf-type').value,n=+$('#rf-n').value;$('#rf-n').innerHTML=nSideOpts(t,+$('#rf-size').value,n);$('#rf-size').disabled=t!=='team';const keep=$$('.rf-side').map(x=>x.value);
     $('#rf-sides').innerHTML=`<div class="form">${Array.from({length:n},(_,i)=>`<label>${n===2?(i?'AWAY':'HOME'):'ฝ่ายที่ '+(i+1)} ${t==='team'?'(ทีม)':'(ผู้เล่น)'}<select class="rf-side">${t==='team'?teamOpts(i===0&&!keep.length?me()?.teamId:keep[i]):playerOpts(i===0&&!keep.length?S.me:keep[i])}</select></label>`).join('')}</div><p class="muted small" style="margin:6px 0 0">ผลัดกันปาตามลำดับฝ่าย ใครปิดเกมได้ก่อนชนะ Leg · เว้นว่างไว้ให้ผู้เล่นกด “เข้าร่วม” เองได้</p>`};
-  $('#rf-type').onchange=sides;$('#rf-n').onchange=sides;sides();
+  $('#rf-type').onchange=sides;$('#rf-n').onchange=sides;$('#rf-size').onchange=sides;sides();
   $('#rf-quick-btn').onclick=async()=>{const n=$('#rf-quick').value.trim();if(!n){toast('พิมพ์ชื่อก่อน');return}if(!(await ensureGuest()))return;
     const p=withCode({id:uid(),name:n.slice(0,40),nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:null,role:'player',created:Date.now()});S.players.push(p);save();
     const empty=$$('.rf-side').find(x=>!x.value);sides();const s2=$$('.rf-side');const idx=empty?s2.findIndex((x,k)=>!x.value):-1;if($('#rf-type').value==='single'&&idx>=0)s2[idx].value=p.id;$('#rf-quick').value='';toast('เพิ่ม '+p.name+' แล้ว')}}
