@@ -98,6 +98,37 @@ main{max-width:1240px;margin:0 auto;padding-block:22px 30px;padding-left:max(16p
 .slog .r{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.8rem;padding:4px 6px;border-radius:6px;background:var(--bg)}
 .slog .r .p{font-family:var(--f-mono);font-weight:700}
 .big-board{max-width:560px}
+.av{overflow:hidden}.av img{width:100%;height:100%;object-fit:cover;display:block}
+.dsp-av{width:clamp(40px,4vw,64px);height:clamp(40px,4vw,64px);font-size:clamp(20px,2vw,32px);vertical-align:middle}
+.bi{position:fixed;inset:0;z-index:72;background:radial-gradient(ellipse at center,rgba(20,20,30,.92),rgba(0,0,0,.97));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4vh;color:#fff;cursor:pointer;animation:bifade .3s}
+.bi.out{animation:biout .6s forwards}
+@keyframes bifade{from{opacity:0}}@keyframes biout{to{opacity:0;transform:scale(1.05)}}
+.bi-title{font-family:var(--f-display);font-size:clamp(2.4rem,7vw,6rem);letter-spacing:.3em;color:#f2b134;text-align:center;display:flex;flex-direction:column;animation:bititle .6s cubic-bezier(.2,1.5,.4,1)}
+.bi-title small{font-family:var(--f-body);font-size:clamp(.9rem,1.6vw,1.4rem);letter-spacing:.05em;color:#cfd3d6}
+@keyframes bititle{from{transform:scale(2.5);opacity:0}}
+.bi-row{display:flex;align-items:center;justify-content:center;gap:4vw;flex-wrap:wrap;max-width:94vw}
+.bi-card{display:flex;flex-direction:column;align-items:center;gap:1.2vh;padding:3vh 2.5vw;border-radius:24px;border:4px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);min-width:min(26vw,320px);max-width:40vw;text-align:center;transition:border-color .1s,box-shadow .1s,transform .2s}
+.bi.two .bi-card:first-child{animation:biL .7s cubic-bezier(.2,1.2,.4,1) both}.bi.two .bi-card:last-child{animation:biR .7s cubic-bezier(.2,1.2,.4,1) both}
+.bi.multi .bi-card{animation:biUp .6s cubic-bezier(.2,1.3,.4,1) both;animation-delay:var(--d);min-width:min(18vw,240px)}
+@keyframes biL{from{transform:translateX(-80vw) rotate(-8deg)}}@keyframes biR{from{transform:translateX(80vw) rotate(8deg)}}@keyframes biUp{from{transform:translateY(60vh);opacity:0}}
+.bi-card b{font-family:var(--f-display);font-size:clamp(1.6rem,3.6vw,3.6rem);line-height:1.1;overflow-wrap:anywhere}.bi-card small{color:#cfd3d6;font-size:clamp(.8rem,1.3vw,1.3rem)}
+.bi-card .bi-av{font-size:clamp(44px,5.5vw,80px)}
+.bi-card .tlogo,.bi-av{width:clamp(80px,9vw,140px)!important;height:clamp(80px,9vw,140px)!important;border-radius:22px}.bi-av{display:grid;place-items:center;font-size:clamp(40px,5vw,72px);border:4px solid;border-radius:50%!important;background:rgba(255,255,255,.08)}
+.bi-card.hl{border-color:#4c9be0;box-shadow:0 0 40px rgba(76,155,224,.6);transform:scale(1.04)}
+.bi-card.win{border-color:#f2b134;box-shadow:0 0 60px rgba(242,177,52,.8);transform:scale(1.1)}
+.bi-vs{font-family:var(--f-display);font-size:clamp(3rem,9vw,8rem);color:#d64a3d;text-shadow:0 0 30px rgba(214,74,61,.8);animation:bivs .5s .5s cubic-bezier(.2,2,.4,1) both}
+@keyframes bivs{from{transform:scale(4) rotate(-20deg);opacity:0}}
+.bi-msg{font-size:clamp(1.4rem,3.4vw,3.2rem);min-height:1.4em;font-family:var(--f-display);letter-spacing:.04em}.bi-msg b{color:#f2b134}
+.bw{position:fixed;inset:0;z-index:74;background:rgba(0,0,0,.85);display:grid;place-items:center;color:#fff;cursor:pointer;text-align:center}
+.bw canvas{position:absolute;inset:0;width:100%;height:100%}
+.bw-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:1.5vh}
+.bw-cup{font-size:clamp(4rem,12vw,10rem);animation:cup 1.2s cubic-bezier(.2,1.6,.4,1) both,bob 2s 1.2s ease-in-out infinite}
+@keyframes cup{from{transform:translateY(-60vh) rotate(-30deg)}}@keyframes bob{50%{transform:translateY(-12px)}}
+.bw-face .bi-card{animation:biUp .8s .5s cubic-bezier(.2,1.3,.4,1) both;border-color:#f2b134;box-shadow:0 0 60px rgba(242,177,52,.7)}
+.bw-title{font-family:var(--f-display);letter-spacing:.35em;font-size:clamp(1.6rem,4vw,3.4rem);color:#f2b134}
+.bw-score{font-family:var(--f-mono);font-size:clamp(2rem,5vw,4.4rem);font-weight:700}
+.dsp-splash{display:flex;flex-direction:column;align-items:center;gap:8px}.dsp-splash small{font-size:.4em;letter-spacing:.2em}.dsp-splash span{font-size:.45em}
+@media (prefers-reduced-motion:reduce){.bi,.bi *,.bw *{animation:none!important}}
 .kbd-hint{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:.76rem;color:var(--muted)}
 .kbd-hint kbd{font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--bg);color:var(--chalk)}
 .kbd-buf{display:none;font-family:var(--f-mono);font-weight:700;font-size:1rem;color:var(--amber-ink);background:var(--amber);border-radius:6px;padding:1px 10px}.kbd-buf.on{display:inline-block}
@@ -479,7 +510,7 @@ function onboardModal(){const u=cloud.user;if(!u)return loginModal();const free=
    <label>ไอคอน<select id="ob-emoji">${EMOJIS.map(e=>`<option>${e}</option>`).join('')}</select></label></div>
    ${free.length?`<div><h3 style="margin-bottom:6px">หรือเลือกชื่อที่แอดมินเพิ่มไว้</h3><div class="pick-list">${free.map(p=>`<div class="opt" data-claim="${p.id}" tabindex="0">${av(p)}<span style="flex:1;min-width:0"><b>${esc(p.name)}</b><br>${teamChip(p.teamId)}</span><span class="btn sm">ฉันคือคนนี้</span></div>`).join('')}</div></div>`:''}`,
    [{label:'ไว้ทีหลัง'},{label:'สร้างโปรไฟล์',cls:'pri',fn:()=>{const name=$('#ob-name').value.trim();if(!name){toast('กรุณากรอกชื่อ');return false}
-     S.players.push({id:u.uid,uid:u.uid,name,nick:$('#ob-nick').value.trim(),emoji:$('#ob-emoji').value,color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:$('#ob-team').value||null,role:isAdminUser()?'admin':'player',created:Date.now()});
+     S.players.push({id:u.uid,uid:u.uid,name,photo:safePhoto(u.photo)||'',nick:$('#ob-nick').value.trim(),emoji:$('#ob-emoji').value,color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:$('#ob-team').value||null,role:isAdminUser()?'admin':'player',created:Date.now()});
      syncMe();save();render();toast('สร้างโปรไฟล์แล้ว ยินดีต้อนรับ '+name)}}],
    {wide:true,after:root=>root.querySelectorAll('[data-claim]').forEach(el=>{const f=()=>{const p=P(el.dataset.claim);if(!p||p.uid)return;p.uid=u.uid;if(isAdminUser())p.role='admin';syncMe();save();closeModal();render();toast('เชื่อมโปรไฟล์ '+p.name+' กับบัญชีของคุณแล้ว')};el.onclick=f;el.onkeydown=e=>{if(e.key==='Enter')f()}})})}
 function accountModal(){const u=cloud.user;const m=myPlayer();if(u&&u.anon){openModal('ผู้เล่นบนเครื่องนี้',`<div class="prof">${m?av(m,'lg'):'<span class="av lg">👤</span>'}<div><h2>${esc(m?m.name:'ยังไม่ได้ลงทะเบียน')}</h2><div class="row">${m&&m.teamId?teamChip(m.teamId):''}<span class="role">GUEST</span></div></div></div><p class="muted small" style="margin:0">เข้าแบบไม่ล็อกอิน ระบบจำผู้เล่นไว้ในเครื่องนี้ ถ้าจะใช้หลายเครื่อง ให้ผูกบัญชี Google (สถิติไม่หาย)</p>`,[...(m?[{label:'แก้ไข / เปลี่ยนทีม',fn:()=>{setTimeout(()=>editPlayer(m.id),10)}}]:[{label:'ลงทะเบียน',cls:'pri',fn:()=>{go('join')}}]),{label:'ผูกบัญชี Google',cls:'pri',fn:()=>{signIn();return false}},{label:'ออกจากระบบ',cls:'dng',fn:()=>{setTimeout(()=>confirmBox('ออกจากระบบ','ถ้าออก เครื่องนี้จะไม่ใช่ '+esc(m?m.name:'ผู้เล่นนี้')+' อีก (ถ้าไม่ได้ผูก Google จะกลับมาเป็นคนเดิมไม่ได้ ให้แอดมินยกเลิกการเชื่อมแล้วกด ฉันคือคนนี้ ใหม่)','ออกจากระบบ',signOut),10)}}]);return}
@@ -540,7 +571,7 @@ const canRef=()=>{if(cloud.state!=='local')return canAct('staff');const m=me();r
 const isAdmin=()=>{if(cloud.state!=='local')return isAdminUser();const m=me();return !!m&&m.role==='admin'};
 
 /* ====================== people rendering ====================== */
-function av(p,cls=''){if(!p)return `<span class="av ${cls}" style="background:var(--panel2)">?</span>`;return `<span class="av ${cls}" style="background:${esc(p.color)}33;border-color:${esc(p.color)}">${esc(p.emoji||'🎯')}</span>`}
+function av(p,cls=''){if(!p)return `<span class="av ${cls}" style="background:var(--panel2)">?</span>`;const ph=safePhoto(p.photo);if(ph)return `<span class="av ${cls}" style="border-color:${esc(p.color)}"><img src="${ph}" alt=""></span>`;return `<span class="av ${cls}" style="background:${esc(p.color)}33;border-color:${esc(p.color)}">${esc(p.emoji||'🎯')}</span>`}
 function teamChip(tid){const t=T(tid);return t?`<span class="team-chip">${safeImg(t.logo)?`<img class="tlogo" src="${safeImg(t.logo)}" alt="" style="width:16px;height:16px">`:`<i style="background:${esc(t.color)}"></i>`}${esc(t.name)}</span>`:`<span class="team-chip"><i style="background:var(--line)"></i>ไม่มีทีม</span>`}
 function plHTML(id,opt={}){const p=P(id)||opt.fake;if(!p)return '<span class="muted">—</span>';
   return `<span class="pl">${av(p)}<span class="t"><b>${esc(p.name)}${p.nick&&!opt.noNick?` <span class="muted small">“${esc(p.nick)}”</span>`:''}</b>${opt.noTeam?'':teamChip(p.teamId)}</span></span>`}
@@ -721,22 +752,23 @@ function editPlayer(id,asMe){
   if(cloud.state!=='local'){if(!cloud.user)return loginModal();if(!id&&!isAdminUser())return myPlayer()?editPlayer(myPlayer().id):onboardModal();if(id&&!canEditPlayer(P(id))){toast('แก้ไขได้เฉพาะโปรไฟล์ของตัวเอง');return}}
   const admin=cloud.state==='local'||isAdminUser();
   const p=id?P(id):{name:'',nick:'',emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],color:COLORS[Math.floor(Math.random()*COLORS.length)],teamId:'',role:'player'};
-  const curRole=roleOf(p);
+  const curRole=roleOf(p);const stp={logo:p.photo||''};const gph=cloud.user&&cloud.user.photo&&(!id||p.uid===cloud.user.uid)?safePhoto(cloud.user.photo):'';
   openModal(id?'แก้ไขผู้เล่น':'เพิ่มผู้เล่น',`<div class="form">
    <label>ชื่อผู้เล่น<input id="pf-name" value="${esc(p.name)}" maxlength="40" placeholder="เช่น สมชาย ใจดี"></label>
    <label>ฉายา (ไม่บังคับ)<input id="pf-nick" value="${esc(p.nick)}" maxlength="24" placeholder="เช่น The Hammer"></label>
    <label>สังกัดทีม (เปลี่ยนทีมได้ที่นี่)<select id="pf-team"><option value="">— ไม่มีทีม —</option>${S.teams.map(t=>`<option value="${t.id}" ${p.teamId===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label>
    ${admin?`<label>บทบาท<select id="pf-role">${['player','referee','admin'].map(r=>`<option value="${r}" ${curRole===r?'selected':''}>${ROLE_LABEL[r]}</option>`).join('')}</select>${cloud.state!=='local'?'<span class="small">กรรมการ/แอดมินมีผลเมื่อผู้เล่นเชื่อมบัญชี Google แล้ว</span>':''}</label>`:''}
+   <div class="full"><span class="small muted">รูปโปรไฟล์ (ไม่บังคับ · ถ้าไม่มีจะใช้ไอคอนแทน)</span>${logoField(p.photo)}${gph?`<button type="button" class="btn sm" id="pf-gphoto" style="margin-top:6px">ใช้รูปจากบัญชี Google</button>`:''}</div>
    <label class="full">ไอคอนประจำตัว<select id="pf-emoji">${EMOJIS.map(e=>`<option ${p.emoji===e?'selected':''}>${e}</option>`).join('')}</select></label>
    <label class="full">สีประจำตัว<select id="pf-color">${COLORS.map(c=>`<option value="${c}" ${p.color===c?'selected':''}>${c}</option>`).join('')}</select></label></div>
    ${admin&&id&&cloud.state!=='local'&&p.uid?`<div class="row"><button class="btn sm dng" type="button" id="pf-unlink">ยกเลิกการเชื่อมบัญชี Google</button></div>`:''}`,
   [{label:'ยกเลิก'},{label:'บันทึก',cls:'pri',fn:()=>{const name=$('#pf-name').value.trim();if(!name){toast('กรุณากรอกชื่อผู้เล่น');return false}
-    const data={name,nick:$('#pf-nick').value.trim(),teamId:$('#pf-team').value||null,emoji:$('#pf-emoji').value,color:$('#pf-color').value};
+    const data={name,nick:$('#pf-nick').value.trim(),teamId:$('#pf-team').value||null,emoji:$('#pf-emoji').value,color:$('#pf-color').value,photo:stp.logo||''};
     const role=admin&&$('#pf-role')?$('#pf-role').value:(p.role||'player');data.role=role;
     if(id)Object.assign(P(id),data);else{const np={id:uid(),created:Date.now(),...data};S.players.push(np);if(cloud.state==='local'&&(asMe||!S.me))S.me=np.id}
     if(cloud.state!=='local'&&admin&&id&&p.uid){const ref=cloud.db.doc('roles/'+p.uid);(role==='player'?ref.delete():ref.set({role})).catch(cloudErr)}
     save();render();toast('บันทึกผู้เล่นแล้ว')}}],
-  {after:()=>{const u=$('#pf-unlink');if(u)u.onclick=()=>{const pp=P(id);if(pp.uid&&cloud.db)cloud.db.doc('roles/'+pp.uid).delete().catch(()=>{});delete pp.uid;pp.role='player';save();closeModal();render();toast('ยกเลิกการเชื่อมบัญชีแล้ว')}}})}
+  {after:()=>{bindLogo(stp);const gb=$('#pf-gphoto');if(gb)gb.onclick=()=>{stp.logo=gph;$('#lg-prev').innerHTML=`<img src="${gph}" alt="">`};const u=$('#pf-unlink');if(u)u.onclick=()=>{const pp=P(id);if(pp.uid&&cloud.db)cloud.db.doc('roles/'+pp.uid).delete().catch(()=>{});delete pp.uid;pp.role='player';save();closeModal();render();toast('ยกเลิกการเชื่อมบัญชีแล้ว')}}})}
 function joinUrl(){return joinLink()}
 function inviteModal(){const url=joinUrl();
   openModal('เชิญผู้เล่นเข้าระบบ',`<p style="margin:0">ให้ผู้เล่นสแกน QR ด้วยกล้องมือถือ (ไม่ต้องใช้ LINE) หรือส่งลิงก์ให้ กด “เข้าสู่ระบบด้วย Google” ครั้งเดียว แล้วตั้งชื่อ + เลือกทีม ก็เข้าร่วมได้ทันที</p>
@@ -888,12 +920,14 @@ function curRoom(){return S.rooms.find(r=>r.id===S.ui.roomId&&!r.sim)}
 /* ---- sound, caller & effects ---- */
 let soundOn=true,callerOn=false;try{soundOn=localStorage.getItem('oche-sound')!=='0';callerOn=localStorage.getItem('oche-caller')==='1'}catch(e){}
 let AC=null;function ac(){if(!soundOn)return null;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
-function tone(freq,dur,type,vol,delay,slideTo){const a=ac();if(!a)return;const t=a.currentTime+(delay||0);const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(freq,t);if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t+dur);g.gain.setValueAtTime(vol||.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.02)}
+const quietHere=()=>!isDisplay()&&typeof displayWin!=='undefined'&&displayWin&&!displayWin.closed;
+function tone(freq,dur,type,vol,delay,slideTo){if(quietHere())return;const a=ac();if(!a)return;const t=a.currentTime+(delay||0);const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(freq,t);if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t+dur);g.gain.setValueAtTime(vol||.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.02)}
 const SFX={hit:()=>tone(520,.07,'triangle',.12),dbl:()=>{tone(600,.07,'triangle',.13);tone(800,.08,'triangle',.11,.05)},treble:()=>{tone(660,.08,'triangle',.14);tone(990,.1,'triangle',.12,.06)},bull:()=>{tone(700,.06,'triangle',.13);tone(1050,.08,'triangle',.12,.05);tone(1400,.1,'triangle',.1,.1)},
   miss:()=>tone(240,.45,'sawtooth',.07,0,110),bust:()=>{tone(300,.18,'square',.09);tone(190,.32,'square',.09,.16)},tick:()=>tone(900,.035,'square',.05),
   chime:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.3,'triangle',.12,i*.11)),checkout:()=>[659,784,988,1318].forEach((f,i)=>tone(f,.28,'triangle',.13,i*.09)),
+  whoosh:()=>{tone(1400,.32,'sawtooth',.025,0,220);tone(900,.28,'triangle',.03,.02,180)},thunk:()=>{tone(140,.12,'sine',.32);tone(70,.18,'sine',.22,.01);tone(2200,.03,'square',.05)},impact:()=>{tone(55,.7,'sine',.45);tone(110,.4,'sawtooth',.08);tone(1800,.08,'square',.05)},
   max:()=>{tone(70,.6,'sine',.35);[392,523,659,784,1046,1318].forEach((f,i)=>tone(f,.45,'sawtooth',.07,.1+i*.12))}};
-function say(text){if(!soundOn||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.92;u.pitch=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function say(text){if(!soundOn||!window.speechSynthesis||quietHere())return;try{const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.92;u.pitch=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function toggleSound(){soundOn=!soundOn;try{localStorage.setItem('oche-sound',soundOn?'1':'0')}catch(e){}toast(soundOn?'เปิดเสียงเอฟเฟกต์แล้ว':'ปิดเสียงแล้ว');render()}
 function toggleCaller(){callerOn=!callerOn;try{localStorage.setItem('oche-caller',callerOn?'1':'0')}catch(e){}toast(callerOn?'เปิดผู้ประกาศคะแนน (Caller) แล้ว':'ปิดผู้ประกาศคะแนนแล้ว');if(callerOn&&!soundOn)toggleSound();else render()}
 function dartSfx(d){if(d.s===0)SFX.miss();else if(d.s===25)SFX.bull();else if(d.m===3)SFX.treble();else if(d.m===2)SFX.dbl();else SFX.hit()}
@@ -925,7 +959,7 @@ function addDart(d,pos){const room=curRoom();if(!room)return;if(rouletteOn){toas
   if(autoSub){const e2=evalDarts(pend,st.rem[st.toThrow],room.out);if(pend.length===3||e2.bust||e2.fin){const n=pend.length;setTimeout(()=>{if(pend.length===n&&curRoom()===room)submitTurn()},700)}}}
 function submitTurn(quick){const room=curRoom();const st=replay(room);if(st.finished||st.needBull)return;
   if(!quick&&!pend.length){toast('ยังไม่ได้บันทึกลูกดอก');return}
-  const ev=makeTurn(room,st,pend,quick);if(!quick&&pendMarks.length)ev.pos=pendMarks.slice(0,ev.darts?ev.darts.length:3).map(m=>[Math.round(m.x*10)/10,Math.round(m.y*10)/10]);room.events.push(ev);pend=[];pendMarks=[];mult=1;
+  room.live=null;lastLiveKey='';const ev=makeTurn(room,st,pend,quick);if(!quick&&pendMarks.length)ev.pos=pendMarks.slice(0,ev.darts?ev.darts.length:3).map(m=>[Math.round(m.x*10)/10,Math.round(m.y*10)/10]);room.events.push(ev);pend=[];pendMarks=[];mult=1;
   if(!ev.bust&&ev.total===180)fx180(pname(room,ev.pid));
   else if(ev.bust){toast('BUST — คะแนนรอบนี้เป็น 0');if(callerOn)say('No score')}
   else if(ev.total===ev.before){SFX.checkout();if(callerOn)setTimeout(()=>say('Game shot!'),300)}
@@ -1070,7 +1104,7 @@ VIEWS.match=()=>{const room=curRoom();
     <div class="row"><button class="btn sm pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn sm ${displayWin&&!displayWin.closed?'on':''}" onclick="openDisplay()" title="เปิดจอแสดงผลสำหรับผู้ชม (จอที่สอง)">🖥️ จอผู้ชม</button><button class="btn sm" onclick="introModal(curRoom())">⚔️ Face-off</button>${room.sides.some(x=>x.playerIds.length>1)||room.type==='team'?`<button class="btn sm" onclick="orderModal(curRoom())">จัดลำดับการปา</button>`:''}<button class="btn sm" onclick="bullOffModal(curRoom())" ${st.finished?'disabled':''}>Sudden Death</button><button class="btn sm" onclick="refModal(curRoom())" title="${canRef()?'':'ต้องเป็นกรรมการหรือแอดมิน'}">🧑‍⚖️ กรรมการ</button><button class="btn sm" onclick="undo()">↶ Undo</button><button class="btn sm ${soundOn?'on':''}" onclick="toggleSound()" title="เสียงเอฟเฟกต์">${soundOn?'🔊':'🔇'}</button><button class="btn sm ${callerOn?'on':''}" onclick="toggleCaller()" title="ผู้ประกาศคะแนนแบบ PDC">🗣️ Caller</button><button class="btn sm" onclick="S.ui.roomId=null;save();render()">เปลี่ยนห้อง</button></div></div>
   ${NS(room)===2?`<div class="arena">${sidePanel(0)}${center}${sidePanel(1)}</div>`:`<div class="multi-sides n${NS(room)}">${room.sides.map((x,i)=>sidePanel(i)).join('')}</div><div class="arena-one">${center}</div>`}
   <div class="panel"><div class="panel-h"><h2>บันทึกเทิร์น (Match Log)</h2><span class="muted small">${roomTurns.length} เทิร์น · ผู้ใช้งาน: ${esc(me()?.name||'ไม่ระบุ')}</span></div><div class="log">${logH||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
-AFTER.match=()=>{postLive();kbShow();const room=curRoom();if(!room)return;
+AFTER.match=()=>{postLive();pushRoomLive();kbShow();const room=curRoom();if(!room)return;
   const bw=$('#bw');if(bw){bw.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;const svg=bw.querySelector('svg');addDart(D(+t.dataset.s,+t.dataset.m),svg?svgPoint(svg,e):null)});
     bw.addEventListener('mouseover',e=>{const t=e.target.closest('[data-s]');const a=$('#aim');if(!t||!a)return;const d=D(+t.dataset.s,+t.dataset.m);a.innerHTML=`เล็งอยู่ที่ <b>${dLabel(d)}</b> = ${d.v} แต้ม`});
     bw.addEventListener('mouseleave',()=>{const a=$('#aim');if(a)a.textContent='ชี้บนเป้าเพื่อดูช่อง แล้วคลิกเพื่อบันทึกลูกดอก'})}
@@ -1326,7 +1360,7 @@ async function openDisplay(){dismissDisplayOffer();
   toast('เปิดจอผู้ชมแล้ว ลากหน้าต่างไปจอที่สอง (ถ้ายังไม่ไปเอง) แล้วแตะหนึ่งครั้งเพื่อเต็มจอ');setTimeout(postLive,800)}
 function displayOfferHTML(){if(isDisplay())return '';const two=hasSecondScreen();if(!two||dispAsked)return '';
   return `<div class="banner dsp-offer"><span>🖥️ <b>ตรวจพบจอที่สอง</b> เปิด “จอผู้ชม” แสดงสกอร์ใหญ่ให้นักกีฬาและคนดู ส่วนจอนี้ใช้กดคะแนนต่อได้ตามปกติ</span><span class="row"><button class="btn pri" onclick="openDisplay()">เปิดจอผู้ชม</button><button class="btn" onclick="dismissDisplayOffer()">ไม่ตอนนี้</button></span></div>`}
-function dispGoFull(){try{document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}dispReady=true;render()}
+function dispGoFull(){ac();try{document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}dispReady=true;render()}
 function dispRoom(){const id=live.roomId||S.ui.roomId;return S.rooms.find(r=>r.id===id&&!r.sim)||null}
 VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCHE');
   const gate=!dispReady?`<button class="dsp-tap" onclick="dispGoFull()">🖥️ แตะที่ใดก็ได้เพื่อเต็มจอ<small>จอนี้แสดงผลอย่างเดียว ควบคุมจากหน้าให้คะแนนบนอีกจอ</small></button>`:'';
@@ -1338,13 +1372,13 @@ VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCH
       <div class="dsp-card"><h2>กำลังแข่งขัน</h2>${lives.map(r=>{const s=replay(r);return `<div class="dsp-li"><b>${esc(sideName(r,0))}</b><span class="mono">${s.rem.join(' · ')}</span><b>${NS(r)===2?esc(sideName(r,1)):'+'+(NS(r)-1)+' คน'}</b></div>`}).join('')||'<p class="muted">ยังไม่มีแมตช์</p>'}</div>
       <div class="dsp-card"><h2>Top 3-Dart Average</h2>${top.map((s,i)=>`<div class="dsp-li"><span class="mono">${i+1}</span><b>${esc(P(s.id).name)}</b><span class="mono">${fmt2(s.avg)}</span></div>`).join('')||'<p class="muted">ยังไม่มีสถิติ</p>'}</div></div></div>`}
   const st=replay(room);const side=st.toThrow;const before=st.rem[side];
-  const lp=live.roomId===room.id&&!st.finished?live.pend:[];const lm=live.roomId===room.id?live.marks:[];
+  const L2=dispLive(room);const lp=!st.finished?L2.pend:[];const lm=L2.marks;
   const ev=evalDarts(lp,before,room.out);const sum=lp.reduce((a,d)=>a+d.v,0);const after=ev.bust?before:before-sum;
   const turns=room.events.filter(e=>e.t==='turn');const lastT=turns[turns.length-1];
   const marks=lp.length?lm:(lastT&&lastT.darts?lastT.darts.map((d,k)=>{const p=lastT.pos&&lastT.pos[k]?lastT.pos[k]:markPos(d);return{x:p[0],y:p[1],n:k+1,c:'#8fa096'}}):[]);
   const avgOf=i=>{const a=turns.filter(e=>e.side===i);const d=a.reduce((x,e)=>x+(e.darts?e.darts.length:e.n||3),0);return d?a.reduce((x,e)=>x+e.total,0)/d*3:0};
   const sidePanel=i=>{const on=!st.finished&&side===i;const rem=on&&lp.length&&!ev.bust?after:st.rem[i];const co=!st.finished?checkout(rem,room.out,on?3-lp.length:3):null;const won=st.finished&&st.winner===i;
-    return `<div class="dsp-side ${on?'on':''} ${won?'won':''}" data-si="${i}"><div class="dsp-tag" style="${NS(room)>2?'color:'+SIDE_COL[i%8]:''}">${sideTag(room,i)}${on?' · กำลังปา':''}${won?' · ผู้ชนะ':''}</div><div class="dsp-name">${room.sides[i].teamId&&T(room.sides[i].teamId)?teamLogo(T(room.sides[i].teamId),56)+' ':''}${esc(sideName(room,i))}</div>
+    return `<div class="dsp-side ${on?'on':''} ${won?'won':''}" data-si="${i}"><div class="dsp-tag" style="${NS(room)>2?'color:'+SIDE_COL[i%8]:''}">${sideTag(room,i)}${on?' · กำลังปา':''}${won?' · ผู้ชนะ':''}</div><div class="dsp-name">${room.sides[i].teamId&&T(room.sides[i].teamId)?teamLogo(T(room.sides[i].teamId),56)+' ':(P(room.sides[i].playerIds[0])?av(P(room.sides[i].playerIds[0]),'dsp-av')+' ':'')}${esc(sideName(room,i))}</div>
       <div class="dsp-roster">${st.order[i].map(id=>`<span class="${on&&st.thrower(i)===id?'now':''}">${esc(pname(room,id))}</span>`).join('')}</div>
       <div class="dsp-rem">${rem}</div><div class="dsp-legs">${Array.from({length:need(room)},(_,k)=>`<i class="${k<st.legsWon[i]?'f':''}"></i>`).join('')}</div>
       <div class="dsp-stat"><span>AVG <b>${fmt2(avgOf(i))}</b></span><span>180s <b>${turns.filter(e=>e.side===i&&!e.bust&&e.total===180).length}</b></span></div>
@@ -1354,15 +1388,73 @@ VIEWS.display=()=>{const room=dispRoom();const name=esc(S.settings.appName||'OCH
   return `${gate}<div class="dsp"><div class="dsp-top"><div><span class="dsp-app">${name}</span><h1>${esc(room.name)}</h1></div>
      <div class="dsp-meta"><span>${room.score} · ${OUT_LABEL[room.out]}</span><span class="dsp-leg">LEG ${Math.min(st.leg,room.bestOf)} / ${room.bestOf}</span>${st.finStage&&room.roundLimit?`<span>รอบปิดเกม ${st.finRounds}/${room.roundLimit}</span>`:''}<span class="dsp-score">${legsStr(st,' : ')}</span></div></div>
    ${NS(room)>2?`<div class="dsp-multi n${NS(room)}">${room.sides.map((x,i)=>sidePanel(i)).join('')}</div>`:''}<div class="dsp-main ${NS(room)>2?'one':''}">${NS(room)===2?sidePanel(0):''}<div class="dsp-center">${st.finished?'':`<div class="dsp-thrower">🎯 ${esc(pname(room,st.thrower(side)))}</div>`}
-     <div class="dsp-board">${boardSVG(marks,false)}</div>
+     <div class="dsp-board">${dspBoardHTML(room,lp,lm,lastT)}</div>
      <div class="dsp-slots">${[0,1,2].map(k=>`<div class="${lp[k]?'f':''}"><small>ลูก ${k+1}</small><b>${lp[k]?dLabel(lp[k]):'–'}</b></div>`).join('')}<div class="tot"><small>รอบนี้</small><b>${ev.bust?0:sum}</b></div></div>${status}</div>${NS(room)===2?sidePanel(1):''}</div>
    <div class="dsp-ticker"><span class="muted">ล่าสุด</span>${ticker||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
 AFTER.display=()=>{renderQRs();const room=dispRoom();if(!room){dispSeen=null;return}const st=replay(room);const turns=room.events.filter(e=>e.t==='turn');
-  const now={roomId:room.id,turns:turns.length,legs:st.legEnds.length,finished:st.finished};
+  const L2=dispLive(room);if(!st.finished&&L2.pend.length>dspShown.n)dspAnimate(room,L2.pend,L2.marks);
+  const starters=room.events.filter(e=>e.t==='starter');
+  const now={roomId:room.id,turns:turns.length,legs:st.legEnds.length,finished:st.finished,starters:starters.length};
   if(dispSeen&&dispSeen.roomId===room.id){
-    if(now.turns>dispSeen.turns){const e=turns[turns.length-1];if(!e.bust&&e.total===180)fx180(pname(room,e.pid));else if(e.bust)SFX.bust();else if(e.total===e.before)SFX.checkout();else if(callerOn)say(e.total===0?'No score':String(e.total))}
-    if(now.legs>dispSeen.legs){const le=st.legEnds[st.legEnds.length-1];dispSplash(st.finished?`🏆 ${sideName(room,st.winner)} ชนะแมตช์ ${legsStr(st,'-')}`:`จบ LEG ${le.leg} · ${sideName(room,le.winner)} ชนะ`)}}
+    if(now.starters>dispSeen.starters&&!st.anyTurn){playIntro(room,starters[starters.length-1].side,1);introSeen[room.id]=1}
+    else if(now.starters>dispSeen.starters&&st.legFresh)playIntro(room,starters[starters.length-1].side,st.leg);
+    else if(now.turns>dispSeen.turns&&turns.length===1&&!introSeen[room.id]){introSeen[room.id]=1;playIntro(room,null,1)}
+    if(now.turns>dispSeen.turns){const e=turns[turns.length-1];if(!e.bust&&e.total===180)fx180(pname(room,e.pid));else if(e.bust){SFX.bust();say('No score')}else if(e.total!==e.before&&callerOn)say(e.total===0?'No score':String(e.total))}
+    if(now.legs>dispSeen.legs){const le=st.legEnds[st.legEnds.length-1];if(st.finished)setTimeout(()=>playWinner(room,st),400);else playLegWin(room,le)}}
+  else if(dispSeen===null&&!st.anyTurn)introSeen[room.id]=0;
   dispSeen=now};
+/* ====================== audience-screen show: flying darts, battle intro, winner ====================== */
+const safePhoto=u=>safeImg(u)||(typeof u==='string'&&/^https:\/\/lh\d\.googleusercontent\.com\/[A-Za-z0-9_\-\/=.%]+$/.test(u)?u:'');
+let lastLiveKey='';
+function pushRoomLive(){const room=curRoom();if(!room||cloud.state==='local'||!cloud.user)return;
+  const k=room.id+'|'+pend.map(d=>d.s+'x'+d.m).join(',');if(k===lastLiveKey)return;lastLiveKey=k;
+  room.live=pend.length?{p:pend.map(d=>[d.s,d.m]),m:pendMarks.map(m=>[Math.round(m.x*10)/10,Math.round(m.y*10)/10]),ts:Date.now()}:null;save()}
+function dispLive(room){const bc=live.roomId===room.id?live:null;const rl=room.live;
+  if(rl&&(!bc||rl.ts>(bc.at||0)))return{pend:rl.p.map(a=>D(a[0],a[1])),marks:rl.m.map(a=>({x:a[0],y:a[1]})),at:rl.ts};
+  return bc?{pend:bc.pend,marks:bc.marks,at:bc.at}:{pend:[],marks:[],at:0}}
+/* dart sprite (board units = mm, tip at 0,0) */
+function dartSprite(x,y,n,col,extra){return `<g class="dsp-dart" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})${extra||''}"><g transform="rotate(-28) scale(1.5)"><line x1="0" y1="0" x2="0" y2="9" stroke="#cfd3d6" stroke-width="1.6"/><rect x="-2.4" y="8" width="4.8" height="20" rx="2" fill="#3a3f44" stroke="#111" stroke-width=".6"/><rect x="-2.4" y="12" width="4.8" height="2" fill="#9aa0a6"/><rect x="-2.4" y="17" width="4.8" height="2" fill="#9aa0a6"/><rect x="-1" y="28" width="2" height="14" fill="#222"/><path d="M0 36 L-9 52 L-1 48 Z M0 36 L9 52 L1 48 Z" fill="${col}" stroke="#111" stroke-width=".6"/><circle cx="0" cy="0" r="2" fill="${col}" stroke="#000" stroke-width=".8"/></g>${n!=null?`<text x="7" y="-5" font-size="8" font-weight="700" fill="#fff" stroke="#000" stroke-width="2" paint-order="stroke" font-family="JetBrains Mono,monospace">${n}</text>`:''}</g>`}
+const DART_COL=['#f2b134','#4c9be0','#e05fa0'];
+let dspShown={key:'',n:0},dspBusy=false;
+function dspBoardHTML(room,lp,lm,lastT){const key=room.id+'|'+room.events.length;if(dspShown.key!==key)dspShown={key,n:0};
+  dspShown.n=Math.min(dspShown.n,lp.length);let darts='';
+  if(lp.length)lm.slice(0,dspShown.n).forEach((m,k)=>darts+=dartSprite(m.x,m.y,k+1,DART_COL[k%3]));
+  else if(lastT&&lastT.darts)lastT.darts.slice(0,lastT.k??3).forEach((d,k)=>{const p=lastT.pos&&lastT.pos[k]?lastT.pos[k]:markPos(d);darts+=`<g opacity=".45">${dartSprite(p[0],p[1],null,'#8fa096')}</g>`});
+  return boardSVG([],false).replace(/<\/svg>$/,`<g id="dsp-darts">${darts}</g></svg>`)}
+const ease=t=>1-Math.pow(1-t,3);
+function flyDart(svg,m,k){return new Promise(res=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.innerHTML=dartSprite(0,0,k+1,DART_COL[k%3]);const layer=svg.querySelector('#dsp-darts')||svg;layer.appendChild(g);
+  const sx=m.x>0?-260:260,sy=260,dur=matchMedia('(prefers-reduced-motion: reduce)').matches?1:430,t0=performance.now();SFX.whoosh();
+  const step=now=>{const t=Math.min(1,(now-t0)/dur),e=ease(t);const x=sx+(m.x-sx)*e,y=sy+(m.y-sy)*e-90*Math.sin(Math.PI*t),sc=2.6-1.6*e;
+    g.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(3)})`);
+    if(t<1)requestAnimationFrame(step);else{g.setAttribute('transform',`translate(${m.x.toFixed(1)} ${m.y.toFixed(1)})`);SFX.thunk();
+      const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');ring.setAttribute('cx',m.x);ring.setAttribute('cy',m.y);ring.setAttribute('r','3');ring.setAttribute('fill','none');ring.setAttribute('stroke','#fff');ring.setAttribute('stroke-width','2');layer.appendChild(ring);
+      let r=3;const grow=()=>{r+=2.2;ring.setAttribute('r',r);ring.setAttribute('opacity',Math.max(0,1-r/30));if(r<30)requestAnimationFrame(grow);else ring.remove()};grow();res()}};requestAnimationFrame(step)})}
+async function dspAnimate(room,lp,lm){if(dspBusy)return;const svg=document.querySelector('.dsp-board svg');if(!svg)return;dspBusy=true;
+  try{while(dspShown.n<lp.length&&lm[dspShown.n]){const k=dspShown.n;await flyDart(document.querySelector('.dsp-board svg')||svg,lm[k],k);dspShown.n=k+1;dartSfx(lp[k])}}finally{dspBusy=false}}
+/* ---- battle intro + toss roulette (plays when a starter is chosen or the first dart of a match lands) ---- */
+let introSeen={};
+function sideFace(room,i){const s=room.sides[i];const t=s.teamId&&T(s.teamId);const p=P(s.playerIds[0]);
+  return `<div class="bi-card" data-bi="${i}" style="--d:${i*0.12}s">${t?teamLogo(t,110):`<span class="av bi-av" style="border-color:${esc((p&&p.color)||'#888')}">${p&&safePhoto(p.photo)?`<img src="${safePhoto(p.photo)}" alt="">`:esc((p&&p.emoji)||'🎯')}</span>`}<b>${esc(sideName(room,i))}</b><small>${s.playerIds.map(id=>esc(pname(room,id))).join(' · ')}</small></div>`}
+function playIntro(room,starter,legNo){const N=NS(room);const ov=document.createElement('div');ov.className='bi '+(N===2?'two':'multi');
+  ov.innerHTML=`<div class="bi-title">${legNo>1?'LEG '+legNo:'BATTLE'}<small>${esc(room.name)} · ${room.score} · BEST OF ${room.bestOf}</small></div><div class="bi-row">${N===2?sideFace(room,0)+'<div class="bi-vs">VS</div>'+sideFace(room,1):room.sides.map((x,i)=>sideFace(room,i)).join('')}</div><div class="bi-msg"></div>`;
+  document.body.appendChild(ov);ov.onclick=()=>ov.remove();SFX.whoosh();setTimeout(SFX.impact,550);if(legNo<=1)setTimeout(()=>say(N===2?sideNameAscii(room,0)+' versus '+sideNameAscii(room,1)+'. Game on!':'Game on!'),900);
+  if(starter==null){setTimeout(()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),600)},3200);return}
+  const cards=()=>[...ov.querySelectorAll('[data-bi]')];let step=0;const total=14+((N-(14%N))%N)+starter;let cur=-1;
+  setTimeout(function spin(){cur=(cur+1)%N;cards().forEach(c=>c.classList.toggle('hl',+c.dataset.bi===cur));SFX.tick();step++;
+    if(step<=total-0)setTimeout(spin,60+step*step*1.6);else{cards().forEach(c=>c.classList.toggle('win',+c.dataset.bi===starter));cards().forEach(c=>c.classList.remove('hl'));
+      ov.querySelector('.bi-msg').innerHTML=`🎯 <b>${esc(sideName(room,starter))}</b> ปาก่อน!`;SFX.chime();setTimeout(()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),600)},2600)}},2000)}
+const sideNameAscii=(room,i)=>{const n=sideName(room,i);return /^[\x20-\x7e]+$/.test(n)?n:(NS(room)===2?(i?'Away':'Home'):'Player '+(i+1))};
+/* ---- leg / match winner ---- */
+function playWinner(room,st){const w=st.winner;const ov=document.createElement('div');ov.className='bw';
+  ov.innerHTML=`<canvas></canvas><div class="bw-in"><div class="bw-cup">🏆</div><div class="bw-face">${sideFace(room,w)}</div><div class="bw-title">MATCH WINNER</div><div class="bw-score">${legsStr(st,' - ')}</div><small>แตะเพื่อปิด</small></div>`;
+  document.body.appendChild(ov);SFX.max();setTimeout(()=>say('Game shot, and the match!'),400);
+  const cv=ov.querySelector('canvas'),c=cv.getContext('2d');const W=cv.width=innerWidth,H=cv.height=innerHeight;const cols=['#f2b134','#d64a3d','#2f9d62','#4c9be0','#ffffff','#b072e0'];
+  let bits=Array.from({length:matchMedia('(prefers-reduced-motion: reduce)').matches?0:180},()=>({x:Math.random()*W,y:-Math.random()*H,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,col:cols[Math.floor(Math.random()*cols.length)],s:6+Math.random()*6}));
+  let alive=true,f=0;ov.onclick=()=>{alive=false;ov.remove()};
+  const loop=()=>{if(!alive)return;f++;c.clearRect(0,0,W,H);bits.forEach(b=>{b.x+=b.vx;b.y+=b.vy;b.r+=b.vr;if(b.y>H)b.y=-10;c.save();c.translate(b.x,b.y);c.rotate(b.r);c.fillStyle=b.col;c.fillRect(-b.s/2,-b.s/4,b.s,b.s/2);c.restore()});if(f<600)requestAnimationFrame(loop);else{alive=false;ov.remove()}};loop()}
+function playLegWin(room,le){SFX.checkout();setTimeout(()=>say('Game shot!'),250);const d=document.createElement('div');d.className='dsp-splash';
+  const t=room.sides[le.winner].teamId&&T(room.sides[le.winner].teamId);d.innerHTML=`<small>จบ LEG ${le.leg}</small>${t?teamLogo(t,64):''}<b>${esc(sideName(room,le.winner))}</b><span>${le.how==='bull'?'ชนะ Sudden Death':'GAME SHOT!'}</span>`;document.body.appendChild(d);setTimeout(()=>d.remove(),3800)}
+
 function dispSplash(text){const d=document.createElement('div');d.className='dsp-splash';d.textContent=text;document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}
 if(liveCh&&isDisplay())setTimeout(()=>{try{liveCh.postMessage({t:'hello'})}catch(e){}},300);
 
