@@ -399,6 +399,53 @@ footer{border-top:1px solid var(--line);background:var(--panel)}
 .move{display:flex;flex-direction:column;gap:6px}
 .move .it{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- readability pass ---- */
+body{font-size:16px;line-height:1.6}
+h1{font-size:clamp(1.6rem,3.2vw,2.1rem)}h2{font-size:clamp(1.15rem,2vw,1.4rem)}
+.head p{font-size:.98rem}
+.tabs{gap:4px;padding-block:4px}
+.tabs a{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px;border-bottom:0;font-weight:600;font-size:.95rem}
+.tabs a:hover{background:var(--panel2)}
+.tabs a.on{background:var(--amber);color:var(--amber-ink)}
+.tabs .ti{font-size:1.05em;line-height:1}
+.btn{min-height:42px;padding:8px 16px;font-size:.95rem;border-radius:10px}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:.86rem;border-radius:8px}
+.panel{padding:20px;gap:14px;border-radius:14px}
+.card{padding:16px;border-radius:14px}
+.tile{padding:14px 16px;border-radius:14px}.tile .k{font-size:.78rem}.tile .v{font-size:2rem}
+th{font-size:.76rem;padding:10px}td{padding:11px 10px}
+tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--panel2) 55%,transparent)}
+input,select,textarea{min-height:42px;font-size:.98rem;border-radius:10px}
+label{font-size:.9rem}
+.pill{font-size:.76rem;padding:2px 10px}
+.side .tag{font-size:.78rem}.side.active{border-width:3px}
+.side.active .tag::before{content:"● ";color:var(--amber)}
+.turn-now{display:flex;align-items:center;gap:10px}.turn-now .av{width:44px;height:44px;font-size:22px}.turn-now small{color:var(--muted);font-size:.78rem;display:block;line-height:1}.turn-now h2{font-size:1.5rem;line-height:1.2}
+.tool-row{gap:8px}
+.tools{position:relative}.tools summary{list-style:none;cursor:pointer}.tools summary::-webkit-details-marker{display:none}
+.tools[open] summary{border-color:var(--amber);color:var(--amber)}
+.tools-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:250px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.35);padding:6px;display:flex;flex-direction:column}
+.tools-menu button{background:none;border:0;text-align:left;padding:11px 12px;border-radius:8px;color:var(--chalk);font:inherit;cursor:pointer}
+.tools-menu button:hover{background:var(--panel2)}.tools-menu button[disabled]{opacity:.4;cursor:not-allowed}
+.slot b{font-size:1.45rem}
+.remain{font-size:clamp(3.2rem,7.5vw,5rem)}
+.empty{font-size:1rem}
+@media (max-width:600px){.tabs a{padding:8px 11px;font-size:.88rem}.tools-menu{right:auto;left:0}.btn{min-height:44px}}
+/* leg win */
+.lw{position:fixed;inset:0;z-index:73;background:rgba(0,0,0,.78);display:grid;place-items:center;cursor:pointer;color:#fff;text-align:center;animation:bifade .25s}
+.lw.out{animation:biout .35s forwards}
+.lw canvas{position:absolute;inset:0;width:100%;height:100%}
+.lw-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:1.4vh;animation:lwpop .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes lwpop{from{transform:scale(.4);opacity:0}}
+.lw-leg{font-family:var(--f-display);letter-spacing:.25em;font-size:clamp(.9rem,1.8vw,1.4rem);color:#cfd3d6;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:.2em 1em}
+.lw .bi-card{border-color:#2f9d62;box-shadow:0 0 50px rgba(47,157,98,.6);min-width:min(60vw,320px)}
+.lw-shot{font-family:var(--f-display);font-size:clamp(2.6rem,8vw,6.5rem);line-height:1;color:#f2b134;text-shadow:0 0 30px rgba(242,177,52,.6);letter-spacing:.04em;animation:lwshot .6s .25s cubic-bezier(.2,2,.4,1) both}
+@keyframes lwshot{from{transform:scale(2.6) rotate(-6deg);opacity:0}}
+.lw-co{font-size:clamp(1rem,2.2vw,1.6rem);color:#e8ecf0}.lw-co b{color:#f2b134;font-family:var(--f-mono)}
+.lw-legs{display:flex;align-items:center;gap:14px;font-family:var(--f-mono)}.lw-legs span{display:flex;flex-direction:column;align-items:center}.lw-legs small{font-size:.7rem;color:#aab}.lw-legs b{font-size:clamp(2rem,4.5vw,3.4rem)}
+.lw-legs span.w b{color:#f2b134;animation:lwnum 1s .5s ease-in-out 2}.lw-legs i{font-style:normal;color:#777;font-size:2rem}
+@keyframes lwnum{50%{transform:scale(1.35)}}
+@media (prefers-reduced-motion:reduce){.lw,.lw *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -713,6 +760,7 @@ function confirmBox(title,msg,okLabel,fn,danger=true){openModal(title,`<p style=
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mx'))closeModal()});
 
 /* ====================== router ====================== */
+const NAV_IC={dashboard:'🏠',rooms:'🚪',match:'🎯',simulator:'🤖',ranking:'🏆',players:'👤',teams:'👥',tournament:'🗂️','hall-of-fame':'🔥',join:'📝',config:'⚙️'};
 const ROUTES=[['dashboard','ภาพรวม'],['rooms','ห้องแข่งขัน'],['match','ให้คะแนนสด'],['simulator','AI จำลอง'],['ranking','อันดับ'],['players','ผู้เล่น'],['teams','ทีม'],['tournament','ผังการแข่งขัน'],['hall-of-fame','Hall of Fame 180'],['join','ลงทะเบียน'],['config','ตั้งค่า']];
 function route(){const h=(location.hash||'').slice(1)||'dashboard';return h.startsWith('join')?'join':h}
 function go(r){if(location.hash.slice(1)===r)render();else location.hash=r}
@@ -721,7 +769,7 @@ function render(){
   const r=route();document.body.classList.toggle('display-mode',r==='display');
   if(r!=='simulator')simStop();
   if(r!=='match'){camStop();if(fsMode){fsMode=false;document.body.style.overflow=''}}
-  $('#tabs').innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${(r===k||(r==='profile'&&k==='ranking'))?'on':''}">${l}</a>`).join('');
+  $('#tabs').innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${(r===k||(r==='profile'&&k==='ranking'))?'on':''}"><span class="ti" aria-hidden="true">${NAV_IC[k]||''}</span>${l}</a>`).join('');
   $('#app-name').textContent=S.settings.appName||'JLC Dart League';document.title=S.settings.appName||'JLC Dart League';$('#foot-name').textContent=S.settings.appName||'OCHE';
   syncMe();const m=me();
   if(cloud.state!=='local'&&!cloud.user)$('#me-chip').innerHTML=`<span class="av" style="background:#fff;border-color:#dadce0">${GLOGO}</span><span class="nm">เข้าสู่ระบบ</span>`;
@@ -927,6 +975,7 @@ function tone(freq,dur,type,vol,delay,slideTo){if(quietHere())return;const a=ac(
 const SFX={hit:()=>tone(520,.07,'triangle',.12),dbl:()=>{tone(600,.07,'triangle',.13);tone(800,.08,'triangle',.11,.05)},treble:()=>{tone(660,.08,'triangle',.14);tone(990,.1,'triangle',.12,.06)},bull:()=>{tone(700,.06,'triangle',.13);tone(1050,.08,'triangle',.12,.05);tone(1400,.1,'triangle',.1,.1)},
   miss:()=>tone(240,.45,'sawtooth',.07,0,110),bust:()=>{tone(300,.18,'square',.09);tone(190,.32,'square',.09,.16)},tick:()=>tone(900,.035,'square',.05),
   chime:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.3,'triangle',.12,i*.11)),checkout:()=>[659,784,988,1318].forEach((f,i)=>tone(f,.28,'triangle',.13,i*.09)),
+  legwin:()=>{[392,523,659,784].forEach((f,i)=>tone(f,.22,'triangle',.13,i*.08));tone(1046,.6,'triangle',.14,.36);tone(1318,.6,'sine',.08,.36);tone(80,.4,'sine',.3,.36)},
   whoosh:()=>{tone(1400,.32,'sawtooth',.025,0,220);tone(900,.28,'triangle',.03,.02,180)},thunk:()=>{tone(140,.12,'sine',.32);tone(70,.18,'sine',.22,.01);tone(2200,.03,'square',.05)},impact:()=>{tone(55,.7,'sine',.45);tone(110,.4,'sawtooth',.08);tone(1800,.08,'square',.05)},
   max:()=>{tone(70,.6,'sine',.35);[392,523,659,784,1046,1318].forEach((f,i)=>tone(f,.45,'sawtooth',.07,.1+i*.12))}};
 function say(text){if(!soundOn||!window.speechSynthesis||quietHere())return;try{const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.92;u.pitch=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
@@ -968,7 +1017,7 @@ function submitTurn(quick){const room=curRoom();const st=replay(room);if(st.fini
   else if(callerOn)say(ev.total===0?'No score':String(ev.total));
   const legsBefore=st.legEnds.length;const st2=roomAfterChange(room);
   if(!st2.finished&&st2.legEnds.length>legsBefore){const le=st2.legEnds[st2.legEnds.length-1];
-    if(room.sides.some(x=>x.playerIds.length>1))nextLegPrompt(room,le,st2);else toast(`จบ Leg ${le.leg} — ${sideName(room,le.winner)} ชนะ (${legsStr(st2,'-')})`)}
+    legWinFx(room,le,st2,()=>{if(room.sides.some(x=>x.playerIds.length>1))nextLegPrompt(room,le,replay(room))});if(0)toast(`จบ Leg ${le.leg} — ${sideName(room,le.winner)} ชนะ (${legsStr(st2,'-')})`)}
   if(!st2.finished&&st2.needBull)setTimeout(()=>bullOffModal(room),300);
   render()}
 function undo(){const room=curRoom();if(pend.length){pend.pop();pendMarks.pop();render();return}
@@ -1017,7 +1066,7 @@ function bullOffModal(room){const st=replay(room);if(st.finished)return;const N=
     $$('[data-sdw]').forEach(b=>b.onclick=()=>{closeModal();bullWin(room,+b.dataset.sdw)})};
   openModal('SUDDEN DEATH · ดวลลูกเดียว',`<p class="muted small" style="margin:0">${st.needBull?`ทุกฝ่ายเหลือ ≤${SDT(room)} และปาครบ ${room.roundLimit} รอบแล้วยังปิด Leg ไม่ได้ `:''}ทุกฝ่ายปาคนละ 1 ลูก ใครปักใกล้จุดกึ่งกลาง Bullseye ที่สุดชนะ Leg นี้ ระบบวัดระยะเป็นมิลลิเมตรตามขนาดกระดานจริง</p><div id="sd-body" style="display:flex;flex-direction:column;gap:10px"></div>`,[{label:'ยกเลิก'}],{wide:true,after:draw});if(callerOn)say('Sudden death. Closest to the bull wins.')}
 function bullWin(room,side){const st=replay(room);const n=st.legEnds.length;room.events.push({t:'bull',side,dist:sdState&&sdState.thr.every(Boolean)?sdState.thr.map(x=>+x.d.toFixed(1)):null,ts:Date.now()});SFX.checkout();pend=[];pendMarks=[];const st2=roomAfterChange(room);
-  if(!st2.finished&&room.sides.some(x=>x.playerIds.length>1)&&st2.legEnds.length>n)setTimeout(()=>nextLegPrompt(room,st2.legEnds[st2.legEnds.length-1],st2),20);render()}
+  if(!st2.finished&&st2.legEnds.length>n){const le=st2.legEnds[st2.legEnds.length-1];setTimeout(()=>legWinFx(room,le,st2,()=>{if(room.sides.some(x=>x.playerIds.length>1))nextLegPrompt(room,le,replay(room))}),20)}render()}
 function refModal(room){if(!canRef()){toast('เฉพาะกรรมการหรือแอดมินเท่านั้น');return}const st=replay(room);
   openModal('กรรมการแก้ไขคะแนน',`<div class="form">${room.sides.map((x,i)=>`<label>คะแนนคงเหลือ ${sideTag(room,i)} · ${esc(sideName(room,i))} (ตอนนี้ ${st.rem[i]})<input type="number" class="rf-rem" min="2" max="${room.score}" placeholder="เว้นว่าง = ไม่เปลี่ยน"></label>`).join('')}<label class="full">เหตุผล (บังคับ)<textarea id="rf-why" placeholder="เช่น ลูกที่ 2 ปักที่ T19 ไม่ใช่ S19 ตามภาพ VAR"></textarea></label></div><p class="muted small" style="margin:0">ทุกการแก้ไขถูกบันทึกใน Audit Log พร้อมชื่อ ${esc(me()?me().name:'')}</p>`,
    [{label:'ยกเลิก'},{label:'ยืนยันการแก้ไข',cls:'pri',fn:()=>{const vals=$$('.rf-rem').map(x=>x.value),why=$('#rf-why').value.trim();
@@ -1031,7 +1080,7 @@ function introModal(room){room.introDone=true;save();
    <div class="faceoff ${NS(room)>2?'multi':''}">${room.sides.map((x,i)=>i).map(i=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">${room.sides[i].teamId?teamLogo(T(room.sides[i].teamId),64):av(P(room.sides[i].playerIds[0]),'lg')}<h2>${esc(sideName(room,i))}</h2><span class="tag small muted">${NS(room)===2?(i?'AWAY SIDE':'HOME SIDE'):'ผู้เล่นที่ '+(i+1)}</span><span class="small muted">${room.sides[i].playerIds.map(id=>esc(pname(room,id))).join(' · ')}</span></div>`).join('<div class="vsb">VS</div>')}</div>
    <p class="muted small" style="margin:0;text-align:center">เลือกวิธีกำหนดผู้เริ่มก่อน</p>`,
    [...room.sides.map((x,i)=>({label:esc(sideName(room,i))+' เริ่ม',fn:()=>setStarter(room,i)})),{label:'🎰 สุ่มผู้เริ่ม',cls:'pri',fn:()=>{setTimeout(()=>tossModal(room),10)}}],{wide:true})}
-function showWinner(room,st){const w=st.winner;
+function showWinner(room,st){const w=st.winner;if(!isDisplay())setTimeout(()=>playWinner(room,st),50);
   openModal('🏆 MATCH WINNER',`<div class="coin" style="color:var(--amber)">${esc(sideName(room,w))}</div><p style="text-align:center;margin:0">${sideTag(room,w)} ชนะ <span class="num">${legsStr(st)}</span></p>${room.tour?'<p class="muted small" style="text-align:center;margin:0">อัปเดตผังทัวร์นาเมนต์ให้อัตโนมัติแล้ว</p>':''}`,
    [{label:'ปิด'},...(room.tour?[{label:'ไปที่ผังการแข่งขัน',cls:'pri',fn:()=>{S.ui.tourId=room.tour.tid;save();go('tournament')}}]:[{label:'รีแมตช์',cls:'pri',fn:()=>rematch(room.id)}])])}
 let camDevices=[],camId='',camMirror=false,camReticle=true;
@@ -1085,7 +1134,7 @@ VIEWS.match=()=>{const room=curRoom();
   const center=`<div class="panel center">
     ${st.finished?`<div class="banner" style="justify-content:center"><b>🏆 จบการแข่งขัน · ${esc(sideName(room,st.winner))} ชนะ ${legsStr(st,'-')}</b></div>`:
      st.needBull?`<div class="banner"><b>ช่วงปิดเกมครบ ${room.roundLimit} รอบ · ต้องดวล Sudden Death</b><button class="btn pri" onclick="bullOffModal(curRoom())">ตัดสิน Bull-off</button></div>`:
-     `<div class="row" style="justify-content:space-between"><div><span class="muted small">LEG ${st.leg}/${room.bestOf} · รอบ ${st.round} · ตาของ</span>${st.finStage&&room.roundLimit?` <span class="pill" style="color:${st.finRounds>=room.roundLimit-2?'var(--red)':'var(--amber)'}" title="เริ่มนับเมื่อทั้งสองฝ่ายเหลือ ${SDT(room)} แต้มหรือน้อยกว่า">รอบปิดเกม ${st.finRounds}/${room.roundLimit}</span>`:''}<h2>${esc(curName)}</h2></div><div class="row">${st.legFresh?`<button class="btn sm pri" onclick="tossModal(curRoom())">🎰 สุ่มผู้เริ่มก่อน</button>`:''}</div></div>
+     `<div class="row" style="justify-content:space-between"><div><span class="muted small">LEG ${st.leg}/${room.bestOf} · รอบ ${st.round}</span>${st.finStage&&room.roundLimit?` <span class="pill" style="color:${st.finRounds>=room.roundLimit-2?'var(--red)':'var(--amber)'}" title="เริ่มนับเมื่อทั้งสองฝ่ายเหลือ ${SDT(room)} แต้มหรือน้อยกว่า">รอบปิดเกม ${st.finRounds}/${room.roundLimit}</span>`:''}<div class="turn-now">${P(st.thrower(side))?av(P(st.thrower(side))):''}<div><small>ตาของ</small><h2>${esc(curName)}</h2></div></div></div><div class="row">${st.legFresh?`<button class="btn sm pri" onclick="tossModal(curRoom())">🎰 สุ่มผู้เริ่มก่อน</button>`:''}</div></div>
     <div class="slots">${[0,1,2].map(k=>`<div class="slot ${pend[k]?'f':k===pend.length&&!st.finished?'nx':''}"><small>ลูก ${k+1}</small><b>${pend[k]?dLabel(pend[k]):'–'}</b><small>${pend[k]?pend[k].v+' แต้ม':''}</small></div>`).join('')}</div>
     <div class="preview"><span>รอบนี้ <span class="tot">${ev.bust?0:sum}</span></span>${ev.bust?'<span class="bust">BUST</span>':ev.fin?'<span class="fin">GAME SHOT!</span>':''}<span class="muted">เหลือ <b class="num" style="color:var(--chalk)">${after}</b></span></div>${statusLine(ev,before,after,sum,room.out)}
     <div class="subtabs">${[['board','🎯 กดบนเป้า'],['pad','ปุ่มตัวเลข'],['quick','กรอกยอดรวม'],['cam','📷 กล้อง / VAR'],['dual','จอคู่ (เป้า+กล้อง)']].map(([k,l])=>`<button class="btn sm ${inputMode===k?'on':''}" onclick="inputMode='${k}';render()">${l}</button>`).join('')}</div>
@@ -1103,7 +1152,14 @@ VIEWS.match=()=>{const room=curRoom();
   </div>`;
   return `${displayOfferHTML()}<div class="score-top"><div style="min-width:0"><div class="row"><span class="code mono muted">${room.code}</span>${statusPill(roomStatus(room))}<span class="pill" style="color:var(--muted)">BEST OF ${room.bestOf}</span>${!st.finished?`<span class="pill" style="color:var(--amber)">LEG ${st.leg} / ${room.bestOf}</span>`:''}</div><h1>${esc(room.name)}</h1><div class="muted small">${room.score} · ${OUT_LABEL[room.out]} · ${modeLabel(room)}${room.roundLimit?' · Sudden Death: ทุกฝ่ายเหลือ ≤'+SDT(room)+' แล้วปาครบ '+room.roundLimit+' รอบ':''}</div></div>
     ${NS(room)===2?`<div class="legs-box"><span>HOME</span><span class="big">${st.legsWon[0]}</span><span class="muted">:</span><span class="big">${st.legsWon[1]}</span><span>AWAY</span></div>`:`<div class="legs-box">${st.legsWon.map((l,i)=>`<span class="lb-i"><small style="color:${SIDE_COL[i%8]}">P${i+1}</small><span class="big">${l}</span></span>`).join('<span class="muted">·</span>')}</div>`}
-    <div class="row"><button class="btn sm pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn sm ${displayWin&&!displayWin.closed?'on':''}" onclick="openDisplay()" title="เปิดจอแสดงผลสำหรับผู้ชม (จอที่สอง)">🖥️ จอผู้ชม</button><button class="btn sm" onclick="introModal(curRoom())">⚔️ Face-off</button>${room.sides.some(x=>x.playerIds.length>1)||room.type==='team'?`<button class="btn sm" onclick="orderModal(curRoom())">จัดลำดับการปา</button>`:''}<button class="btn sm" onclick="bullOffModal(curRoom())" ${st.finished?'disabled':''}>Sudden Death</button><button class="btn sm" onclick="refModal(curRoom())" title="${canRef()?'':'ต้องเป็นกรรมการหรือแอดมิน'}">🧑‍⚖️ กรรมการ</button><button class="btn sm" onclick="undo()">↶ Undo</button><button class="btn sm ${soundOn?'on':''}" onclick="toggleSound()" title="เสียงเอฟเฟกต์">${soundOn?'🔊':'🔇'}</button><button class="btn sm ${callerOn?'on':''}" onclick="toggleCaller()" title="ผู้ประกาศคะแนนแบบ PDC">🗣️ Caller</button><button class="btn sm" onclick="S.ui.roomId=null;save();render()">เปลี่ยนห้อง</button></div></div>
+    <div class="row tool-row"><button class="btn pri" onclick="setFs(true)">⛶ เป้าเต็มจอ</button><button class="btn ${displayWin&&!displayWin.closed?'on':''}" onclick="openDisplay()" title="เปิดจอแสดงผลสำหรับผู้ชม (จอที่สอง)">🖥️ จอผู้ชม</button><button class="btn" onclick="undo()">↶ Undo</button><button class="btn ${soundOn?'on':''}" onclick="toggleSound()" title="เปิด/ปิดเสียง" aria-label="เสียง">${soundOn?'🔊':'🔇'}</button>
+      <details class="tools"><summary class="btn">⋯ เครื่องมือ</summary><div class="tools-menu">
+        <button onclick="this.closest('details').open=false;introModal(curRoom())">⚔️ Face-off / เลือกคนเริ่ม</button>
+        ${room.sides.some(x=>x.playerIds.length>1)||room.type==='team'?`<button onclick="this.closest('details').open=false;orderModal(curRoom())">🔢 จัดลำดับการปา</button>`:''}
+        <button onclick="this.closest('details').open=false;bullOffModal(curRoom())" ${st.finished?'disabled':''}>🎯 Sudden Death (ดวล Bull)</button>
+        <button onclick="this.closest('details').open=false;refModal(curRoom())">🧑‍⚖️ กรรมการแก้คะแนน${canRef()?'':' (เฉพาะกรรมการ)'}</button>
+        <button onclick="toggleCaller()">🗣️ ผู้ประกาศคะแนน: ${callerOn?'เปิด':'ปิด'}</button>
+        <button onclick="S.ui.roomId=null;save();render()">🔁 เปลี่ยนห้อง</button></div></details></div></div>
   ${NS(room)===2?`<div class="arena">${sidePanel(0)}${center}${sidePanel(1)}</div>`:`<div class="multi-sides n${NS(room)}">${room.sides.map((x,i)=>sidePanel(i)).join('')}</div><div class="arena-one">${center}</div>`}
   <div class="panel"><div class="panel-h"><h2>บันทึกเทิร์น (Match Log)</h2><span class="muted small">${roomTurns.length} เทิร์น · ผู้ใช้งาน: ${esc(me()?.name||'ไม่ระบุ')}</span></div><div class="log">${logH||'<span class="muted">ยังไม่มีการปา</span>'}</div></div>`};
 AFTER.match=()=>{postLive();pushRoomLive();kbShow();const room=curRoom();if(!room)return;
@@ -1454,7 +1510,19 @@ function playWinner(room,st){const w=st.winner;const ov=document.createElement('
   let bits=Array.from({length:matchMedia('(prefers-reduced-motion: reduce)').matches?0:180},()=>({x:Math.random()*W,y:-Math.random()*H,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,col:cols[Math.floor(Math.random()*cols.length)],s:6+Math.random()*6}));
   let alive=true,f=0;ov.onclick=()=>{alive=false;ov.remove()};
   const loop=()=>{if(!alive)return;f++;c.clearRect(0,0,W,H);bits.forEach(b=>{b.x+=b.vx;b.y+=b.vy;b.r+=b.vr;if(b.y>H)b.y=-10;c.save();c.translate(b.x,b.y);c.rotate(b.r);c.fillStyle=b.col;c.fillRect(-b.s/2,-b.s/4,b.s,b.s/2);c.restore()});if(f<600)requestAnimationFrame(loop);else{alive=false;ov.remove()}};loop()}
-function playLegWin(room,le){SFX.checkout();setTimeout(()=>say('Game shot!'),250);const d=document.createElement('div');d.className='dsp-splash';
+function legWinFx(room,le,st,onDone){const w=le.winner;const ev=room.events[le.idx];const N=NS(room);
+  const co=ev&&ev.t==='turn'?`ปิดด้วย ${ev.darts?ev.darts.slice(0,ev.k??3).map(dLabel).join(' · '):''} <b>(${ev.total})</b>`:le.how==='bull'?'ชนะการดวล Sudden Death':'';
+  const ov=document.createElement('div');ov.className='lw';ov.setAttribute('role','status');
+  ov.innerHTML=`<canvas></canvas><div class="lw-in"><div class="lw-leg">LEG ${le.leg} · ${room.bestOf>1?'BEST OF '+room.bestOf:'FINAL'}</div>${sideFace(room,w)}<div class="lw-shot">${le.how==='bull'?'SUDDEN DEATH!':'GAME SHOT!'}</div><div class="lw-co">${co}</div>
+    <div class="lw-legs">${st.legsWon.map((l,i)=>`<span class="${i===w?'w':''}"><small>${esc(N===2?(i?'AWAY':'HOME'):'P'+(i+1))}</small><b>${l}</b></span>`).join('<i>:</i>')}</div><small class="muted">แตะเพื่อไปต่อ</small></div>`;
+  document.body.appendChild(ov);SFX.legwin();setTimeout(()=>say(le.how==='bull'?'Closest to the bull. Leg to '+sideNameAscii(room,w):'Game shot, and the leg!'),350);
+  const cv=ov.querySelector('canvas'),c=cv.getContext('2d');const W=cv.width=innerWidth,H=cv.height=innerHeight;let parts=[];const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const burst=(x,y)=>{const col=['#f2b134','#2f9d62','#4c9be0','#ffffff','#d64a3d'];for(let i=0;i<80;i++){const a=Math.random()*6.283,sp=2+Math.random()*6;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,l:50+Math.random()*30,col:col[i%5]})}};
+  if(!reduce){burst(W*.25,H*.35);setTimeout(()=>burst(W*.75,H*.35),250);setTimeout(()=>burst(W*.5,H*.2),500)}
+  let alive=true,f=0;const close=()=>{if(!alive)return;alive=false;ov.classList.add('out');setTimeout(()=>{ov.remove();onDone&&onDone()},350)};ov.onclick=close;
+  const loop=()=>{if(!alive)return;f++;c.clearRect(0,0,W,H);parts=parts.filter(p=>p.l-->0);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.09;c.globalAlpha=Math.max(0,p.l/80);c.fillStyle=p.col;c.fillRect(p.x,p.y,4,4)});requestAnimationFrame(loop)};loop();
+  setTimeout(close,isDisplay()?4200:3200)}
+function playLegWin(room,le){legWinFx(room,le,replay(room));return;SFX.checkout();setTimeout(()=>say('Game shot!'),250);const d=document.createElement('div');d.className='dsp-splash';
   const t=room.sides[le.winner].teamId&&T(room.sides[le.winner].teamId);d.innerHTML=`<small>จบ LEG ${le.leg}</small>${t?teamLogo(t,64):''}<b>${esc(sideName(room,le.winner))}</b><span>${le.how==='bull'?'ชนะ Sudden Death':'GAME SHOT!'}</span>`;document.body.appendChild(d);setTimeout(()=>d.remove(),3800)}
 
 function dispSplash(text){const d=document.createElement('div');d.className='dsp-splash';d.textContent=text;document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}
